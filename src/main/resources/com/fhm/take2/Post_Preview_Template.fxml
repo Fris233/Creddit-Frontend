@@ -68,7 +68,7 @@
                   </Label>
                </children>
             </AnchorPane>
-            <AnchorPane>
+            <AnchorPane fx:id="mediaAnchor">
                <children>
                   <ImageView fx:id="previewMedia" fitHeight="377.0" fitWidth="780.0" onMouseClicked="#OpenPost" pickOnBounds="true" preserveRatio="true" />
                </children>
@@ -173,6 +173,9 @@
                </children>
             </AnchorPane>
          </children>
+         <padding>
+            <Insets top="10.0" />
+         </padding>
       </VBox>
    </children>
    <cursor>

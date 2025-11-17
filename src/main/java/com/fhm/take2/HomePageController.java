@@ -1,7 +1,11 @@
 package com.fhm.take2;
 
+import com.Client;
+import com.crdt.Post;
+import com.crdt.User;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -14,6 +18,8 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
+import java.util.ArrayList;
+
 public class HomePageController {
 
     @FXML private AnchorPane loggedInPane;
@@ -24,6 +30,33 @@ public class HomePageController {
     @FXML private ScrollPane scrollPane1;
     @FXML private TextField searchField;
     @FXML private ImageView userPFP;
+
+    private User currentUser;
+
+    public void InitData(User user) {
+        currentUser = user;
+        if(currentUser != null) {
+            loggedOutPane.setDisable(true);
+            loggedOutPane.setVisible(false);
+            loggedInPane.setDisable(false);
+            loggedInPane.setVisible(true);
+        }
+        try {
+            ArrayList<Post> postFeed = Client.GetPostFeed(currentUser, 0);
+            for (Post post : postFeed) {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("Post_Preview_Template.fxml"));
+                Node postNode = loader.load();
+
+                PostPreviewTemplateController controller = loader.getController();
+                controller.init(post);
+
+                postsContainer.getChildren().add(postNode);
+            }
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     @FXML
     void Chat(MouseEvent event) {
@@ -50,8 +83,8 @@ public class HomePageController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("create-post-page.fxml"));
             Parent root = loader.load();
 
-            //CreatePostPageController createPostPageController = loader.getController();
-            //createPostPageController.InitData(currentUser);
+            CreatePostPageController createPostPageController = loader.getController();
+            createPostPageController.InitData(currentUser);
 
             // Create the second scene
             Scene scene2 = new Scene(root);
@@ -74,11 +107,20 @@ public class HomePageController {
 
     @FXML
     void Login(MouseEvent event) {
-        System.out.println("Login Button Pressed");
-        loggedOutPane.setDisable(true);
-        loggedOutPane.setVisible(false);
-        loggedInPane.setDisable(false);
-        loggedInPane.setVisible(true);
+        try {
+            System.out.println("Login Button Pressed");
+            User user = Client.login("Mohamed", "FuckingMohamedAshraf");
+            if(user != null) {
+                this.currentUser = user;
+                loggedOutPane.setDisable(true);
+                loggedOutPane.setVisible(false);
+                loggedInPane.setDisable(false);
+                loggedInPane.setVisible(true);
+            }
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
         event.consume();
     }
 

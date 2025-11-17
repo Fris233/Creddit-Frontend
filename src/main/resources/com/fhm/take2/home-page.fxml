@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import java.net.URL?>
+<?import javafx.geometry.Insets?>
 <?import javafx.geometry.Point3D?>
 <?import javafx.scene.Cursor?>
 <?import javafx.scene.control.Button?>
@@ -20,7 +21,10 @@
    <children>
       <ScrollPane fx:id="scrollPane" layoutX="351.0" layoutY="83.0" prefHeight="817.0" prefWidth="813.0" style="-fx-background-color: #0E1113;" stylesheets="@CredditCSS.css">
          <content>
-            <VBox fx:id="postsContainer" minHeight="815.0" prefWidth="811.0" spacing="5.0" style="-fx-background-color: #0E1113;" />
+            <VBox fx:id="postsContainer" minHeight="815.0" prefWidth="811.0" spacing="10.0" style="-fx-background-color: #0E1113;">
+               <padding>
+                  <Insets top="20.0" />
+               </padding></VBox>
          </content>
       </ScrollPane>
       <AnchorPane layoutY="83.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="818.0" prefWidth="276.0" style="-fx-background-color: #0E1113; -fx-border-color: gray;" stylesheets="@CredditCSS.css">
@@ -199,7 +203,10 @@
             </Label>
             <ScrollPane fx:id="scrollPane1" layoutX="3.0" layoutY="46.0" prefHeight="770.0" prefWidth="346.0" style="-fx-background-color: #0E1113;" stylesheets="@CredditCSS.css">
                <content>
-                  <VBox fx:id="recentPostsContainer" minHeight="768.0" prefWidth="344.0" spacing="30.0" style="-fx-background-color: #0E1113;" />
+                  <VBox fx:id="recentPostsContainer" minHeight="768.0" prefWidth="344.0" spacing="30.0" style="-fx-background-color: #0E1113;">
+                     <padding>
+                        <Insets top="10.0" />
+                     </padding></VBox>
                </content>
             </ScrollPane>
          </children>

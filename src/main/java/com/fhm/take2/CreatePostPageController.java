@@ -4,6 +4,7 @@ import com.Client;
 import com.crdt.Media;
 import com.crdt.MediaType;
 import com.crdt.Post;
+import com.crdt.User;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.fxml.FXML;
@@ -42,12 +43,12 @@ public class CreatePostPageController {
     @FXML private ImageView userPFP;
 
     private ArrayList<File> selectedFiles;
-
+    private User currentUser;
     private BooleanProperty validPostInfo = new SimpleBooleanProperty(false);
 
-    @FXML
-    public void initialize() {
+    public void InitData(User user) {
         selectedFiles = new ArrayList<>();
+        currentUser = user;
 
         contentArea.setWrapText(true);
 
@@ -114,8 +115,8 @@ public class CreatePostPageController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("home-page.fxml"));
             Parent root = loader.load();
 
-            //HomePageController homePageController = loader.getController();
-            //homePageController.InitData(currentUser);
+            HomePageController homePageController = loader.getController();
+            homePageController.InitData(currentUser);
 
             // Create the second scene
             Scene scene2 = new Scene(root);
@@ -148,7 +149,7 @@ public class CreatePostPageController {
 
         System.out.println("Post Button Pressed!");
 
-        if(!Client.isServerReachable(System.getenv("Base_URL"))) {
+        if(!Client.isServerReachable()) {
             new Alert(Alert.AlertType.ERROR, "Server unreachable! Check your connection and try again!").showAndWait();
             return;
         }
@@ -183,7 +184,7 @@ public class CreatePostPageController {
             }
 
             // Now send post JSON
-            Post post = new Post(1, Client.GetUser(1), null, title, content, null, null, null, null, 0);
+            Post post = new Post(1, Client.GetUser(1), null, title, content, null, null, null, null, 0, 0);
             String jsonBody = Client.GetJSON(post);
 
             URL url = new URL(System.getenv("Base_URL") + "/post/create");
@@ -216,7 +217,7 @@ public class CreatePostPageController {
     }
 
     private String uploadFile(File file) throws Exception {
-        if(!Client.isServerReachable(System.getenv("Base_URL")))
+        if(!Client.isServerReachable())
             return null;
         String boundary = "----Boundary" + System.currentTimeMillis();
         URL url = new URL(System.getenv("Base_URL") + "/upload");

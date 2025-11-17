@@ -15,7 +15,7 @@ public class User implements Reportable {
     protected boolean active;
 
     public User(int id, String username, String email, String password, Gender gender, String bio, Media pfp, Timestamp timeCreated, boolean active) {
-        if (id <= 0)
+        if (id < 0)
             return;
         if (username == null || username.isEmpty() || username.length() > 32)
             return;
