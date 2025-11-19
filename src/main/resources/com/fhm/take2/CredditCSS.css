@@ -1,0 +1,32 @@
+.button {
+    -fx-background-color: #0E1113; /* normal state color */
+    -fx-background-radius: 10; /* Some roundness to the button */
+}
+
+.button:hover {
+    -fx-background-color: #404040; /* hover color */
+    -fx-cursor: hand; /* hand cursor on hover */
+}
+
+.text-field {
+    -fx-background-color: transparent;
+    -fx-text-fill: white;
+}
+
+.text-area {
+    -fx-background-color: transparent;
+    -fx-text-fill: white;
+}
+
+.text-area .scroll-pane {
+    -fx-background-color: transparent;
+}
+
+.text-area .scroll-pane .viewport {
+    -fx-background-color: transparent;
+}
+
+.text-area .content {
+    -fx-background-color: transparent;
+    -fx-text-fill: white;
+}
