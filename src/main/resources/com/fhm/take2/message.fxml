@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox prefHeight="414.0" prefWidth="407.0" style="-fx-background-color: #1E1E1E;" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.fhm.take2.MessageController">
+
+    <!-- Messages Display Area -->
+    <ScrollPane fx:id="scrollPane" style="-fx-background: #1E1E1E; -fx-border-color: #1E1E1E;" VBox.vgrow="ALWAYS">
+        <VBox fx:id="messagesContainer" style="-fx-background-color: #1E1E1E;" />
+    </ScrollPane>
+
+    <!-- Input Area -->
+    <HBox spacing="10" style="-fx-background-color: #2D2D2D; -fx-padding: 10;">
+        <TextField fx:id="messageInput" promptText="Type your message here..." HBox.hgrow="ALWAYS" />
+
+        <Button fx:id="sendButton" onAction="#sendMessage" text="Send" />
+    </HBox>
+
+    <padding>
+        <Insets bottom="10" left="10" right="10" top="10" />
+    </padding>
+
+    <spacing>10</spacing>
+</VBox>
