@@ -18,6 +18,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class HomePageController {
@@ -140,6 +141,21 @@ public class HomePageController {
     void SearchPressed(KeyEvent event) {
         System.out.println("Search Pressed");
         event.consume();
+    }
+
+    @FXML
+    private void openMessageWindow() {
+        try {
+            Parent root = FXMLLoader.load(getClass().getResource("message.fxml"));
+            Stage stage = new Stage();
+            stage.setTitle("Messaging App");
+            stage.setScene(new Scene(root, 800, 600));
+            stage.setMinWidth(600);
+            stage.setMinHeight(400);
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 }

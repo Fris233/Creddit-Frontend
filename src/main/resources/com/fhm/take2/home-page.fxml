@@ -61,6 +61,24 @@
                   </AnchorPane>
               </content>
             </ScrollPane>
+             <ScrollPane layoutX="6.0" layoutY="352.0" nodeOrientation="LEFT_TO_RIGHT" prefHeight="90.0" prefWidth="262.0" style="-fx-background-color: #0E1113;" stylesheets="@CredditCSS.css">
+              <content>
+                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="114.0" prefWidth="247.0" style="-fx-background-color: #0E1113;">
+                     <children>
+                        <AnchorPane layoutX="-1.0" prefHeight="52.0" prefWidth="262.0">
+                           <children>
+                              <Button contentDisplay="RIGHT" layoutX="-6.0" mnemonicParsing="false" onMouseClicked="#openMessageWindow" prefHeight="52.0" prefWidth="262.0" style="-fx-text-fill: #ffffff;" text="Messages" textFill="#c6151500" />
+                              <ImageView fitHeight="40.0" fitWidth="44.0" layoutX="30.0" layoutY="6.0" mouseTransparent="true" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@assets/message.png" />
+                                 </image>
+                              </ImageView>
+                           </children>
+                        </AnchorPane>
+                     </children>
+                  </AnchorPane>
+              </content>
+            </ScrollPane>
             <AnchorPane layoutX="14.0" layoutY="736.0">
                <children>
                   <Button layoutX="-7.0" mnemonicParsing="false" onMouseClicked="#CheckRules" prefHeight="52.0" prefWidth="262.0" style="-fx-text-fill: #ffffff;" text="Creddit Rules" textFill="#c6151500">
