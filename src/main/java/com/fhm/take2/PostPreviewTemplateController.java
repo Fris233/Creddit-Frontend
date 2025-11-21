@@ -6,6 +6,7 @@ import com.crdt.User;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
@@ -23,6 +24,7 @@ public class PostPreviewTemplateController {
     @FXML private Label modLabel;
     @FXML private ImageView previewMedia;
     @FXML private AnchorPane mediaAnchor;
+    @FXML private AnchorPane voteAnchor;
     @FXML private Label subName;
     @FXML private ImageView subPFP;
     @FXML private Label timeLabel;
@@ -33,28 +35,22 @@ public class PostPreviewTemplateController {
 
     private Post post;
     private User currentUser;
-    private int myVote = 0;
+    private int myOGVote;
+    private int myVote;
 
     public void init(Post post, User user) {
         this.post = post;
         this.currentUser = user;
+        myOGVote = 0;
         if(user != null) {
             try {
-                myVote = Client.CheckVote(currentUser, post);
+                myOGVote = Client.CheckVote(currentUser, post);
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            switch (myVote) {
-                case 1:
-                    //Has Upvoted
-                    break;
-                case -1:
-                    //Has Downvoted
-                    break;
-                default:
-                    break;
-            }
         }
+        myVote = myOGVote;
+        ColorVote();
         subName.setText(post.GetSubcreddit() != null? "cr/" + post.GetSubcreddit().GetSubName() : "u/" + post.GetAuthor().getUsername());
         timeLabel.setText(timeAgo(post.GetTimeCreated()));
         titleLabel.setText(post.GetTitle());
@@ -97,6 +93,26 @@ public class PostPreviewTemplateController {
         return years + (years == 1? " year ago" : " years ago");
     }
 
+    private void ColorVote() {
+        switch (myVote) {
+            case 1:
+                voteAnchor.setStyle("-fx-background-color: #d93900; -fx-background-radius: 25;");
+                upvoteButton.setImage(new Image(String.valueOf(this.getClass().getResource("assets/vote_arrow_fill.png"))));
+                downvoteButton.setImage(new Image(String.valueOf(this.getClass().getResource("assets/vote_arrow.png"))));
+                break;
+            case -1:
+                voteAnchor.setStyle("-fx-background-color: #6a5cff; -fx-background-radius: 25;");
+                upvoteButton.setImage(new Image(String.valueOf(this.getClass().getResource("assets/vote_arrow.png"))));
+                downvoteButton.setImage(new Image(String.valueOf(this.getClass().getResource("assets/vote_arrow_fill.png"))));
+                break;
+            default:
+                voteAnchor.setStyle("-fx-background-color: black; -fx-background-radius: 25;");
+                upvoteButton.setImage(new Image(String.valueOf(this.getClass().getResource("assets/vote_arrow.png"))));
+                downvoteButton.setImage(new Image(String.valueOf(this.getClass().getResource("assets/vote_arrow.png"))));
+                break;
+        }
+    }
+
     @FXML
     void Upvote(MouseEvent event) {
         if(currentUser == null) {
@@ -106,9 +122,10 @@ public class PostPreviewTemplateController {
         }
         System.out.println("Upvote Pressed!");
         try {
-            if(Client.Vote(currentUser, post, myVote != 1? 1 : 0)) {
-                myVote = 1;
-                votesLabel.setText(String.valueOf(Integer.parseInt(votesLabel.getText()) + 1));
+            myVote = myVote != 1? 1 : 0;
+            if(Client.Vote(currentUser, post, myVote)) {
+                votesLabel.setText(String.valueOf(post.GetVotes() + (myVote - myOGVote)));
+                ColorVote();
             }
         }
         catch (Exception e) {
@@ -124,8 +141,10 @@ public class PostPreviewTemplateController {
             return;
         }
         try {
-            if(Client.Vote(currentUser, post, myVote != -1? -1 : 0)) {
-                votesLabel.setText(String.valueOf(Integer.parseInt(votesLabel.getText()) - 1));
+            myVote = myVote != -1? -1 : 0;
+            if(Client.Vote(currentUser, post, myVote)) {
+                votesLabel.setText(String.valueOf(post.GetVotes() + (myVote - myOGVote)));
+                ColorVote();
             }
         }
         catch (Exception e) {
