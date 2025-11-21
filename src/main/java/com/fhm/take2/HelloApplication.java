@@ -12,7 +12,12 @@ import java.io.IOException;
 public class HelloApplication extends Application {
     @Override
     public void start(Stage stage) throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("home-page.fxml"));
+        String page = "home-page.fxml";
+        if(!Client.isServerReachable()) {
+            System.out.println("Server Unreachable!");
+            //page = ""; // should have a no connection and retry page
+        }
+        FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource(page));
         Scene scene = new Scene(fxmlLoader.load(), 1600, 900);
         HomePageController homePageController = fxmlLoader.getController();
         homePageController.InitData(null);
