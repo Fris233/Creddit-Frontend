@@ -20,7 +20,7 @@ public class HelloApplication extends Application {
         FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource(page));
         Scene scene = new Scene(fxmlLoader.load(), 1600, 900);
         HomePageController homePageController = fxmlLoader.getController();
-        homePageController.InitData(null);
+        homePageController.InitData(null, null);
         stage.setTitle("CREDDIT");
         stage.setScene(scene);
         stage.show();

@@ -116,7 +116,7 @@ public class CreatePostPageController {
             Parent root = loader.load();
 
             HomePageController homePageController = loader.getController();
-            homePageController.InitData(currentUser);
+            homePageController.InitData(currentUser, null);
 
             // Create the second scene
             Scene scene2 = new Scene(root);

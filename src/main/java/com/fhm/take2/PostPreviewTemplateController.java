@@ -1,6 +1,8 @@
 package com.fhm.take2;
 
+import com.Client;
 import com.crdt.Post;
+import com.crdt.User;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -30,17 +32,39 @@ public class PostPreviewTemplateController {
     @FXML private Label commentsLabel;
 
     private Post post;
+    private User currentUser;
+    private int myVote = 0;
 
-    public void init(Post post) {
+    public void init(Post post, User user) {
         this.post = post;
+        this.currentUser = user;
+        if(user != null) {
+            try {
+                myVote = Client.CheckVote(currentUser, post);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            switch (myVote) {
+                case 1:
+                    //Has Upvoted
+                    break;
+                case -1:
+                    //Has Downvoted
+                    break;
+                default:
+                    break;
+            }
+        }
         subName.setText(post.GetSubcreddit() != null? "cr/" + post.GetSubcreddit().GetSubName() : "u/" + post.GetAuthor().getUsername());
         timeLabel.setText(timeAgo(post.GetTimeCreated()));
         titleLabel.setText(post.GetTitle());
         votesLabel.setText(String.valueOf(post.GetVotes()));
         commentsLabel.setText(String.valueOf(post.GetComments()));
-        if(post.GetMedia() == null || post.GetMedia().isEmpty()) {
-            System.out.println("Deleting media anchor pane");
+        if(post.GetMedia() == null || post.GetMedia().isEmpty())
             ((Pane)mediaAnchor.getParent()).getChildren().remove(mediaAnchor);
+        if(post.GetSubcreddit() == null) {
+            JoinButton.setDisable(true);
+            JoinButton.setVisible(false);
         }
     }
 
@@ -75,17 +99,49 @@ public class PostPreviewTemplateController {
 
     @FXML
     void Upvote(MouseEvent event) {
+        if(currentUser == null) {
+            System.out.println("Not logged in!");
+            event.consume();
+            return;
+        }
         System.out.println("Upvote Pressed!");
+        try {
+            if(Client.Vote(currentUser, post, myVote != 1? 1 : 0)) {
+                myVote = 1;
+                votesLabel.setText(String.valueOf(Integer.parseInt(votesLabel.getText()) + 1));
+            }
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
         event.consume();
     }
     @FXML
     void Downvote(MouseEvent event) {
+        if(currentUser == null) {
+            System.out.println("Not logged in!");
+            event.consume();
+            return;
+        }
+        try {
+            if(Client.Vote(currentUser, post, myVote != -1? -1 : 0)) {
+                votesLabel.setText(String.valueOf(Integer.parseInt(votesLabel.getText()) - 1));
+            }
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
         System.out.println("Downvote Pressed!");
         event.consume();
     }
 
     @FXML
     void JoinSubcreddit(MouseEvent event) {
+        if(currentUser == null) {
+            System.out.println("Not logged in!");
+            event.consume();
+            return;
+        }
         System.out.println("Join Subcreddit Pressed!");
         event.consume();
     }

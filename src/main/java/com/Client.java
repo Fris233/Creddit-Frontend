@@ -95,6 +95,60 @@ public abstract class Client {
         return user;
     }
 
+    public static int CheckVote(User user, Post post) throws Exception {
+        JsonObject json = new JsonObject();
+        json.add("user", gson.toJsonTree(user));
+        json.add("post", gson.toJsonTree(post));
+
+        String jsonBody = gson.toJson(json);
+
+        URL url = new URL(BASE_URL + "/user/checkvote");
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("POST");
+        conn.setDoOutput(true);
+        conn.setRequestProperty("Content-Type", "application/json");
+
+        try (OutputStream os = conn.getOutputStream()) {
+            os.write(jsonBody.getBytes());
+        }
+
+        BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+        StringBuilder sb = new StringBuilder();
+        String line;
+        while ((line = reader.readLine()) != null) sb.append(line);
+        reader.close();
+
+        return gson.fromJson(sb.toString(), int.class);
+    }
+
+    public static boolean Vote(User user, Post post, int value) throws Exception {
+        JsonObject json = new JsonObject();
+        json.add("user", gson.toJsonTree(user));
+        json.add("post", gson.toJsonTree(post));
+        json.addProperty("value", gson.toJson(value));
+
+        String jsonBody = gson.toJson(json);
+
+        URL url = new URL(BASE_URL + "/post/vote");
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("POST");
+        conn.setDoOutput(true);
+        conn.setRequestProperty("Content-Type", "application/json");
+
+        try (OutputStream os = conn.getOutputStream()) {
+            os.write(jsonBody.getBytes());
+        }
+
+        BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+        StringBuilder sb = new StringBuilder();
+        String line;
+        while ((line = reader.readLine()) != null) sb.append(line);
+        reader.close();
+
+        Map<?,?> map = gson.fromJson(sb.toString(), Map.class);
+        return map.get("status").equals("ok");
+    }
+
     public static ArrayList<Post> GetPostFeed(User user, int lastID) throws Exception {
         JsonObject json = new JsonObject();
         json.add("user", gson.toJsonTree(user));

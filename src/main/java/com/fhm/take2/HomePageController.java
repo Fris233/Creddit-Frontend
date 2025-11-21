@@ -34,8 +34,9 @@ public class HomePageController {
 
     private User currentUser;
 
-    public void InitData(User user) {
+    public void InitData(User user, String searchPrompt) {
         currentUser = user;
+        this.searchField.setText(searchPrompt);
         if(currentUser != null) {
             loggedOutPane.setDisable(true);
             loggedOutPane.setVisible(false);
@@ -49,7 +50,7 @@ public class HomePageController {
                 Node postNode = loader.load();
 
                 PostPreviewTemplateController controller = loader.getController();
-                controller.init(post);
+                controller.init(post, user);
 
                 postsContainer.getChildren().add(postNode);
             }
@@ -113,10 +114,7 @@ public class HomePageController {
             User user = Client.login("Mohamed", "FuckingMohamedAshraf");
             if(user != null) {
                 this.currentUser = user;
-                loggedOutPane.setDisable(true);
-                loggedOutPane.setVisible(false);
-                loggedInPane.setDisable(false);
-                loggedInPane.setVisible(true);
+                Refresh(null);
             }
         }
         catch (Exception e) {
@@ -134,7 +132,25 @@ public class HomePageController {
     @FXML
     void Refresh(MouseEvent event) {
         System.out.println("Dashboard Button Pressed");
-        event.consume();
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("home-page.fxml"));
+            Parent root = loader.load();
+
+            HomePageController homePageController = loader.getController();
+            homePageController.InitData(currentUser, searchField.getText());
+
+            // Create the second scene
+            Scene scene2 = new Scene(root);
+            // Get the current stage
+            Stage stage = (Stage)postsContainer.getScene().getWindow();
+            // Set the new scene
+            stage.setScene(scene2);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+        if(event != null)
+            event.consume();
     }
 
     @FXML
