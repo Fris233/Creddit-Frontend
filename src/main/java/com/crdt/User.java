@@ -1,7 +1,16 @@
 package com.crdt;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Map;
 
 public class User implements Reportable {
     protected int id;
@@ -40,8 +49,19 @@ public class User implements Reportable {
     public void register() {
     }
 
-    public static User login(String s, String p) {
-        return null;
+    public static User login(String usermail, String password, String BASE_URL, Gson gson) throws Exception {
+        URL url = new URL(BASE_URL + String.format("/user/login?usermail=%s&password=%s", java.net.URLEncoder.encode(usermail, "UTF-8"), java.net.URLEncoder.encode(password, "UTF-8")));
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("GET");
+
+        BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+        StringBuilder sb = new StringBuilder();
+        String line;
+        while ((line = reader.readLine()) != null) sb.append(line);
+        reader.close();
+
+        User user = gson.fromJson(sb.toString(), User.class);
+        return user;
     }
 
     public void update() {
@@ -68,6 +88,60 @@ public class User implements Reportable {
     }
 
     public void savePost(Post post) {
+    }
+
+    public boolean Vote(Post post, int value, String BASE_URL, Gson gson) throws Exception {
+        JsonObject json = new JsonObject();
+        json.add("user", gson.toJsonTree(this));
+        json.add("post", gson.toJsonTree(post));
+        json.addProperty("value", gson.toJson(value));
+
+        String jsonBody = gson.toJson(json);
+
+        URL url = new URL(BASE_URL + "/post/vote");
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("POST");
+        conn.setDoOutput(true);
+        conn.setRequestProperty("Content-Type", "application/json");
+
+        try (OutputStream os = conn.getOutputStream()) {
+            os.write(jsonBody.getBytes());
+        }
+
+        BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+        StringBuilder sb = new StringBuilder();
+        String line;
+        while ((line = reader.readLine()) != null) sb.append(line);
+        reader.close();
+
+        Map<?,?> map = gson.fromJson(sb.toString(), Map.class);
+        return map.get("status").equals("ok");
+    }
+
+    public int CheckVote(Post post, String BASE_URL, Gson gson) throws Exception {
+        JsonObject json = new JsonObject();
+        json.add("user", gson.toJsonTree(this));
+        json.add("post", gson.toJsonTree(post));
+
+        String jsonBody = gson.toJson(json);
+
+        URL url = new URL(BASE_URL + "/user/checkvote");
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("POST");
+        conn.setDoOutput(true);
+        conn.setRequestProperty("Content-Type", "application/json");
+
+        try (OutputStream os = conn.getOutputStream()) {
+            os.write(jsonBody.getBytes());
+        }
+
+        BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+        StringBuilder sb = new StringBuilder();
+        String line;
+        while ((line = reader.readLine()) != null) sb.append(line);
+        reader.close();
+
+        return gson.fromJson(sb.toString(), int.class);
     }
 
     public void joinSubcreddit(Subcreddit subcreddit) {

@@ -38,17 +38,12 @@ public class PostPreviewTemplateController {
     private int myOGVote;
     private int myVote;
 
-    public void init(Post post, User user) {
+    public void init(Post post, User user, int userVote) {
         this.post = post;
         this.currentUser = user;
         myOGVote = 0;
-        if(user != null) {
-            try {
-                myOGVote = Client.CheckVote(currentUser, post);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
+        if(user != null)
+            myOGVote = userVote;
         myVote = myOGVote;
         ColorVote();
         subName.setText(post.GetSubcreddit() != null? "cr/" + post.GetSubcreddit().GetSubName() : "u/" + post.GetAuthor().getUsername());

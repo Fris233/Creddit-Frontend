@@ -20,6 +20,7 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Map;
 
 public class HomePageController {
 
@@ -44,13 +45,13 @@ public class HomePageController {
             loggedInPane.setVisible(true);
         }
         try {
-            ArrayList<Post> postFeed = Client.GetPostFeed(currentUser, 0);
-            for (Post post : postFeed) {
+            Map<Post, Integer> postFeed = Client.GetPostFeed(currentUser, 0);
+            for (Post post : postFeed.keySet()) {
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("Post_Preview_Template.fxml"));
                 Node postNode = loader.load();
 
                 PostPreviewTemplateController controller = loader.getController();
-                controller.init(post, user);
+                controller.init(post, user, postFeed.get(post));
 
                 postsContainer.getChildren().add(postNode);
             }

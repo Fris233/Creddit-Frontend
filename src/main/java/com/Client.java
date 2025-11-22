@@ -12,11 +12,11 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public abstract class Client {
@@ -32,6 +32,9 @@ public abstract class Client {
         gson = new GsonBuilder().registerTypeAdapterFactory(userAdapter).create();
         BASE_URL = System.getenv("BASE_URL");
     }
+
+
+    //BOOKMARK: Helpers
 
     public static boolean isServerReachable() {
         try {
@@ -62,6 +65,11 @@ public abstract class Client {
         return gson.toJson(obj);
     }
 
+
+
+
+    //BOOKMARK: User
+
     public static User GetUser(int id) throws Exception {
         URL url = new URL(BASE_URL + String.format("/user?id=%s", java.net.URLEncoder.encode(String.valueOf(id), "UTF-8")));
         System.out.println(url);
@@ -81,75 +89,18 @@ public abstract class Client {
     }
 
     public static User login(String usermail, String password) throws Exception {
-        URL url = new URL(BASE_URL + String.format("/user/login?usermail=%s&password=%s", java.net.URLEncoder.encode(usermail, "UTF-8"), java.net.URLEncoder.encode(password, "UTF-8")));
-        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-        conn.setRequestMethod("GET");
-
-        BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-        StringBuilder sb = new StringBuilder();
-        String line;
-        while ((line = reader.readLine()) != null) sb.append(line);
-        reader.close();
-
-        User user = gson.fromJson(sb.toString(), User.class);
-        return user;
+        return User.login(usermail, password, BASE_URL, gson);
     }
 
     public static int CheckVote(User user, Post post) throws Exception {
-        JsonObject json = new JsonObject();
-        json.add("user", gson.toJsonTree(user));
-        json.add("post", gson.toJsonTree(post));
-
-        String jsonBody = gson.toJson(json);
-
-        URL url = new URL(BASE_URL + "/user/checkvote");
-        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-        conn.setRequestMethod("POST");
-        conn.setDoOutput(true);
-        conn.setRequestProperty("Content-Type", "application/json");
-
-        try (OutputStream os = conn.getOutputStream()) {
-            os.write(jsonBody.getBytes());
-        }
-
-        BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-        StringBuilder sb = new StringBuilder();
-        String line;
-        while ((line = reader.readLine()) != null) sb.append(line);
-        reader.close();
-
-        return gson.fromJson(sb.toString(), int.class);
+        return user.CheckVote(post, BASE_URL, gson);
     }
 
     public static boolean Vote(User user, Post post, int value) throws Exception {
-        JsonObject json = new JsonObject();
-        json.add("user", gson.toJsonTree(user));
-        json.add("post", gson.toJsonTree(post));
-        json.addProperty("value", gson.toJson(value));
-
-        String jsonBody = gson.toJson(json);
-
-        URL url = new URL(BASE_URL + "/post/vote");
-        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-        conn.setRequestMethod("POST");
-        conn.setDoOutput(true);
-        conn.setRequestProperty("Content-Type", "application/json");
-
-        try (OutputStream os = conn.getOutputStream()) {
-            os.write(jsonBody.getBytes());
-        }
-
-        BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-        StringBuilder sb = new StringBuilder();
-        String line;
-        while ((line = reader.readLine()) != null) sb.append(line);
-        reader.close();
-
-        Map<?,?> map = gson.fromJson(sb.toString(), Map.class);
-        return map.get("status").equals("ok");
+        return user.Vote(post, value, BASE_URL, gson);
     }
 
-    public static ArrayList<Post> GetPostFeed(User user, int lastID) throws Exception {
+    public static Map<Post, Integer> GetPostFeed(User user, int lastID) throws Exception {
         JsonObject json = new JsonObject();
         json.add("user", gson.toJsonTree(user));
         json.addProperty("lastID", gson.toJson(lastID));
@@ -172,10 +123,15 @@ public abstract class Client {
         while ((line = reader.readLine()) != null) sb.append(line);
         reader.close();
 
-        Post[] postsArray = gson.fromJson(sb.toString(), Post[].class);
-        ArrayList<Post> posts = new ArrayList<>(Arrays.asList(postsArray));
+        JsonObject jsonObj = gson.fromJson(sb.toString(), JsonObject.class);
+        Post[] posts = gson.fromJson(jsonObj.get("posts"), Post[].class);
+        Integer[] myVotes = gson.fromJson(jsonObj.get("votes"), Integer[].class);
 
-        return posts;
+        Map<Post, Integer> postMap = new LinkedHashMap<>();
+        int sz = posts.length;
+        for(int i = 0; i < sz; i++)
+            postMap.put(posts[i], myVotes[i]);
+
+        return postMap;
     }
-
 }
