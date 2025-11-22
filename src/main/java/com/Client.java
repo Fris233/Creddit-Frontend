@@ -174,8 +174,6 @@ public abstract class Client {
 
         Post[] postsArray = gson.fromJson(sb.toString(), Post[].class);
         ArrayList<Post> posts = new ArrayList<>(Arrays.asList(postsArray));
-        for(Post post : posts)
-            System.out.println(post.GetID());
 
         return posts;
     }

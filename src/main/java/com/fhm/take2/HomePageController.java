@@ -27,8 +27,8 @@ public class HomePageController {
     @FXML private AnchorPane loggedOutPane;
     @FXML private VBox postsContainer;
     @FXML private VBox recentPostsContainer;
-    @FXML private ScrollPane scrollPane;
-    @FXML private ScrollPane scrollPane1;
+    @FXML private ScrollPane recentScrollPane;
+    @FXML private ScrollPane postsScrollPane;
     @FXML private TextField searchField;
     @FXML private ImageView userPFP;
 
@@ -62,7 +62,17 @@ public class HomePageController {
 
     @FXML
     void Chat(MouseEvent event) {
-        System.out.println("Chat Button Pressed");
+        try {
+            Parent root = FXMLLoader.load(getClass().getResource("message.fxml"));
+            Stage stage = new Stage();
+            stage.setTitle("Messaging App");
+            stage.setScene(new Scene(root, 800, 600));
+            stage.setMinWidth(600);
+            stage.setMinHeight(400);
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         event.consume();
     }
 
@@ -158,20 +168,4 @@ public class HomePageController {
         System.out.println("Search Pressed");
         event.consume();
     }
-
-    @FXML
-    private void openMessageWindow() {
-        try {
-            Parent root = FXMLLoader.load(getClass().getResource("message.fxml"));
-            Stage stage = new Stage();
-            stage.setTitle("Messaging App");
-            stage.setScene(new Scene(root, 800, 600));
-            stage.setMinWidth(600);
-            stage.setMinHeight(400);
-            stage.show();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
 }
