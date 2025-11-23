@@ -11,23 +11,26 @@
 <?import javafx.scene.media.MediaView?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="495.0" prefWidth="900.0" style="-fx-background-color: #0E1113; -fx-border-width: 2 0 0 0; -fx-background-radius: 10;" stylesheets="@CredditCSS.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.fhm.take2.MediaViewController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="495.0" prefWidth="832.0" style="-fx-background-color: #0E1113; -fx-border-width: 2 0 0 0; -fx-background-radius: 10;" stylesheets="@CredditCSS.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.fhm.take2.MediaViewController">
    <children>
-      <Button fx:id="prevButton" alignment="CENTER" focusTraversable="false" layoutY="204.0" maxHeight="42.0" maxWidth="142.0" minHeight="35.0" minWidth="25.0" mnemonicParsing="false" onMouseClicked="#PrevMedia" prefHeight="42.0" prefWidth="33.0" text="&lt;">
-         <font>
-            <Font size="16.0" />
-         </font>
-      </Button>
-      <StackPane layoutX="46.0" prefHeight="381.0" prefWidth="785.0">
+      <StackPane layoutX="10.0" prefHeight="381.0" prefWidth="785.0">
          <children>
-            <ImageView fx:id="mediaImage" fitHeight="381.0" fitWidth="811.0" pickOnBounds="true" preserveRatio="true" />
+            <ImageView fx:id="mediaImage" fitHeight="381.0" fitWidth="811.0" pickOnBounds="true" preserveRatio="true">
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
+            </ImageView>
          </children>
       </StackPane>
-      <AnchorPane fx:id="mediaPane" focusTraversable="true" layoutX="45.0" onKeyPressed="#HandleKeyPress" onKeyReleased="#HandleKeyRelease" prefHeight="450.0" prefWidth="811.0">
+      <AnchorPane fx:id="mediaPane" focusTraversable="true" layoutX="11.0" onKeyPressed="#HandleKeyPress" onKeyReleased="#HandleKeyRelease" prefHeight="450.0" prefWidth="798.0">
          <children>
             <StackPane layoutX="3.0" prefHeight="380.0" prefWidth="769.0">
                <children>
-                  <MediaView fx:id="mediaViewer" fitHeight="380.0" fitWidth="805.0" onMouseClicked="#MediaClicked" />
+                  <MediaView fx:id="mediaViewer" fitHeight="380.0" fitWidth="805.0" onMouseClicked="#MediaClicked">
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </MediaView>
                </children>
             </StackPane>
             <Button alignment="CENTER" focusTraversable="false" layoutY="408.0" maxHeight="42.0" maxWidth="142.0" minHeight="35.0" minWidth="25.0" mnemonicParsing="false" onMouseClicked="#PlayMedia" prefHeight="42.0" prefWidth="96.0" text="Play">
@@ -49,17 +52,12 @@
             </Label>
          </children>
       </AnchorPane>
-      <Label fx:id="mediaIndexLabel" alignment="CENTER" focusTraversable="false" layoutX="379.0" layoutY="450.0" prefHeight="42.0" prefWidth="142.0" textFill="WHITE">
+      <Label fx:id="mediaIndexLabel" alignment="CENTER" focusTraversable="false" layoutX="344.0" layoutY="450.0" prefHeight="42.0" prefWidth="142.0" textFill="WHITE">
          <font>
             <Font size="14.0" />
          </font>
       </Label>
-      <Button fx:id="nextButton" alignment="CENTER" focusTraversable="false" layoutX="867.0" layoutY="204.0" maxHeight="42.0" maxWidth="142.0" minHeight="35.0" minWidth="25.0" mnemonicParsing="false" onMouseClicked="#NextMedia" prefHeight="42.0" prefWidth="33.0" text="&gt;">
-         <font>
-            <Font size="16.0" />
-         </font>
-      </Button>
-      <Label fx:id="unknownMediaLabel" alignment="CENTER" focusTraversable="false" layoutX="73.0" layoutY="192.0" onMouseClicked="#OpenUnknownMedia" prefHeight="70.0" prefWidth="761.0" textFill="WHITE">
+      <Label fx:id="unknownMediaLabel" alignment="CENTER" focusTraversable="false" layoutX="37.0" layoutY="192.0" onMouseClicked="#OpenUnknownMedia" prefHeight="70.0" prefWidth="761.0" textFill="WHITE">
          <font>
             <Font size="14.0" />
          </font>
@@ -67,7 +65,17 @@
             <Cursor fx:constant="HAND" />
          </cursor>
       </Label>
-      <Button fx:id="removeButton" alignment="CENTER" focusTraversable="false" layoutX="867.0" maxHeight="42.0" maxWidth="142.0" minHeight="35.0" minWidth="25.0" mnemonicParsing="false" onMouseClicked="#RemoveMedia" prefHeight="42.0" prefWidth="33.0" text="X">
+      <Button fx:id="prevButton" alignment="CENTER" focusTraversable="false" layoutY="204.0" maxHeight="42.0" maxWidth="142.0" minHeight="35.0" minWidth="25.0" mnemonicParsing="false" onMouseClicked="#PrevMedia" prefHeight="42.0" prefWidth="33.0" text="&lt;">
+         <font>
+            <Font size="16.0" />
+         </font>
+      </Button>
+      <Button fx:id="nextButton" alignment="CENTER" focusTraversable="false" layoutX="798.0" layoutY="204.0" maxHeight="42.0" maxWidth="142.0" minHeight="35.0" minWidth="25.0" mnemonicParsing="false" onMouseClicked="#NextMedia" prefHeight="42.0" prefWidth="33.0" text="&gt;">
+         <font>
+            <Font size="16.0" />
+         </font>
+      </Button>
+      <Button fx:id="removeButton" alignment="CENTER" focusTraversable="false" layoutX="798.0" maxHeight="42.0" maxWidth="142.0" minHeight="35.0" minWidth="25.0" mnemonicParsing="false" onMouseClicked="#RemoveMedia" prefHeight="42.0" prefWidth="33.0" text="X">
          <font>
             <Font size="16.0" />
          </font>

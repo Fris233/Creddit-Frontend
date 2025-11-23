@@ -14,6 +14,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -63,6 +64,10 @@ public class HomePageController {
         catch (Exception e) {
             e.printStackTrace();
         }
+        postsScrollPane.addEventFilter(ScrollEvent.SCROLL, e -> {
+            double delta = e.getDeltaY() * 2;
+            postsScrollPane.setVvalue(postsScrollPane.getVvalue() - delta / postsScrollPane.getContent().getBoundsInLocal().getHeight());
+        });
     }
 
     @FXML
