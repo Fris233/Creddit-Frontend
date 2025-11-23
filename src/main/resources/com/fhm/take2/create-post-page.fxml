@@ -14,6 +14,7 @@
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
@@ -46,18 +47,24 @@
                         </TextField>
                      </children>
                   </AnchorPane>
-                  <AnchorPane prefHeight="207.0" prefWidth="1318.0">
+                  <AnchorPane prefHeight="182.0" prefWidth="1318.0">
                      <children>
-                        <TextArea fx:id="contentArea" layoutX="81.0" layoutY="27.0" minHeight="161.0" prefWidth="1036.0" promptText="Body Text (optional)" style="-fx-border-color: gray; -fx-border-radius: 25;" wrapText="true">
+                        <TextArea fx:id="contentArea" layoutX="81.0" layoutY="2.0" minHeight="142.0" prefHeight="173.0" prefWidth="1036.0" promptText="Body Text (optional)" style="-fx-border-color: gray; -fx-border-radius: 25;" wrapText="true">
                            <font>
                               <Font size="24.0" />
                            </font>
                         </TextArea>
                      </children>
                   </AnchorPane>
-                  <AnchorPane layoutX="10.0" layoutY="294.0" prefHeight="117.0" prefWidth="1318.0">
+                  <StackPane fx:id="mediaPane" />
+                  <AnchorPane layoutX="10.0" layoutY="294.0" prefHeight="69.0" prefWidth="1318.0">
                      <children>
                         <Button fx:id="postButton" layoutX="1028.0" layoutY="14.0" mnemonicParsing="false" onMouseClicked="#SendPost" prefHeight="40.0" prefWidth="77.0" style="-fx-text-fill: #525454; -fx-background-color: #191c1e; -fx-background-radius: 30;" text="Post" textFill="#c6151500">
+                           <font>
+                              <Font size="18.0" />
+                           </font>
+                        </Button>
+                        <Button layoutX="96.0" layoutY="16.0" mnemonicParsing="false" onMouseClicked="#AttachMedia" prefHeight="40.0" prefWidth="77.0" style="-fx-text-fill: #ffffff; -fx-background-color: #115bca; -fx-background-radius: 30;" text="Attach" textFill="#c6151500">
                            <font>
                               <Font size="18.0" />
                            </font>
