@@ -185,8 +185,9 @@ public class PostPreviewTemplateController {
     @FXML
     void OpenPost(MouseEvent event) {
         System.out.println("Open Post Pressed!");
-        if(mediaViewController != null)
-            mediaViewController.Clean();
+        //TODO: DO NOT FORGET TO UNCOMMENT THIS!!
+        /*if(mediaViewController != null)
+            mediaViewController.Clean();*/
         event.consume();
     }
 

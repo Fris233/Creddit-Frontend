@@ -183,7 +183,7 @@ public class HomePageController {
 
     private void Clean() {
         for(PostPreviewTemplateController controller : postPreviewControllers)
-            if(controller != null)
+            if(controller != null && controller.mediaViewController != null)
                 controller.mediaViewController.Clean();
     }
 }

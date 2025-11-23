@@ -23,7 +23,7 @@
             <ImageView fx:id="mediaImage" fitHeight="381.0" fitWidth="811.0" pickOnBounds="true" preserveRatio="true" />
          </children>
       </StackPane>
-      <AnchorPane fx:id="mediaPane" focusTraversable="true" layoutX="45.0" onKeyPressed="#HandleKeyPress" prefHeight="450.0" prefWidth="811.0">
+      <AnchorPane fx:id="mediaPane" focusTraversable="true" layoutX="45.0" onKeyPressed="#HandleKeyPress" onKeyReleased="#HandleKeyRelease" prefHeight="450.0" prefWidth="811.0">
          <children>
             <StackPane layoutX="3.0" prefHeight="380.0" prefWidth="769.0">
                <children>

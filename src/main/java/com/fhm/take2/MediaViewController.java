@@ -99,22 +99,26 @@ public class MediaViewController {
             UpdateMediaTimeLabel(Duration.seconds(progressSlider.getValue()), mp.getTotalDuration());
             event.consume();
         }
+        else if (event.getCode() == KeyCode.PERIOD) {
+            // Seek forward 1 frame (assumes 60 fps)
+            progressSlider.setValue(progressSlider.getValue() + (1/60.0));
+            mp.seek(Duration.seconds(progressSlider.getValue()));
+            UpdateMediaTimeLabel(Duration.seconds(progressSlider.getValue()), mp.getTotalDuration());
+            event.consume();
+        }
+        else if (event.getCode() == KeyCode.COMMA) {
+            // Seek backward 1 frame (assumes 60 fps)
+            progressSlider.setValue(progressSlider.getValue() - (1/60.0));
+            mp.seek(Duration.seconds(progressSlider.getValue()));
+            UpdateMediaTimeLabel(Duration.seconds(progressSlider.getValue()), mp.getTotalDuration());
+            event.consume();
+        }
         if (event.getCode() == KeyCode.UP) {
             volumeSlider.setValue(volumeSlider.getValue() + 5);
             event.consume();
         }
         else if (event.getCode() == KeyCode.DOWN) {
-            // Seek backward 5 seconds (but not before start)
             volumeSlider.setValue(volumeSlider.getValue() - 5);
-            event.consume();
-        }
-        else if(event.getCode() == KeyCode.SPACE) {
-            if(mp.getStatus() == MediaPlayer.Status.PLAYING) {
-                PauseMedia();
-            }
-            else {
-                PlayMedia();
-            }
             event.consume();
         }
 
@@ -123,19 +127,34 @@ public class MediaViewController {
             UpdateMediaTimeLabel(mp.getCurrentTime(), mp.getTotalDuration());
         }
     }
+    @FXML
+    void HandleKeyRelease(KeyEvent event) {
+        if(mp == null)  return;
+
+        if(event.getCode() == KeyCode.SPACE) {
+            if(mp.getStatus() == MediaPlayer.Status.PLAYING) {
+                PauseMedia();
+            }
+            else {
+                PlayMedia();
+            }
+            event.consume();
+        }
+    }
 
     private void UpdateIndexLabel() {
         mediaIndexLabel.setText((currentMediaIndex + 1) + "/" + (creating? fileArrayList.size() : mediaArrayList.size()));
     }
 
     @FXML
-    void MediaClicked() {
+    void MediaClicked(MouseEvent event) {
         if(mp != null && mp.getStatus() == MediaPlayer.Status.PLAYING) {
             PauseMedia();
         }
         else {
             PlayMedia();
         }
+        event.consume();
     }
 
     private void handleSeek(MouseEvent event) {
@@ -154,6 +173,7 @@ public class MediaViewController {
             if(!paused.get())
                 mp.play();
         }
+        event.consume();
         mediaPane.requestFocus();
     }
 
@@ -278,13 +298,14 @@ public class MediaViewController {
     }
 
     @FXML
-    void OpenUnknownMedia() {
+    void OpenUnknownMedia(MouseEvent event) {
         String url = unknownMediaLabel.getText();
         try {
             java.awt.Desktop.getDesktop().browse(new java.net.URI(url));
         } catch (Exception e) {
             e.printStackTrace();
         }
+        event.consume();
     }
 
     @FXML
@@ -294,21 +315,23 @@ public class MediaViewController {
     void PlayMedia() {  if(mp != null) mp.play(); mediaPane.requestFocus(); paused.set(false); }
 
     @FXML
-    void NextMedia() {
+    void NextMedia(MouseEvent event) {
         if(currentMediaIndex == (creating? fileArrayList.size() : mediaArrayList.size()) - 1)
             return;
         currentMediaIndex++;
         PrevNextButtons();
         DisplayMedia();
+        event.consume();
     }
 
     @FXML
-    void PrevMedia() {
+    void PrevMedia(MouseEvent event) {
         if(currentMediaIndex == 0)
             return;
         currentMediaIndex--;
         PrevNextButtons();
         DisplayMedia();
+        event.consume();
     }
 
     void AddMedia(File file) {
