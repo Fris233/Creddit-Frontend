@@ -228,7 +228,6 @@ public class MediaViewController {
 
         String url = extractUrl(item);
 
-        System.out.println(url);
         if (url != null && !url.isEmpty()) {
             String type = detectType(item);
 
@@ -239,35 +238,49 @@ public class MediaViewController {
             }
             else if (type.equals("Video") || type.equals("Audio")) {
                 javafx.scene.media.Media mediaObj = new javafx.scene.media.Media(url);
+                mediaObj.setOnError(() -> {
+                    Platform.runLater(this::RemoveMedia);
+                    System.out.println("corrupted media detected");
+                });
                 mp = new MediaPlayer(mediaObj);
+                mp.setOnError(() -> {
+                    Platform.runLater(this::RemoveMedia);
+                    System.out.println("corrupted media detected");
+                    mp = null;
+                });
                 progressSlider.setValue(0);
                 UpdateMediaTimeLabel(Duration.seconds(0), Duration.seconds(0));
                 mp.setOnReady(() -> {
+                    if(mp.getTotalDuration() == null || mp.getTotalDuration().isUnknown() || mp.getTotalDuration().isIndefinite()) {
+                        System.out.println("corrupted media detected");
+                        Platform.runLater(this::RemoveMedia);
+                        return;
+                    }
                     progressSlider.setMin(0);
                     progressSlider.setMax(mp.getTotalDuration().toSeconds());
                     UpdateMediaTimeLabel(mp.getCurrentTime(), mp.getTotalDuration());
-                });
-                mp.setVolume(volumeSlider.getValue() / 100.0);
-                mp.currentTimeProperty().addListener((obs, oldTime, newTime) -> {
-                    if (!isSeeking && mp.getTotalDuration() != null) {
-                        Platform.runLater(() -> {
-                            progressSlider.setValue(newTime.toSeconds());
-                            UpdateMediaTimeLabel(newTime, mp.getTotalDuration());
-                        });
+                    mp.setVolume(volumeSlider.getValue() / 100.0);
+                    mp.currentTimeProperty().addListener((obs, oldTime, newTime) -> {
+                        if (!isSeeking && mp.getTotalDuration() != null) {
+                            Platform.runLater(() -> {
+                                progressSlider.setValue(newTime.toSeconds());
+                                UpdateMediaTimeLabel(newTime, mp.getTotalDuration());
+                            });
+                        }
+                    });
+                    progressSlider.setOnMousePressed(this::handleSeek);
+                    progressSlider.setOnMouseReleased(this::handleSeek);
+                    mp.setAutoPlay(false);
+                    if (type.equals("Video")) {
+                        mediaViewer.setMediaPlayer(mp);
+                    } else {
+                        isAudio = true;
+                        mediaViewer.setMediaPlayer(null); // prevent audio-only issues
+                        mediaImage.setImage(new Image(getClass().getResource("/com/fhm/take2/assets/audio_default_static.png").toExternalForm()));
+                        mediaImage.setVisible(true);
                     }
+                    mediaPane.setVisible(true);
                 });
-                progressSlider.setOnMousePressed(this::handleSeek);
-                progressSlider.setOnMouseReleased(this::handleSeek);
-                mp.setAutoPlay(false);
-                if (type.equals("Video")) {
-                    mediaViewer.setMediaPlayer(mp);
-                } else {
-                    isAudio = true;
-                    mediaViewer.setMediaPlayer(null); // prevent audio-only issues
-                    mediaImage.setImage(new Image(getClass().getResource("/com/fhm/take2/assets/audio_default_static.png").toExternalForm()));
-                    mediaImage.setVisible(true);
-                }
-                mediaPane.setVisible(true);
             } else {
                 unknownMediaLabel.setDisable(false);
                 unknownMediaLabel.setVisible(true);
@@ -346,7 +359,11 @@ public class MediaViewController {
         DisplayMedia();
     }
 
-    ArrayList<File> GetFileArrayList() {  return this.fileArrayList; }
+    ArrayList<File> GetFileArrayList() {
+        if(mp != null && mp.getTotalDuration() != null && !mp.getTotalDuration().isUnknown() && !mp.getTotalDuration().isIndefinite())
+            RemoveMedia();
+        return this.fileArrayList;
+    }
 
     @FXML
     void RemoveMedia() {
@@ -362,6 +379,8 @@ public class MediaViewController {
     }
 
     private void PrevNextButtons() {
+        if(mp != null && mp.getTotalDuration() != null && !mp.getTotalDuration().isUnknown() && !mp.getTotalDuration().isIndefinite())
+            RemoveMedia();
         UpdateIndexLabel();
         int sz = creating? fileArrayList.size() : mediaArrayList.size();
         if(currentMediaIndex == 0) {
@@ -391,7 +410,7 @@ public class MediaViewController {
         mediaPane.setVisible(false);
         unknownMediaLabel.setDisable(true);
         unknownMediaLabel.setVisible(false);
-        if(mp != null)
+        if(mp != null && mp.getTotalDuration() != null && !mp.getTotalDuration().isUnknown() && !mp.getTotalDuration().isIndefinite())
             mp.dispose();
         mp = null;
     }
