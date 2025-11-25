@@ -1,10 +1,12 @@
 package com.fhm.take2;
-
+import com.crdt.Gender;
+import com.crdt.User;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
@@ -14,6 +16,8 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
 
 public class MessageController implements Initializable {
@@ -22,13 +26,20 @@ public class MessageController implements Initializable {
     @FXML private ScrollPane scrollPane;
     @FXML private TextField messageInput;
     @FXML private Button sendButton;
+    @FXML private VBox friendsListContainer;
+    @FXML private Label friendName;
+    @FXML private Label friendStatus;
+    private User currentUser;
+    private List<User> friends = new ArrayList<>();
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         setupEventHandlers();
         setupScrollPane();
         applyInlineStyles();
-        addSampleMessages(); // Add sample messages to demonstrate layout
+        addSampleMessages();
+        setupFriendlist();
+        showEmptyChatState();
     }
 
     private void applyInlineStyles() {
@@ -41,7 +52,7 @@ public class MessageController implements Initializable {
 
     private void setupEventHandlers() {
         // Send button click handler
-        sendButton.setOnAction(event -> sendMessage());
+        sendButton.setOnAction(_ -> sendMessage());
 
         // Enter key handler for text field
         messageInput.setOnKeyPressed(event -> {
@@ -51,9 +62,7 @@ public class MessageController implements Initializable {
         });
 
         // Disable send button when input is empty
-        messageInput.textProperty().addListener((observable, oldValue, newValue) -> {
-            sendButton.setDisable(newValue.trim().isEmpty());
-        });
+        messageInput.textProperty().addListener((_, _, newValue) -> sendButton.setDisable(newValue.trim().isEmpty()));
 
         // Initially disable send button
         sendButton.setDisable(true);
@@ -61,9 +70,7 @@ public class MessageController implements Initializable {
 
     private void setupScrollPane() {
         // Auto-scroll to bottom when new messages are added
-        messagesContainer.heightProperty().addListener((observable, oldValue, newValue) -> {
-            scrollPane.setVvalue(1.0);
-        });
+        messagesContainer.heightProperty().addListener((_, _, _) -> scrollPane.setVvalue(1.0));
 
         scrollPane.setFitToWidth(true);
     }
@@ -127,4 +134,103 @@ public class MessageController implements Initializable {
 
         return messageContainer;
     }
+
+    private void setupFriendlist() {
+        try {
+            User friend1 = new User(1, "Hassan", "hassan@gmail.com", "0001", Gender.MALE, "lelelelelelelelelelelelelele", null, null, true);
+            friends.add(friend1);
+
+            User friend2 = new User(1, "Hasan", "hasan@gmail.com", "0010", Gender.MALE, "صلي على محمد", null, null, false);
+            friends.add(friend2);
+
+            displayFriendList();
+
+        } catch (Exception e) {
+            System.out.println("Error creating dummy users: " + e.getMessage());
+            friends = new ArrayList<>();
+        }
+    }
+
+    private void displayFriendList() {
+        friendsListContainer.getChildren().clear();
+
+        for (User user : friends) {
+            HBox friendItem = createFriendItem(user);
+            friendsListContainer.getChildren().add(friendItem);
+        }
+    }
+
+    private HBox createFriendItem(User user) {
+        HBox container = new HBox();
+        container.setSpacing(12);
+        container.setPadding(new Insets(12));
+        container.setAlignment(Pos.CENTER_LEFT);
+        container.setStyle("-fx-background-radius: 4; -fx-cursor: hand;");
+
+        // Hover effect
+        container.setOnMouseEntered(_ -> {
+            if (currentUser != user) {
+                container.setStyle("-fx-background-color: #272729; -fx-background-radius: 4; -fx-cursor: hand;");
+            }
+        });
+        container.setOnMouseExited(_ -> {
+            if (currentUser != user) {
+                container.setStyle("-fx-background-color: transparent; -fx-background-radius: 4; -fx-cursor: hand;");
+            }
+        });
+
+
+        Text statusDot = new Text("•");
+        boolean isOnline = user.getActive();
+        statusDot.setStyle(isOnline ?
+                "-fx-fill: #46D160; -fx-font-size: 24px;" :
+                "-fx-fill: #818384; -fx-font-size: 24px;");
+
+        // User info
+        VBox userInfo = new VBox();
+        userInfo.setSpacing(2);
+        HBox.setHgrow(userInfo, Priority.ALWAYS);
+
+
+        Label usernameLabel = new Label(user.getUsername());
+        usernameLabel.setStyle("-fx-text-fill: #D7DADC; -fx-font-size: 14px; -fx-font-weight: bold;");
+
+
+        Label messageLabel = new Label("Click to start chatting"); // Placeholder
+        messageLabel.setStyle("-fx-text-fill: #818384; -fx-font-size: 12px;");
+        messageLabel.setMaxWidth(150);
+        messageLabel.setWrapText(true);
+
+        userInfo.getChildren().addAll(usernameLabel, messageLabel);
+
+
+        Label timeLabel = new Label(isOnline ? "now" : "recently");
+        timeLabel.setStyle("-fx-text-fill: #818384; -fx-font-size: 11px;");
+
+        container.getChildren().addAll(statusDot, userInfo, timeLabel);
+
+        // Click to select friend
+        container.setOnMouseClicked(_ -> selectUser(user));
+
+        return container;
+    }
+
+    private void selectUser(User user) {
+        currentUser = user;
+
+        // Update chat header with user's username
+        friendName.setText(user.getUsername());
+        friendStatus.setText(user.getActive() ? "Online" : "Offline");
+
+        // Clear existing messages and show sample conversation
+        messagesContainer.getChildren().clear();
+        addSampleMessages();
+    }
+
+    private void showEmptyChatState() {
+        messagesContainer.getChildren().clear();
+        friendName.setText("Select a chat");
+        friendStatus.setText("Send an invite message to start chatting!");
+    }
+
 }

@@ -66,7 +66,7 @@ public class HomePageController {
         try {
             Parent root = FXMLLoader.load(getClass().getResource("message.fxml"));
             Stage stage = new Stage();
-            stage.setTitle("Messaging App");
+            stage.setTitle("Chats");
             stage.setScene(new Scene(root, 800, 600));
             stage.setMinWidth(600);
             stage.setMinHeight(400);
