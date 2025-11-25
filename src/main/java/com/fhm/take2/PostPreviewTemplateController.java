@@ -4,13 +4,15 @@ import com.Client;
 import com.crdt.Post;
 import com.crdt.User;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
 
 import java.sql.Timestamp;
 import java.time.Duration;
@@ -22,8 +24,7 @@ public class PostPreviewTemplateController {
     @FXML private Button MoreOptionsButton;
     @FXML private ImageView downvoteButton;
     @FXML private Label modLabel;
-    @FXML private ImageView previewMedia;
-    @FXML private AnchorPane mediaAnchor;
+    @FXML private StackPane mediaAnchor;
     @FXML private AnchorPane voteAnchor;
     @FXML private Label subName;
     @FXML private ImageView subPFP;
@@ -38,9 +39,12 @@ public class PostPreviewTemplateController {
     private int myOGVote;
     private int myVote;
 
+    MediaViewController mediaViewController;
+
     public void init(Post post, User user, int userVote) {
         this.post = post;
         this.currentUser = user;
+        this.mediaViewController = null;
         myOGVote = 0;
         if(user != null)
             myOGVote = userVote;
@@ -51,8 +55,20 @@ public class PostPreviewTemplateController {
         titleLabel.setText(post.GetTitle());
         votesLabel.setText(String.valueOf(post.GetVotes()));
         commentsLabel.setText(String.valueOf(post.GetComments()));
-        if(post.GetMedia() == null || post.GetMedia().isEmpty())
-            ((Pane)mediaAnchor.getParent()).getChildren().remove(mediaAnchor);
+        if(post.GetMedia() != null && !post.GetMedia().isEmpty()) {
+            try {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("media-view.fxml"));
+                Node mediaNode = loader.load();
+
+                mediaViewController = loader.getController();
+                mediaViewController.init(post.GetMedia(), false, null);
+
+                mediaAnchor.getChildren().add(mediaNode);
+            }
+            catch (Exception ex) {
+                System.out.println(ex.getMessage());
+            }
+        }
         if(post.GetSubcreddit() == null) {
             JoinButton.setDisable(true);
             JoinButton.setVisible(false);
@@ -169,11 +185,16 @@ public class PostPreviewTemplateController {
     @FXML
     void OpenPost(MouseEvent event) {
         System.out.println("Open Post Pressed!");
+        //TODO: DO NOT FORGET TO UNCOMMENT THIS!!
+        /*if(mediaViewController != null)
+            mediaViewController.Clean();*/
         event.consume();
     }
 
     @FXML
     void OpenSubcreddit(MouseEvent event) {
+        if(mediaViewController != null)
+            mediaViewController.Clean();
         if(post.GetSubcreddit() == null) {
             System.out.println("Open user profile");
         }

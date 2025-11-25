@@ -19,9 +19,9 @@
 
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="900.0" prefWidth="1600.0" style="-fx-background-color: #0E1113;" stylesheets="@CredditCSS.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.fhm.take2.HomePageController">
    <children>
-      <ScrollPane fx:id="postsScrollPane" layoutX="351.0" layoutY="83.0" prefHeight="817.0" prefWidth="813.0" style="-fx-background-color: #0E1113;" stylesheets="@CredditCSS.css">
+      <ScrollPane fx:id="postsScrollPane" layoutX="307.0" layoutY="84.0" prefHeight="817.0" prefWidth="908.0" style="-fx-background-color: #0E1113; -fx-background: #0E1113;" stylesheets="@CredditCSS.css">
          <content>
-            <VBox fx:id="postsContainer" minHeight="815.0" prefWidth="811.0" spacing="10.0" style="-fx-background-color: #0E1113;">
+            <VBox fx:id="postsContainer" maxWidth="-Infinity" minHeight="813.0" prefWidth="893.0" spacing="10.0" style="-fx-background-color: #0E1113;">
                <padding>
                   <Insets top="20.0" />
                </padding></VBox>

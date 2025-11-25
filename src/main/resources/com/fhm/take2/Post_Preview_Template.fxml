@@ -9,10 +9,11 @@
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onMouseClicked="#OpenPost" prefWidth="811.0" style="-fx-background-color: #0E1113; -fx-border-color: gray; -fx-border-width: 2 0 0 0;" stylesheets="@CredditCSS.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.fhm.take2.PostPreviewTemplateController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onMouseClicked="#OpenPost" prefWidth="800.0" style="-fx-background-color: #0E1113; -fx-border-color: gray; -fx-border-width: 2 0 0 0;" stylesheets="@CredditCSS.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.fhm.take2.PostPreviewTemplateController">
    <children>
       <VBox layoutX="14.0" layoutY="7.0" spacing="15.0">
          <children>
@@ -68,11 +69,7 @@
                   </Label>
                </children>
             </AnchorPane>
-            <AnchorPane fx:id="mediaAnchor">
-               <children>
-                  <ImageView fx:id="previewMedia" fitHeight="377.0" fitWidth="780.0" onMouseClicked="#OpenPost" pickOnBounds="true" preserveRatio="true" />
-               </children>
-            </AnchorPane>
+            <StackPane fx:id="mediaAnchor" prefHeight="0.0" prefWidth="783.0" />
             <AnchorPane>
                <children>
                   <HBox spacing="20.0">

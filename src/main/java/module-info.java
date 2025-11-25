@@ -9,6 +9,7 @@ module com.fhm.take2 {
     requires com.google.gson;
     requires gson.extras;
     requires java.sql;
+    requires javafx.media;
 
     opens com.fhm.take2 to javafx.fxml;
     opens com.crdt to com.google.gson;

@@ -14,6 +14,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -21,6 +22,7 @@ import javafx.stage.Stage;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.Objects;
 
 public class HomePageController {
 
@@ -34,10 +36,12 @@ public class HomePageController {
     @FXML private ImageView userPFP;
 
     private User currentUser;
+    private ArrayList<PostPreviewTemplateController> postPreviewControllers;
 
     public void InitData(User user, String searchPrompt) {
         currentUser = user;
         this.searchField.setText(searchPrompt);
+        postPreviewControllers = new ArrayList<>();
         if(currentUser != null) {
             loggedOutPane.setDisable(true);
             loggedOutPane.setVisible(false);
@@ -54,17 +58,22 @@ public class HomePageController {
                 controller.init(post, user, postFeed.get(post));
 
                 postsContainer.getChildren().add(postNode);
+                postPreviewControllers.add(controller);
             }
         }
         catch (Exception e) {
             e.printStackTrace();
         }
+        postsScrollPane.addEventFilter(ScrollEvent.SCROLL, e -> {
+            double delta = e.getDeltaY() * 2;
+            postsScrollPane.setVvalue(postsScrollPane.getVvalue() - delta / postsScrollPane.getContent().getBoundsInLocal().getHeight());
+        });
     }
 
     @FXML
     void Chat(MouseEvent event) {
         try {
-            Parent root = FXMLLoader.load(getClass().getResource("message.fxml"));
+            Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("message.fxml")));
             Stage stage = new Stage();
             stage.setTitle("Chats");
             stage.setScene(new Scene(root, 800, 600));
@@ -80,6 +89,7 @@ public class HomePageController {
     @FXML
     void CheckRules(MouseEvent event) {
         System.out.println("Rules Button Pressed");
+        Clean();
         event.consume();
     }
 
@@ -92,6 +102,7 @@ public class HomePageController {
     @FXML
     void CreatePost(MouseEvent event) {
         System.out.println("Create Post Button Pressed");
+        Clean();
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("create-post-page.fxml"));
             Parent root = loader.load();
@@ -115,11 +126,13 @@ public class HomePageController {
     @FXML
     void CreateSubcreddit(MouseEvent event) {
         System.out.println("Create Subcreddit Button Pressed");
+        Clean();
         event.consume();
     }
 
     @FXML
     void Login(MouseEvent event) {
+        Clean();
         try {
             System.out.println("Login Button Pressed");
             User user = Client.login("Mohamed", "FuckingMohamedAshraf");
@@ -137,12 +150,14 @@ public class HomePageController {
     @FXML
     void ProfilePressed(MouseEvent event) {
         System.out.println("Profile Button Pressed");
+        Clean();
         event.consume();
     }
 
     @FXML
     void Refresh(MouseEvent event) {
         System.out.println("Dashboard Button Pressed");
+        Clean();
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("home-page.fxml"));
             Parent root = loader.load();
@@ -167,6 +182,13 @@ public class HomePageController {
     @FXML
     void SearchPressed(KeyEvent event) {
         System.out.println("Search Pressed");
+        Clean();
         event.consume();
+    }
+
+    private void Clean() {
+        for(PostPreviewTemplateController controller : postPreviewControllers)
+            if(controller != null && controller.mediaViewController != null)
+                controller.mediaViewController.Clean();
     }
 }

@@ -9,6 +9,7 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -16,12 +17,13 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import javafx.stage.Window;
 
 import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Map;
@@ -33,6 +35,7 @@ public class CreatePostPageController {
     @FXML private Button RulesButton;
     @FXML private TextArea contentArea;
     @FXML private AnchorPane loggedInPane;
+    @FXML private StackPane mediaPane;
     @FXML private Button postButton;
     @FXML private VBox createInfoContainer;
     @FXML private ScrollPane scrollPane;
@@ -42,12 +45,14 @@ public class CreatePostPageController {
     @FXML private TextField titleField;
     @FXML private ImageView userPFP;
 
-    private ArrayList<File> selectedFiles;
+    //private ArrayList<File> selectedFiles;
+    private MediaViewController mediaViewController;
     private User currentUser;
     private BooleanProperty validPostInfo = new SimpleBooleanProperty(false);
 
     public void InitData(User user) {
-        selectedFiles = new ArrayList<>();
+        //selectedFiles = new ArrayList<>();
+        mediaViewController = null;
         currentUser = user;
 
         contentArea.setWrapText(true);
@@ -99,18 +104,24 @@ public class CreatePostPageController {
     @FXML
     void CheckRules(MouseEvent event) {
         System.out.println("Rules Button Pressed!");
+        if(mediaViewController != null)
+            mediaViewController.Clean();
         event.consume();
     }
 
     @FXML
     void CreateSubcreddit(MouseEvent event) {
         System.out.println("Create Subcreddit Button Pressed!");
+        if(mediaViewController != null)
+            mediaViewController.Clean();
         event.consume();
     }
 
     @FXML
     void GoHome(MouseEvent event) {
         System.out.println("Dashboard Pressed!");
+        if(mediaViewController != null)
+            mediaViewController.Clean();
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("home-page.fxml"));
             Parent root = loader.load();
@@ -140,6 +151,8 @@ public class CreatePostPageController {
     @FXML
     void SearchPressed(KeyEvent event) {
         System.out.println("Search Pressed!");
+        if(mediaViewController != null)
+            mediaViewController.Clean();
         event.consume();
     }
 
@@ -159,56 +172,52 @@ public class CreatePostPageController {
             String content = contentArea.getText();
 
             String mediaUrl = null;
-            String mediaType = null;
+            MediaType mediaType = null;
 
             // If file selected, upload first
-            for(File selectedFile : selectedFiles) {
-                System.out.println("Uploading file: " + selectedFile.getName());
-                String uploadResponse = uploadFile(selectedFile);
-                if(uploadResponse == null) {
-                    new Alert(Alert.AlertType.ERROR, "Server unreachable! Check your connection and try again!").showAndWait();
-                    //UpdateBaseURL();
-                    return;
-                }
-                Map<?, ?> json = Client.GetResponse(uploadResponse);
-                mediaUrl = (String) json.get("url");
+            ArrayList<Media> media = new ArrayList<>();
+            if(mediaViewController != null) {
+                ArrayList<File> fileArrayList = mediaViewController.GetFileArrayList();
+                for (File selectedFile : fileArrayList) {
+                    System.out.println("Uploading file: " + selectedFile.getName());
+                    String uploadResponse = Client.UploadFile(selectedFile);
+                    if (uploadResponse == null) {
+                        new Alert(Alert.AlertType.ERROR, "Server unreachable! Check your connection and try again!").showAndWait();
+                        return;
+                    }
+                    Map<?, ?> json = Client.GetResponse(uploadResponse);
+                    mediaUrl = (String) json.get("url");
 
-                // Detect media type
-                String mime = Files.probeContentType(selectedFile.toPath());
-                if (mime != null) {
-                    if (mime.startsWith("image/")) mediaType = "image";
-                    else if (mime.startsWith("video/")) mediaType = "video";
-                    else if (mime.startsWith("audio/")) mediaType = "audio";
-                    else if (mime.equals("application/pdf")) mediaType = "pdf";
+                    // Detect media type
+                    String mime = Files.probeContentType(selectedFile.toPath());
+                    if (mime != null) {
+                        if (mime.startsWith("image/")) mediaType = MediaType.IMAGE;
+                        else if (mime.startsWith("video/")) mediaType = MediaType.VIDEO;
+                        else if (mime.startsWith("audio/")) mediaType = MediaType.AUDIO;
+                        else if (mime.equals("application/pdf")) mediaType = MediaType.OTHER;
+                    }
+                    media.add(new Media(mediaType, mediaUrl));
                 }
             }
 
             // Now send post JSON
-            Post post = new Post(1, Client.GetUser(1), null, title, content, null, null, null, null, 0, 0);
-            String jsonBody = Client.GetJSON(post);
-
-            URL url = new URL(System.getenv("Base_URL") + "/post/create");
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestMethod("POST");
-            conn.setDoOutput(true);
-            conn.setRequestProperty("Content-Type", "application/json");
-
-            try (OutputStream os = conn.getOutputStream()) {
-                os.write(jsonBody.getBytes());
-            }
-
-            if (conn.getResponseCode() == 200) {
+            Post post = new Post(1, currentUser, null, title, content, media, null, null, null, 0, 0);
+            if (Client.CreatePost(post)) {
                 Alert alert = new Alert(Alert.AlertType.INFORMATION, "Post uploaded successfully!");
                 alert.showAndWait();
                 titleField.clear();
                 contentArea.clear();
-                selectedFiles = new ArrayList<>();
-            } else {
+                if(mediaViewController != null) {
+                    mediaViewController.Clean();
+                    RemoveMediaPane();
+                }
+            }
+            else {
                 Alert alert = new Alert(Alert.AlertType.ERROR, "Failed to send post!");
                 alert.showAndWait();
             }
-
-        } catch (Exception ex) {
+        }
+        catch (Exception ex) {
             ex.printStackTrace();
             new Alert(Alert.AlertType.ERROR, "Error: " + ex.getMessage()).showAndWait();
         }
@@ -216,30 +225,46 @@ public class CreatePostPageController {
         event.consume();
     }
 
-    private String uploadFile(File file) throws Exception {
-        if(!Client.isServerReachable())
-            return null;
-        String boundary = "----Boundary" + System.currentTimeMillis();
-        URL url = new URL(System.getenv("Base_URL") + "/upload");
-        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-        conn.setDoOutput(true);
-        conn.setRequestMethod("POST");
-        conn.setRequestProperty("Content-Type", "multipart/form-data; boundary=" + boundary);
+    @FXML
+    void AttachMedia(MouseEvent event) {
+        Window window = ((javafx.scene.Node) event.getSource()).getScene().getWindow();
 
-        try (DataOutputStream out = new DataOutputStream(conn.getOutputStream())) {
-            out.writeBytes("--" + boundary + "\r\n");
-            out.writeBytes("Content-Disposition: form-data; name=\"file\"; filename=\"" + file.getName() + "\"\r\n");
-            out.writeBytes("Content-Type: " + Files.probeContentType(file.toPath()) + "\r\n\r\n");
-            Files.copy(file.toPath(), out);
-            out.writeBytes("\r\n--" + boundary + "--\r\n");
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Open File");
+
+        fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
+
+        File file = fileChooser.showOpenDialog(window);
+        if(file == null)
+            return;
+        if(mediaViewController == null) {
+            try {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("media-view.fxml"));
+                Node mediaNode = loader.load();
+
+                mediaViewController = loader.getController();
+                mediaViewController.init(null, true, new ArrayList<>());
+
+                mediaPane.getChildren().add(mediaNode);
+
+                mediaViewController.done.addListener((obs, oldVal, newVal) -> {
+                    if (newVal)
+                        RemoveMediaPane();
+                });
+            }
+            catch (Exception ex) {
+                System.out.println(ex.getMessage());
+            }
         }
+        mediaViewController.AddMedia(file);
+        event.consume();
+    }
 
-        BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-        StringBuilder response = new StringBuilder();
-        String line;
-        while ((line = in.readLine()) != null) response.append(line);
-        in.close();
-        return response.toString();
+    private void RemoveMediaPane() {
+        mediaPane.getChildren().clear();
+        if(mediaViewController != null)
+            mediaViewController.Clean();
+        mediaViewController = null;
     }
 
 }

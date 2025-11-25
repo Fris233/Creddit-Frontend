@@ -1,19 +1,19 @@
 package com;
 
 import com.crdt.Admin;
+import com.crdt.Media;
 import com.crdt.Post;
 import com.crdt.User;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.typeadapters.RuntimeTypeAdapterFactory;
+import javafx.scene.control.Alert;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -63,6 +63,30 @@ public abstract class Client {
 
     public static String GetJSON(Object obj) {
         return gson.toJson(obj);
+    }
+
+    public static String UploadFile(File file) throws Exception {
+        String boundary = "----Boundary" + System.currentTimeMillis();
+        URL url = new URL(BASE_URL + "/upload");
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setDoOutput(true);
+        conn.setRequestMethod("POST");
+        conn.setRequestProperty("Content-Type", "multipart/form-data; boundary=" + boundary);
+
+        try (DataOutputStream out = new DataOutputStream(conn.getOutputStream())) {
+            out.writeBytes("--" + boundary + "\r\n");
+            out.writeBytes("Content-Disposition: form-data; name=\"file\"; filename=\"" + file.getName() + "\"\r\n");
+            out.writeBytes("Content-Type: " + Files.probeContentType(file.toPath()) + "\r\n\r\n");
+            Files.copy(file.toPath(), out);
+            out.writeBytes("\r\n--" + boundary + "--\r\n");
+        }
+
+        BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+        StringBuilder response = new StringBuilder();
+        String line;
+        while ((line = in.readLine()) != null) response.append(line);
+        in.close();
+        return response.toString();
     }
 
 
@@ -133,5 +157,14 @@ public abstract class Client {
             postMap.put(posts[i], myVotes[i]);
 
         return postMap;
+    }
+
+
+
+
+    //BOOKMARK: Post
+
+    public static boolean CreatePost(Post post) throws Exception {
+        return post.create(BASE_URL, gson);
     }
 }
