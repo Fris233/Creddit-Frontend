@@ -106,6 +106,7 @@ public class LoginController {
             passwordField.setVisible(false);
             passwordField.setManaged(false);
             visiblePasswordField.requestFocus();
+            visiblePasswordField.positionCaret(visiblePasswordField.getLength());
         } else {
             // Show the password field
             passwordField.setText(visiblePasswordField.getText());
@@ -114,6 +115,7 @@ public class LoginController {
             visiblePasswordField.setVisible(false);
             visiblePasswordField.setManaged(false);
             passwordField.requestFocus();
+            passwordField.positionCaret(passwordField.getLength());
         }
     }
 
