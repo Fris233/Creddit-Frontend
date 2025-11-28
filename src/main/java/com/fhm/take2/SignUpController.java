@@ -232,7 +232,7 @@ public class SignUpController {
             try {
                 String bio = ""; // Empty bio
 
-                User user = Client.signup(username, email, password, gender, bio);
+                Client.register(new User(0, username, email, password, gender, bio, null, null, true));
 
                 // Update UI on JavaFX Application Thread
                 javafx.application.Platform.runLater(() -> {
