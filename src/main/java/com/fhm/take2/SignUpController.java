@@ -64,7 +64,7 @@ public class SignUpController {
     private Runnable onReturnToLogin;
     private boolean isPasswordVisible = false;
     private boolean isConfirmPasswordVisible = false;
-
+//a
     @FXML
     public void initialize() {
         System.out.println("Sign Up Controller Initialized");
