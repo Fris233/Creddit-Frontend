@@ -14,45 +14,53 @@
       prefWidth="400"
       prefHeight="500"
       fx:controller="com.fhm.take2.LoginController">
-
     <stylesheets>
         <URL value="@CredditCSS.css" />
     </stylesheets>
-
-    <!-- Title -->
     <Label text="Log In" style="-fx-text-fill: white; -fx-font-size: 24; -fx-font-weight: bold;" />
-
-    <!-- Login Form -->
     <VBox spacing="15" alignment="CENTER_LEFT" style="-fx-padding: 20 0 0 0;">
         <!-- Email/Username -->
         <Label text="Email or username *" style="-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 12;" />
         <TextField fx:id="emailField"
                    promptText="Enter your email or username"
-                   style="-fx-background-radius: 5; -fx-border-radius: 5; -fx-border-color: #555; -fx-border-width: 1; -fx-padding: 8;"
+                   style="-fx-background-radius: 5; -fx-border-radius: 5; -fx-border-color: #555; -fx-border-width: 1; -fx-padding: 8 12 8 12; -fx-text-fill: white; -fx-background-color: #2C3539;"
                    prefHeight="35" />
-
-        <!-- Password -->
         <Label text="Password *" style="-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 12;" />
-        <PasswordField fx:id="passwordField"
+        <StackPane fx:id="passwordContainer" prefHeight="35">
+            <PasswordField fx:id="passwordField"
+                           promptText="Enter your password"
+                           style="-fx-background-radius: 5; -fx-border-radius: 5; -fx-border-color: #555; -fx-border-width: 1; -fx-padding: 8 35 8 12; -fx-text-fill: white; -fx-background-color: #2C3539;"
+                           prefHeight="35" />
+            <TextField fx:id="visiblePasswordField"
                        promptText="Enter your password"
-                       style="-fx-background-radius: 5; -fx-border-radius: 5; -fx-border-color: #555; -fx-border-width: 1; -fx-padding: 8;"
-                       prefHeight="35" />
+                       style="-fx-background-radius: 5; -fx-border-radius: 5; -fx-border-color: #555; -fx-border-width: 1; -fx-padding: 8 35 8 12; -fx-text-fill: white; -fx-background-color: #2C3539;"
+                       prefHeight="35"
+                       visible="false"
+                       managed="false" />
+            <Button fx:id="togglePasswordButton"
+                    onAction="#togglePasswordVisibility"
+                    style="-fx-background-color: transparent; -fx-border-color: transparent; -fx-cursor: hand;"
+                    minWidth="30"
+                    minHeight="30"
+                    maxWidth="30"
+                    maxHeight="30"
+                    StackPane.alignment="CENTER_RIGHT">
+                <tooltip>
+                    <Tooltip text="Show/Hide Password" style="-fx-text-fill: white; -fx-background-color: #2C3539;" />
+                </tooltip>
+            </Button>
+        </StackPane>
     </VBox>
-
-    <!-- Spacer to push OK button to bottom -->
     <VBox VBox.vgrow="ALWAYS" />
-
-    <!-- OK Button at Bottom Center -->
     <Button fx:id="okButton"
             text="LOGIN"
             onAction="#handleOkButton"
-            style="-fx-background-color: #4caf50; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 10;"
+            style="-fx-background-color: #4caf50; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 10; -fx-cursor: hand;"
             prefWidth="120"
             prefHeight="40" />
-
-    <!-- Sign Up Section -->
     <Hyperlink fx:id="signUpLink"
                text="New to Creddit? Sign Up"
-               onAction="#handleSignUp" style="-fx-text-fill: #0079d3; -fx-border-color: transparent;" />
+               onAction="#handleSignUp"
+               style="-fx-text-fill: #0079d3; -fx-border-color: transparent; -fx-cursor: hand;" />
 
 </VBox>

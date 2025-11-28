@@ -10,7 +10,11 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.event.ActionEvent;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 
 import java.io.IOException;
 import java.util.function.Consumer;
@@ -24,29 +28,93 @@ public class LoginController {
     private PasswordField passwordField;
 
     @FXML
+    private TextField visiblePasswordField;
+
+    @FXML
+    private StackPane passwordContainer;
+
+    @FXML
+    private Button togglePasswordButton;
+
+    @FXML
     private Hyperlink signUpLink;
 
     @FXML
     private Button okButton;
 
     private Consumer<User> onLoginSuccess;
-
-    // Initialize method - called after FXML fields are injected
+    private boolean isPasswordVisible = false;
     @FXML
     public void initialize() {
         System.out.println("Login Controller Initialized");
-
-        // Setup button hover effects
         setupOkButtonEffects();
-
-        // Setup text field focus effects
+        setupTogglePasswordButton();
         setupTextFieldEffects();
-
-        // Set focus to email field when the form loads
+        setupPasswordVisibility();
         emailField.requestFocus();
-
-        // Add Enter key support for login
         setupEnterKeySupport();
+    }
+
+    private void setupTogglePasswordButton() {
+        // Set the eye icon
+        Image eyeImage = new Image(getClass().getResourceAsStream("/com/fhm/take2/assets/eye3.png"));
+        ImageView eyeIcon = new ImageView(eyeImage);
+        eyeIcon.setFitHeight(20);
+        eyeIcon.setFitWidth(20);
+        eyeIcon.setPreserveRatio(true);
+
+        togglePasswordButton.setGraphic(eyeIcon);
+        togglePasswordButton.setStyle("-fx-background-color: transparent; -fx-border-color: transparent;");
+
+        togglePasswordButton.addEventHandler(MouseEvent.MOUSE_ENTERED, e -> {
+            togglePasswordButton.setStyle("-fx-background-color: #404040; -fx-border-color: transparent;");
+        });
+
+        togglePasswordButton.addEventHandler(MouseEvent.MOUSE_EXITED, e -> {
+            togglePasswordButton.setStyle("-fx-background-color: transparent; -fx-border-color: transparent;");
+        });
+    }
+
+    private void setupPasswordVisibility() {
+        // Initially hide the visible password field
+        visiblePasswordField.setVisible(false);
+        visiblePasswordField.setManaged(false);
+
+        // Sync the text between password fields
+        passwordField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (!visiblePasswordField.isFocused()) {
+                visiblePasswordField.setText(newValue);
+            }
+        });
+
+        visiblePasswordField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (!passwordField.isFocused()) {
+                passwordField.setText(newValue);
+            }
+        });
+    }
+
+    @FXML
+    private void togglePasswordVisibility(ActionEvent event) {
+        isPasswordVisible = !isPasswordVisible;
+
+        if (isPasswordVisible) {
+            // Show the visible password field
+            visiblePasswordField.setText(passwordField.getText());
+            visiblePasswordField.setVisible(true);
+            visiblePasswordField.setManaged(true);
+            passwordField.setVisible(false);
+            passwordField.setManaged(false);
+            visiblePasswordField.requestFocus();
+        } else {
+            // Show the password field
+            passwordField.setText(visiblePasswordField.getText());
+            passwordField.setVisible(true);
+            passwordField.setManaged(true);
+            visiblePasswordField.setVisible(false);
+            visiblePasswordField.setManaged(false);
+            passwordField.requestFocus();
+        }
     }
 
     // Set callback for successful login
@@ -79,7 +147,7 @@ public class LoginController {
     }
 
     private void setupTextFieldEffects() {
-        TextField[] textFields = {emailField, passwordField};
+        TextField[] textFields = {emailField, passwordField, visiblePasswordField};
 
         for (TextField field : textFields) {
             field.focusedProperty().addListener((obs, oldVal, newVal) -> {
@@ -97,9 +165,16 @@ public class LoginController {
     private void setupEnterKeySupport() {
         // Allow pressing Enter in password field to trigger login
         passwordField.setOnAction(event -> handleLogin());
+        visiblePasswordField.setOnAction(event -> handleLogin());
 
         // Allow pressing Enter in email field to move to password field
-        emailField.setOnAction(event -> passwordField.requestFocus());
+        emailField.setOnAction(event -> {
+            if (isPasswordVisible) {
+                visiblePasswordField.requestFocus();
+            } else {
+                passwordField.requestFocus();
+            }
+        });
     }
 
     @FXML
@@ -110,15 +185,14 @@ public class LoginController {
 
     @FXML
     private void handleSignUp(ActionEvent event) {
-        System.out.println("Sign up link clicked - navigating to sign up page");
+        System.out.println("Sign up link clicked");
         navigateToSignUp();
     }
 
     private void handleLogin() {
         String email = emailField.getText();
-        String password = passwordField.getText();
+        String password = isPasswordVisible ? visiblePasswordField.getText() : passwordField.getText();
 
-        // Basic validation
         if (email == null || email.trim().isEmpty()) {
             showAlert("Validation Error", "Please enter your email or username");
             emailField.requestFocus();
@@ -127,16 +201,16 @@ public class LoginController {
 
         if (password == null || password.trim().isEmpty()) {
             showAlert("Validation Error", "Please enter your password");
-            passwordField.requestFocus();
+            if (isPasswordVisible) {
+                visiblePasswordField.requestFocus();
+            } else {
+                passwordField.requestFocus();
+            }
             return;
         }
-
-        // Here you would typically validate credentials
         System.out.println("Login attempt with:");
         System.out.println("Email/Username: " + email);
         System.out.println("Password: " + maskPassword(password));
-
-        // Use actual login logic with your Client class
         User user = performLogin(email, password);
 
         if (user != null) {
@@ -147,15 +221,18 @@ public class LoginController {
             }
         } else {
             showAlert("Login Failed", "Invalid credentials. Please try again.");
-            // Clear password field on failed login
             passwordField.clear();
-            passwordField.requestFocus();
+            visiblePasswordField.clear();
+            if (isPasswordVisible) {
+                visiblePasswordField.requestFocus();
+            } else {
+                passwordField.requestFocus();
+            }
         }
     }
 
     private User performLogin(String email, String password) {
         try {
-            // Use your actual Client.login method which calls User.login internally
             User user = Client.login(email, password);
 
             if (user != null) {
@@ -177,45 +254,19 @@ public class LoginController {
 
     private void navigateToSignUp() {
         try {
-            System.out.println("Loading signup.fxml...");
             FXMLLoader loader = new FXMLLoader(getClass().getResource("sign-up.fxml"));
             Parent root = loader.load();
-            System.out.println("signup.fxml loaded successfully");
-
-            // Get the signup controller
-            SignUpController signUpController = loader.getController();
-
-            // Set up callback for successful signup
-            signUpController.setOnSignUpSuccess(user -> {
-                // When signup is successful, close the signup window and call login success
-                if (onLoginSuccess != null) {
-                    onLoginSuccess.accept(user);
-                }
-            });
-
-            // Get the current stage (login window)
             Stage currentStage = (Stage) signUpLink.getScene().getWindow();
-            System.out.println("Current stage: " + currentStage);
-
-            // Set the new scene (replace login with signup)
             Scene scene = new Scene(root);
             currentStage.setScene(scene);
             currentStage.setTitle("Sign Up - Creddit");
             currentStage.centerOnScreen();
 
-            System.out.println("Navigation to sign up completed");
-
         } catch (IOException e) {
             e.printStackTrace();
-            System.err.println("Error loading signup.fxml: " + e.getMessage());
             showAlert("Navigation Error", "Unable to load sign up page: " + e.getMessage());
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.err.println("Unexpected error: " + e.getMessage());
-            showAlert("Error", "An unexpected error occurred: " + e.getMessage());
         }
     }
-
     private String maskPassword(String password) {
         return password.replaceAll(".", "*");
     }
@@ -225,24 +276,19 @@ public class LoginController {
         alert.setTitle(title);
         alert.setHeaderText(null);
         alert.setContentText(message);
-
-        // Style the alert to match our dark theme
         DialogPane dialogPane = alert.getDialogPane();
         dialogPane.setStyle("-fx-background-color: #0E1113;");
         dialogPane.lookup(".content.label").setStyle("-fx-text-fill: white;");
-
-        // Apply custom style to buttons
         ButtonType okButton = alert.getButtonTypes().get(0);
         Node okButtonNode = dialogPane.lookupButton(okButton);
         okButtonNode.setStyle("-fx-background-color: #0E1113; -fx-text-fill: white; -fx-background-radius: 10;");
 
         alert.showAndWait();
     }
-
-    // Additional utility methods
     public void clearForm() {
         emailField.clear();
         passwordField.clear();
+        visiblePasswordField.clear();
         emailField.requestFocus();
     }
 
@@ -252,5 +298,6 @@ public class LoginController {
 
     public void setPassword(String password) {
         passwordField.setText(password);
+        visiblePasswordField.setText(password);
     }
 }
