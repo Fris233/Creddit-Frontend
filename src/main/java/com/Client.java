@@ -111,6 +111,8 @@ public abstract class Client {
     }
 
     public static boolean register(User user) throws Exception {
+        if(user == null)
+            return false;
         return user.register(BASE_URL, gson);
     }
 

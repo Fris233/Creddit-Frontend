@@ -368,8 +368,10 @@ public class SignUpController {
             showAlert("Validation Error", "Password cannot exceed 32 characters");
             if (isPasswordVisible) {
                 visiblePasswordField.requestFocus();
+                visiblePasswordField.positionCaret(visiblePasswordField.getLength());
             } else {
                 passwordField.requestFocus();
+                passwordField.positionCaret(passwordField.getLength());
             }
             return;
         }
