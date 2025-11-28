@@ -410,7 +410,7 @@ public class SignUpController {
                 boolean active = true;
 
                 // Create user object
-                User user = new User(-1, username, email, password, gender, bio, pfp, timeCreated, active);
+                User user = new User(0, username, email, password, gender, bio, pfp, timeCreated, active);
 
                 // Use Client.register instead of Client.signup
                 boolean registrationSuccess = Client.register(user);
