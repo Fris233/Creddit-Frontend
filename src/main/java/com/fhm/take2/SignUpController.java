@@ -495,6 +495,29 @@ public class SignUpController {
             currentStage.setTitle("Login - Creddit");
             currentStage.centerOnScreen();
 
+            LoginController loginController = loader.getController();
+
+            loginController.setOnLoginSuccess(user -> {
+                currentStage.close();
+                try {
+                    FXMLLoader loader2 = new FXMLLoader(getClass().getResource("home-page.fxml"));
+                    Parent root2 = loader2.load();
+
+                    HomePageController homePageController = loader2.getController();
+                    homePageController.InitData(user, null);
+
+                    // Create the second scene
+                    Scene scene2 = new Scene(root2);
+                    // Get the current stage
+                    Stage stage = (Stage)currentStage.getOwner();
+                    // Set the new scene
+                    stage.setScene(scene2);
+                }
+                catch (Exception ex) {
+                    System.out.println(ex.getMessage());
+                }
+            });
+
         } catch (IOException e) {
             e.printStackTrace();
             showAlert("Navigation Error", "Unable to load login page: " + e.getMessage());
