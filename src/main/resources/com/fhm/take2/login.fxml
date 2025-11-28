@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<?import java.net.URL?>
+<VBox xmlns="http://javafx.com/javafx/11.0.1"
+      xmlns:fx="http://javafx.com/fxml/1"
+      alignment="TOP_CENTER"
+      spacing="20"
+      style="-fx-background-color: #0E1113; -fx-padding: 40 20 20 20;"
+      prefWidth="400"
+      prefHeight="500"
+      fx:controller="com.fhm.take2.LoginController">
+
+    <stylesheets>
+        <URL value="@CredditCSS.css" />
+    </stylesheets>
+
+    <!-- Title -->
+    <Label text="Log In" style="-fx-text-fill: white; -fx-font-size: 24; -fx-font-weight: bold;" />
+
+    <!-- Login Form -->
+    <VBox spacing="15" alignment="CENTER_LEFT" style="-fx-padding: 20 0 0 0;">
+        <!-- Email/Username -->
+        <Label text="Email or username *" style="-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 12;" />
+        <TextField fx:id="emailField"
+                   promptText="Enter your email or username"
+                   style="-fx-background-radius: 5; -fx-border-radius: 5; -fx-border-color: #555; -fx-border-width: 1; -fx-padding: 8;"
+                   prefHeight="35" />
+
+        <!-- Password -->
+        <Label text="Password *" style="-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 12;" />
+        <PasswordField fx:id="passwordField"
+                       promptText="Enter your password"
+                       style="-fx-background-radius: 5; -fx-border-radius: 5; -fx-border-color: #555; -fx-border-width: 1; -fx-padding: 8;"
+                       prefHeight="35" />
+    </VBox>
+
+    <!-- Spacer to push OK button to bottom -->
+    <VBox VBox.vgrow="ALWAYS" />
+
+    <!-- OK Button at Bottom Center -->
+    <Button fx:id="okButton"
+            text="LOGIN"
+            onAction="#handleOkButton"
+            style="-fx-background-color: #4caf50; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 10;"
+            prefWidth="120"
+            prefHeight="40" />
+
+    <!-- Sign Up Section -->
+    <Hyperlink fx:id="signUpLink"
+               text="New to Creddit? Sign Up"
+               onAction="#handleSignUp" style="-fx-text-fill: #0079d3; -fx-border-color: transparent;" />
+
+</VBox>

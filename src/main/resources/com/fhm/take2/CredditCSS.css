@@ -37,3 +37,38 @@
     -fx-background-color: transparent;
     -fx-text-fill: white;
 }
+/* ComboBox styling */
+.combo-box {
+    -fx-background-color: #2C3539;
+    -fx-text-fill: white;
+    -fx-border-color: #555;
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
+}
+
+.combo-box .list-cell {
+    -fx-background-color: #2C3539;
+    -fx-text-fill: white;
+}
+
+.combo-box .list-view {
+    -fx-background-color: #2C3539;
+    -fx-background-radius: 5;
+}
+
+.combo-box .list-view .list-cell {
+    -fx-background-color: #2C3539;
+    -fx-text-fill: white;
+}
+
+.combo-box .list-view .list-cell:hover {
+    -fx-background-color: #404040;
+}
+
+.combo-box .list-view .list-cell:selected {
+    -fx-background-color: #0079d3;
+}
+
+.combo-box .arrow {
+    -fx-background-color: white;
+}
