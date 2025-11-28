@@ -24,6 +24,31 @@ public class HelloApplication extends Application {
             HomePageController homePageController = fxmlLoader.getController();
             homePageController.InitData(null, null);
         }
+        else {
+            Error404Controller error404Controller = fxmlLoader.getController();
+            error404Controller.refreshButton.setOnAction(e -> {
+                if(!Client.isServerReachable()) {
+                    return;
+                }
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("home-page.fxml"));
+                Parent root = null;
+                try {
+                    root = loader.load();
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+
+                HomePageController homePageController = loader.getController();
+                homePageController.InitData(null, null);
+
+                // Create the second scene
+                Scene scene2 = new Scene(root);
+                // Get the current stage
+                Stage stage2 = (Stage)error404Controller.refreshButton.getScene().getWindow();
+                // Set the new scene
+                stage2.setScene(scene2);
+            });
+        }
         stage.setTitle("CREDDIT");
         stage.setScene(scene);
         stage.show();

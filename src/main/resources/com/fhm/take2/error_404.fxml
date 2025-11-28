@@ -15,7 +15,7 @@
       </ImageView>
       <AnchorPane layoutX="5.0" layoutY="8.0" prefHeight="109.0" prefWidth="389.0" AnchorPane.leftAnchor="5.0">
          <children>
-            <Button fx:id="refreshButton" mnemonicParsing="false" onMouseClicked="#Refresh" prefHeight="109.0" prefWidth="390.0" style="-fx-text-fill: #ffffff;" text="REFRESH" textFill="#c6151500">
+            <Button fx:id="refreshButton" mnemonicParsing="false" prefHeight="109.0" prefWidth="390.0" style="-fx-text-fill: #ffffff;" text="REFRESH" textFill="#c6151500">
                <font>
                   <Font size="18.0" />
                </font>
