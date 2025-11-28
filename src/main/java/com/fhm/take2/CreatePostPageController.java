@@ -7,6 +7,8 @@ import com.crdt.Post;
 import com.crdt.User;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -14,19 +16,17 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 
 import java.io.*;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.Map;
+import java.util.*;
 
 public class CreatePostPageController {
 
@@ -38,6 +38,11 @@ public class CreatePostPageController {
     @FXML private StackPane mediaPane;
     @FXML private Button postButton;
     @FXML private VBox createInfoContainer;
+
+    @FXML private TextField categorySearchField;
+    @FXML private ListView<String> lvSuggestions;
+    @FXML private HBox hbSelectedCategories;
+
     @FXML private ScrollPane scrollPane;
     @FXML private TextField searchField;
     @FXML private ComboBox<?> subcredditComboBox;
@@ -50,12 +55,36 @@ public class CreatePostPageController {
     private User currentUser;
     private BooleanProperty validPostInfo = new SimpleBooleanProperty(false);
 
+    private ArrayList<String> allCategories;
+    private ArrayList<String> selectedCategories;
+
+    private ObservableList<String> suggestions;
+
     public void InitData(User user) {
-        //selectedFiles = new ArrayList<>();
+        try {
+            allCategories = new ArrayList<>(Arrays.asList(Client.GetAllCategories()));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        selectedCategories = new ArrayList<>();
         mediaViewController = null;
         currentUser = user;
 
         contentArea.setWrapText(true);
+
+        suggestions = FXCollections.observableArrayList();
+        lvSuggestions.setItems(suggestions);
+        lvSuggestions.setVisible(false);
+        lvSuggestions.setFocusTraversable(false);
+        lvSuggestions.setFixedCellSize(24);
+        categorySearchField.textProperty().addListener((obs, old, text) -> {
+            UpdateSuggestions(text);
+        });
+
+        lvSuggestions.setOnMouseClicked(e -> {
+            if(e.getClickCount() == 1)
+                HandleSelect();
+        });
 
         int[] lastLineCount = { 1 };
 
@@ -79,10 +108,7 @@ public class CreatePostPageController {
         });
 
         titleField.textProperty().addListener((obs, oldText, newText) -> {
-            if(newText.isEmpty())
-                validPostInfo.set(false);
-            else
-                validPostInfo.set(true);
+            validPostInfo.set(!newText.isBlank());
         });
 
         validPostInfo.addListener((obs, oldVal, newVal) -> {
@@ -156,6 +182,118 @@ public class CreatePostPageController {
         event.consume();
     }
 
+    private void HandleSelect() {
+        String chosen;
+
+        int sel = lvSuggestions.getSelectionModel().getSelectedIndex();
+
+        if (sel != -1) {
+            chosen = suggestions.get(sel);
+        } else {
+            if(!suggestions.isEmpty())
+                chosen = suggestions.get(0);
+            else
+                chosen = categorySearchField.getText();
+        }
+
+        categorySearchField.setText(chosen);
+        lvSuggestions.setVisible(false);
+        categorySearchField.requestFocus();
+        categorySearchField.positionCaret(categorySearchField.getLength());
+    }
+
+    private void UpdateSuggestions(String input) {
+        if (input == null || input.trim().isEmpty()) {
+            suggestions.clear();
+            lvSuggestions.setVisible(false);
+            return;
+        }
+
+        String lower = input.toLowerCase();
+
+        // filter
+        suggestions.setAll(allCategories.stream().filter(c -> c.toLowerCase().contains(lower)).toList());
+
+        // remove selection when typing
+        lvSuggestions.getSelectionModel().clearSelection();
+
+        if (suggestions.isEmpty()) {
+            lvSuggestions.setVisible(false);
+        } else {
+            lvSuggestions.setVisible(true);
+
+            // auto shrink / expand
+            int maxVisible = Math.min(suggestions.size(), 6);
+            lvSuggestions.setPrefHeight(maxVisible * lvSuggestions.getFixedCellSize());
+        }
+    }
+
+    private void AddCategory(String category) {
+        if(selectedCategories.contains(category))
+            return;
+        selectedCategories.add(category);
+        RenderSelectedCategories();
+    }
+
+    private void RenderSelectedCategories() {
+        hbSelectedCategories.getChildren().clear();
+        for(String str : selectedCategories) {
+            HBox chip = CreateChip(str);
+            hbSelectedCategories.getChildren().add(chip);
+        }
+    }
+
+    private HBox CreateChip(String str) {
+        Label name = new Label(str);
+        Button remove = new Button("X");
+        remove.setOnAction(e -> {
+            selectedCategories.remove(str);
+            RenderSelectedCategories();
+        });
+        remove.setStyle("-fx-background-color: transparent;");
+        HBox box = new HBox(name, remove);
+        //box.setPrefHeight(24);
+        box.setStyle("-fx-background-radius: 10; -fx-padding: 5 0 0 10; -fx-background-color: #d0d0d0; -fx-spacing: 15;");
+        return box;
+    }
+
+    @FXML
+    void CategorySearchKeyHandler(KeyEvent event) {
+        if(event.getCode() == KeyCode.ENTER) {
+            HandleSelect();
+            String text = categorySearchField.getText().trim();
+            if(text.isEmpty())
+                return;
+            if(selectedCategories.stream().anyMatch(c -> c.equalsIgnoreCase(text)))
+                return;
+            AddCategory(text);
+            categorySearchField.clear();
+            lvSuggestions.setVisible(false);
+        }
+        else if(event.getCode() == KeyCode.TAB) {
+            if(suggestions.isEmpty())
+                return;
+            HandleSelect();
+        }
+        else if(event.getCode() == KeyCode.UP) {
+            if (!suggestions.isEmpty()) {
+                int sel = lvSuggestions.getSelectionModel().getSelectedIndex();
+                if (sel == -1) sel = suggestions.size() - 1;
+                else sel = (sel - 1 + suggestions.size()) % suggestions.size(); // circular
+                lvSuggestions.getSelectionModel().select(sel);
+            }
+        }
+        else if(event.getCode() == KeyCode.DOWN) {
+            if (!suggestions.isEmpty()) {
+                int sel = lvSuggestions.getSelectionModel().getSelectedIndex();
+                if (sel == -1) sel = 0;     // first press = select top item
+                else sel = (sel + 1) % suggestions.size(); // circular
+                lvSuggestions.getSelectionModel().select(sel);
+            }
+        }
+        event.consume();
+    }
+
     @FXML
     void SendPost(MouseEvent event) {
         if(!validPostInfo.get()) return;
@@ -201,12 +339,17 @@ public class CreatePostPageController {
             }
 
             // Now send post JSON
-            Post post = new Post(1, currentUser, null, title, content, media, null, null, null, 0, 0);
+            Post post = new Post(1, currentUser, null, title, content, media, selectedCategories, null, null, 0, 0);
             if (Client.CreatePost(post)) {
                 Alert alert = new Alert(Alert.AlertType.INFORMATION, "Post uploaded successfully!");
                 alert.showAndWait();
                 titleField.clear();
                 contentArea.clear();
+                categorySearchField.clear();
+                lvSuggestions.setVisible(false);
+                selectedCategories.clear();
+                RenderSelectedCategories();
+
                 if(mediaViewController != null) {
                     mediaViewController.Clean();
                     RemoveMediaPane();

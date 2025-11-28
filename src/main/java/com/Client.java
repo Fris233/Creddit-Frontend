@@ -1,18 +1,18 @@
 package com;
 
-import com.crdt.*;
+import com.crdt.Admin;
+import com.crdt.Media;
+import com.crdt.Post;
+import com.crdt.User;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.typeadapters.RuntimeTypeAdapterFactory;
-import javafx.scene.control.Alert;
 
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -93,7 +93,6 @@ public abstract class Client {
 
     public static User GetUser(int id) throws Exception {
         URL url = new URL(BASE_URL + String.format("/user?id=%s", java.net.URLEncoder.encode(String.valueOf(id), "UTF-8")));
-        System.out.println(url);
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         conn.setRequestMethod("GET");
 
@@ -104,13 +103,15 @@ public abstract class Client {
         reader.close();
 
         User user = gson.fromJson(sb.toString(), User.class);
-        System.out.println(user.getId());
-        System.out.println(user.getUsername());
         return user;
     }
 
     public static User login(String usermail, String password) throws Exception {
         return User.login(usermail, password, BASE_URL, gson);
+    }
+
+    public static boolean register(User user) throws Exception {
+        return user.register(BASE_URL, gson);
     }
 
     public static int CheckVote(User user, Post post) throws Exception {
@@ -156,39 +157,6 @@ public abstract class Client {
         return postMap;
     }
 
-    // Update the signup method in your Client class to use Gender enum
-    public static User signup(String username, String email, String password, Gender gender, String bio) throws Exception {
-        // Create a JSON object with user data
-        JsonObject json = new JsonObject();
-        json.addProperty("username", username);
-        json.addProperty("email", email);
-        json.addProperty("password", password);
-        json.addProperty("gender", gender.toString()); // Convert enum to string
-        json.addProperty("bio", bio);
-
-        String jsonBody = gson.toJson(json);
-
-        URL url = new URL(BASE_URL + "/user/signup");
-        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-        conn.setRequestMethod("POST");
-        conn.setDoOutput(true);
-        conn.setRequestProperty("Content-Type", "application/json");
-
-        try (OutputStream os = conn.getOutputStream()) {
-            os.write(jsonBody.getBytes());
-        }
-
-        BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-        StringBuilder sb = new StringBuilder();
-        String line;
-        while ((line = reader.readLine()) != null) sb.append(line);
-        reader.close();
-
-        // Parse the response and return the created user
-        User user = gson.fromJson(sb.toString(), User.class);
-        return user;
-    }
-
 
 
 
@@ -196,5 +164,19 @@ public abstract class Client {
 
     public static boolean CreatePost(Post post) throws Exception {
         return post.create(BASE_URL, gson);
+    }
+
+    public static String[] GetAllCategories() throws Exception {
+        URL url = new URL(BASE_URL + "/category/all");
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("GET");
+
+        BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+        StringBuilder sb = new StringBuilder();
+        String line;
+        while ((line = reader.readLine()) != null) sb.append(line);
+        reader.close();
+
+        return gson.fromJson(sb.toString(), String[].class);
     }
 }

@@ -46,7 +46,18 @@ public class User implements Reportable {
         this.active = active;
     }
 
-    public void register() {
+    public boolean register(String BASE_URL, Gson gson) throws Exception {
+        String jsonBody = gson.toJson(this);
+        URL url = new URL(BASE_URL + "/user/register");
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("POST");
+        conn.setDoOutput(true);
+        conn.setRequestProperty("Content-Type", "application/json");
+        try (OutputStream os = conn.getOutputStream()) {
+            os.write(jsonBody.getBytes());
+        }
+
+        return conn.getResponseCode() == 200;
     }
 
     public static User login(String usermail, String password, String BASE_URL, Gson gson) throws Exception {
