@@ -379,7 +379,7 @@ public class MediaViewController {
     }
 
     private void PrevNextButtons() {
-        if(mp != null && mp.getTotalDuration() != null && !mp.getTotalDuration().isUnknown() && !mp.getTotalDuration().isIndefinite())
+        if(mp != null && (mp.getTotalDuration() == null || mp.getTotalDuration().isUnknown() || mp.getTotalDuration().isIndefinite()))
             RemoveMedia();
         UpdateIndexLabel();
         int sz = creating? fileArrayList.size() : mediaArrayList.size();
