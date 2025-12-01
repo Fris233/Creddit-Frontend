@@ -7,6 +7,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import javafx.stage.Window;
 
 import java.io.IOException;
 import java.util.concurrent.Executors;
@@ -78,7 +79,16 @@ public class HelloApplication extends Application {
         }
         stage.setTitle("CREDDIT");
         stage.setScene(scene);
+
+        stage.setOnCloseRequest(event -> {
+            cleanup();
+        });
+
         stage.show();
+    }
+
+    private void cleanup() {
+        closeSession();
     }
 
     public static void main(String[] args) {

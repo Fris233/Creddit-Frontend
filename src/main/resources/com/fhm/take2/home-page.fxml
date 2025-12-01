@@ -43,24 +43,42 @@
                         </ImageView>
                     </children>
                 </AnchorPane>
-                <ScrollPane layoutX="6.0" layoutY="125.0" nodeOrientation="LEFT_TO_RIGHT" prefHeight="90.0" prefWidth="262.0" style="-fx-background-color: #0E1113;" stylesheets="@CredditCSS.css">
-                    <content>
-                        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="114.0" prefWidth="247.0" style="-fx-background-color: #0E1113;">
-                            <children>
-                                <AnchorPane layoutX="-1.0" prefHeight="52.0" prefWidth="262.0">
-                                    <children>
-                                        <Button contentDisplay="RIGHT" layoutX="-6.0" mnemonicParsing="false" onMouseClicked="#CreateSubcreddit" prefHeight="52.0" prefWidth="262.0" style="-fx-text-fill: #ffffff;" text="Create Subcreddit" textFill="#c6151500" />
-                                        <ImageView fitHeight="40.0" fitWidth="44.0" layoutX="30.0" layoutY="6.0" mouseTransparent="true" pickOnBounds="true" preserveRatio="true">
+            <VBox layoutX="6.0" layoutY="125.0" spacing="50.0">
+               <children>
+                      <ScrollPane maxHeight="265.0" nodeOrientation="LEFT_TO_RIGHT" prefWidth="262.0" style="-fx-background-color: #0E1113;" stylesheets="@CredditCSS.css">
+                          <content>
+                              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="61.0" prefWidth="260.0" style="-fx-background-color: #0E1113;">
+                                  <children>
+                                        <Button contentDisplay="RIGHT" layoutX="-7.0" mnemonicParsing="false" onMouseClicked="#CreateSubcreddit" prefHeight="52.0" prefWidth="270.0" style="-fx-text-fill: #ffffff;" text="Create Subcreddit" textFill="#c6151500" />
+                                        <ImageView fitHeight="40.0" fitWidth="44.0" layoutX="29.0" layoutY="6.0" mouseTransparent="true" pickOnBounds="true" preserveRatio="true">
                                             <image>
                                                 <Image url="@assets/add.png" />
                                             </image>
                                         </ImageView>
-                                    </children>
-                                </AnchorPane>
-                            </children>
-                        </AnchorPane>
-                    </content>
-                </ScrollPane>
+                                  </children>
+                              </AnchorPane>
+                          </content>
+                      </ScrollPane>
+                      <ScrollPane maxHeight="265.0" nodeOrientation="LEFT_TO_RIGHT" prefWidth="262.0" style="-fx-background-color: #0E1113;" stylesheets="@CredditCSS.css">
+                          <content>
+                              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="61.0" prefWidth="260.0" style="-fx-background-color: #0E1113;">
+                                  <children>
+                                        <ImageView fitHeight="40.0" fitWidth="44.0" layoutX="28.0" layoutY="6.0" mouseTransparent="true" pickOnBounds="true" preserveRatio="true">
+                                            <image>
+                                                <Image url="@assets/recent.png" />
+                                            </image>
+                                        </ImageView>
+                                        <Label layoutX="105.0" layoutY="6.0" prefHeight="40.0" prefWidth="50.0" text="RECENT" textFill="WHITE" wrapText="true">
+                                            <font>
+                                                <Font size="14.0" />
+                                            </font>
+                                        </Label>
+                                  </children>
+                              </AnchorPane>
+                          </content>
+                      </ScrollPane>
+               </children>
+            </VBox>
                 <AnchorPane layoutX="14.0" layoutY="736.0">
                     <children>
                         <Button layoutX="-7.0" mnemonicParsing="false" onMouseClicked="#CheckRules" prefHeight="52.0" prefWidth="262.0" style="-fx-text-fill: #ffffff;" text="Creddit Rules" textFill="#c6151500">
@@ -75,28 +93,6 @@
                         </ImageView>
                     </children>
                 </AnchorPane>
-                <ScrollPane layoutX="6.0" layoutY="239.0" nodeOrientation="LEFT_TO_RIGHT" prefHeight="90.0" prefWidth="262.0" style="-fx-background-color: #0E1113;" stylesheets="@CredditCSS.css">
-                    <content>
-                        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="114.0" prefWidth="247.0" style="-fx-background-color: #0E1113;">
-                            <children>
-                                <AnchorPane layoutX="-1.0" prefHeight="52.0" prefWidth="262.0">
-                                    <children>
-                                        <ImageView fitHeight="40.0" fitWidth="44.0" layoutX="29.0" layoutY="6.0" mouseTransparent="true" pickOnBounds="true" preserveRatio="true">
-                                            <image>
-                                                <Image url="@assets/recent.png" />
-                                            </image>
-                                        </ImageView>
-                                        <Label layoutX="106.0" layoutY="6.0" prefHeight="40.0" prefWidth="50.0" text="RECENT" textFill="WHITE" wrapText="true">
-                                            <font>
-                                                <Font size="14.0" />
-                                            </font>
-                                        </Label>
-                                    </children>
-                                </AnchorPane>
-                            </children>
-                        </AnchorPane>
-                    </content>
-                </ScrollPane>
             </children>
         </AnchorPane>
         <GridPane prefHeight="84.0" prefWidth="1600.0" style="-fx-border-color: gray;" stylesheets="@CredditCSS.css">

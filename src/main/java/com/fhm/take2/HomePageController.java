@@ -77,20 +77,22 @@ public class HomePageController {
             loggedOutPane.setVisible(false);
             loggedInPane.setDisable(false);
             loggedInPane.setVisible(true);
-            // userPFP.setImage(currentUser.getProfilePicture());
+            //userPFP.setImage(currentUser.getPfp());
         } else {
             // User is logged out
             loggedOutPane.setDisable(false);
             loggedOutPane.setVisible(true);
             loggedInPane.setDisable(true);
             loggedInPane.setVisible(false);
+            recentScrollPane.setDisable(true);
+            recentScrollPane.setVisible(false);
         }
     }
 
     @FXML
     void Chat(MouseEvent event) {
         if (currentUser == null) {
-            showLoginAlert();
+            Login();
             return;
         }
         try {
@@ -100,6 +102,7 @@ public class HomePageController {
             stage.setScene(new Scene(root, 800, 600));
             stage.setMinWidth(600);
             stage.setMinHeight(400);
+            stage.initOwner(postsContainer.getScene().getWindow());
             stage.show();
         } catch (IOException e) {
             e.printStackTrace();
@@ -123,7 +126,7 @@ public class HomePageController {
     @FXML
     void CreatePost(MouseEvent event) {
         if (currentUser == null) {
-            showLoginAlert();
+            Login();
             return;
         }
         System.out.println("Create Post Button Pressed");
@@ -150,7 +153,7 @@ public class HomePageController {
     @FXML
     void CreateSubcreddit(MouseEvent event) {
         if (currentUser == null) {
-            showLoginAlert();
+            Login();
             return;
         }
         System.out.println("Create Subcreddit Button Pressed");
@@ -159,10 +162,9 @@ public class HomePageController {
     }
 
     @FXML
-    void Login(MouseEvent event) {
+    void Login() {
         System.out.println("Login Button Pressed");
         navigateToLoginDialog();
-        event.consume();
     }
 
     // In the navigateToLoginDialog method, update the stage title:
@@ -205,7 +207,7 @@ public class HomePageController {
     @FXML
     void ProfilePressed(MouseEvent event) {
         if (currentUser == null) {
-            showLoginAlert();
+            Login();
             return;
         }
         System.out.println("Profile Button Pressed");
@@ -242,10 +244,6 @@ public class HomePageController {
         System.out.println("Search Pressed");
         Clean();
         event.consume();
-    }
-
-    private void showLoginAlert() {
-        showAlert("Login Required", "Please log in to access this feature.");
     }
 
     private void showAlert(String title, String message) {

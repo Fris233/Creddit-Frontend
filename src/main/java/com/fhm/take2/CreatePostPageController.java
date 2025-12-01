@@ -126,6 +126,27 @@ public class CreatePostPageController {
             double delta = e.getDeltaY() * 2;
             scrollPane.setVvalue(scrollPane.getVvalue() - delta / scrollPane.getContent().getBoundsInLocal().getHeight());
         });
+
+        // Handle dragging over the pane
+        scrollPane.setOnDragOver(event -> {
+            if (event.getGestureSource() != scrollPane && event.getDragboard().hasFiles()) {
+                event.acceptTransferModes(javafx.scene.input.TransferMode.COPY_OR_MOVE);
+            }
+            event.consume();
+        });
+
+        // Handle dropping files
+        scrollPane.setOnDragDropped(event -> {
+            var db = event.getDragboard();
+            boolean success = false;
+            if (db.hasFiles()) {
+                success = true;
+                List<File> files = db.getFiles();
+                files.forEach(this::AddFile);
+            }
+            event.setDropCompleted(success);
+            event.consume();
+        });
     }
 
     @FXML
@@ -387,6 +408,11 @@ public class CreatePostPageController {
         File file = fileChooser.showOpenDialog(window);
         if(file == null)
             return;
+        AddFile(file);
+        event.consume();
+    }
+
+    private void AddFile(File file) {
         if(mediaViewController == null) {
             try {
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("media-view.fxml"));
@@ -407,7 +433,6 @@ public class CreatePostPageController {
             }
         }
         mediaViewController.AddMedia(file);
-        event.consume();
     }
 
     private void RemoveMediaPane() {

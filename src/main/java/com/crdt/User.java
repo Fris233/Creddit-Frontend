@@ -83,7 +83,7 @@ public class User implements Reportable {
         return gson.fromJson(sb.toString(), User.class);
     }
 
-    public void keepAlive(String BASE_URL, Gson gson) throws Exception {
+    public boolean keepAlive(String BASE_URL, Gson gson) throws Exception {
         String jsonBody = gson.toJson(this);
         URL url = new URL(BASE_URL + "/user/keepalive");
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -93,6 +93,8 @@ public class User implements Reportable {
         try (OutputStream os = conn.getOutputStream()) {
             os.write(jsonBody.getBytes());
         }
+
+        return conn.getResponseCode() == 200;
     }
 
     public void update() {
