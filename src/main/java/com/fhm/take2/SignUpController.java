@@ -506,6 +506,8 @@ public class SignUpController {
                     HomePageController homePageController = loader2.getController();
                     homePageController.InitData(user, null);
 
+                    HelloApplication.startSession(user);
+
                     // Create the second scene
                     Scene scene2 = new Scene(root2);
                     // Get the current stage

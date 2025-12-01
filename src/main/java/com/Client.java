@@ -110,6 +110,17 @@ public abstract class Client {
         return User.login(usermail, password, BASE_URL, gson);
     }
 
+    public static void keepAlive(User user) {
+        if(user == null)
+            return;
+        try {
+            user.keepAlive(BASE_URL, gson);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     public static boolean register(User user) throws Exception {
         if(user == null)
             return false;

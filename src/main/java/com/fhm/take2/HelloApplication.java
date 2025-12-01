@@ -1,6 +1,7 @@
 package com.fhm.take2;
 
 import com.Client;
+import com.crdt.User;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -8,8 +9,34 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 public class HelloApplication extends Application {
+    private static ScheduledExecutorService scheduler;
+    private static ScheduledFuture<?> scheduledTask;
+    private static User currentUser;
+
+    public static void startSession(User user) {
+        currentUser = user;
+        scheduler = Executors.newSingleThreadScheduledExecutor();
+
+        scheduledTask = scheduler.scheduleAtFixedRate(() -> {
+            Client.keepAlive(currentUser);
+        }, 0, 5, TimeUnit.SECONDS);
+    }
+
+    public static void closeSession() {
+        if (scheduledTask != null) {
+            scheduledTask.cancel(true);
+        }
+        if (scheduler != null) {
+            scheduler.shutdownNow();
+        }
+    }
+
     @Override
     public void start(Stage stage) throws IOException {
         String page = "home-page.fxml";

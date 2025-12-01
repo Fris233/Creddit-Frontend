@@ -2,6 +2,7 @@ package com.crdt;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import javafx.scene.control.Alert;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -71,8 +72,27 @@ public class User implements Reportable {
         while ((line = reader.readLine()) != null) sb.append(line);
         reader.close();
 
-        User user = gson.fromJson(sb.toString(), User.class);
-        return user;
+        if(conn.getResponseCode() == 500) {
+            Map<?,?> map = gson.fromJson(sb.toString(), Map.class);
+            if(map.get("status").equals("error") && map.get("message").equals("online")) {
+                new Alert(Alert.AlertType.ERROR, "Server unreachable! Check your connection and try again!").showAndWait();
+                return null;
+            }
+        }
+
+        return gson.fromJson(sb.toString(), User.class);
+    }
+
+    public void keepAlive(String BASE_URL, Gson gson) throws Exception {
+        String jsonBody = gson.toJson(this);
+        URL url = new URL(BASE_URL + "/user/keepalive");
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("POST");
+        conn.setDoOutput(true);
+        conn.setRequestProperty("Content-Type", "application/json");
+        try (OutputStream os = conn.getOutputStream()) {
+            os.write(jsonBody.getBytes());
+        }
     }
 
     public void update() {

@@ -190,6 +190,7 @@ public class HomePageController {
                 this.currentUser = user;
                 updateLoginUI();
                 loginStage.close();
+                HelloApplication.startSession(currentUser);
                 // Refresh the page to show user-specific content
                 Refresh(null);
             });
