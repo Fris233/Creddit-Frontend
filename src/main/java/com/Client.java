@@ -1,9 +1,6 @@
 package com;
 
-import com.crdt.Admin;
-import com.crdt.Media;
-import com.crdt.Post;
-import com.crdt.User;
+import com.crdt.*;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
@@ -25,8 +22,14 @@ public abstract class Client {
         RuntimeTypeAdapterFactory<User> userAdapter =
                 RuntimeTypeAdapterFactory.of(User.class, "type")
                         .registerSubtype(User.class, "user")
+                        .registerSubtype(Moderator.class, "moderator")
                         .registerSubtype(Admin.class, "admin");
-        gson = new GsonBuilder().registerTypeAdapterFactory(userAdapter).create();
+        RuntimeTypeAdapterFactory<Reportable> reportableAdapter =
+                RuntimeTypeAdapterFactory.of(Reportable.class, "type")
+                        .registerSubtype(User.class, "user")
+                        .registerSubtype(Post.class, "post")
+                        .registerSubtype(Comment.class, "comment");
+        gson = new GsonBuilder().registerTypeAdapterFactory(userAdapter).registerTypeAdapterFactory(reportableAdapter).create();
         BASE_URL = System.getenv("BASE_URL");
     }
 

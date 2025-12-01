@@ -10,6 +10,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
@@ -40,6 +41,12 @@ public class MessageController implements Initializable {
         addSampleMessages();
         setupFriendlist();
         showEmptyChatState();
+
+        // Setup scroll behavior
+        scrollPane.addEventFilter(ScrollEvent.SCROLL, e -> {
+            double delta = e.getDeltaY() * 2;
+            scrollPane.setVvalue(scrollPane.getVvalue() - delta / scrollPane.getContent().getBoundsInLocal().getHeight());
+        });
     }
 
     private void applyInlineStyles() {

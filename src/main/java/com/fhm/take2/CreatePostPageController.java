@@ -19,6 +19,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.*;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -118,6 +119,12 @@ public class CreatePostPageController {
             else {
                 postButton.setStyle("-fx-background-color: #191c1e; -fx-text-fill: #525454; -fx-background-radius: 30;"); //button grayed out
             }
+        });
+
+        // Setup scroll behavior
+        scrollPane.addEventFilter(ScrollEvent.SCROLL, e -> {
+            double delta = e.getDeltaY() * 2;
+            scrollPane.setVvalue(scrollPane.getVvalue() - delta / scrollPane.getContent().getBoundsInLocal().getHeight());
         });
     }
 
