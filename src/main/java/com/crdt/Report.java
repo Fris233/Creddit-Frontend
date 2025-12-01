@@ -57,10 +57,10 @@ public class Report {
         return null;
     }
 
-    public void Resolve(User user) throws SQLException {
+    public void Resolve() throws SQLException {
     }
 
-    public void Dismiss(User user) throws SQLException {
+    public void Dismiss() throws SQLException {
     }
 
 
