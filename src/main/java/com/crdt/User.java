@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import javafx.scene.control.Alert;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
@@ -65,18 +66,16 @@ public class User implements Reportable {
         URL url = new URL(BASE_URL + String.format("/user/login?usermail=%s&password=%s", java.net.URLEncoder.encode(usermail, "UTF-8"), java.net.URLEncoder.encode(password, "UTF-8")));
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         conn.setRequestMethod("GET");
-
         BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
         StringBuilder sb = new StringBuilder();
         String line;
         while ((line = reader.readLine()) != null) sb.append(line);
         reader.close();
 
-        if(conn.getResponseCode() == 500) {
+        if(conn.getResponseCode() == 500 || conn.getResponseCode() == 233) {
             Map<?,?> map = gson.fromJson(sb.toString(), Map.class);
-            if(map.get("status").equals("error") && map.get("message").equals("online")) {
-                new Alert(Alert.AlertType.ERROR, "Server unreachable! Check your connection and try again!").showAndWait();
-                return null;
+            if(map.get("status").equals("error")) {
+                throw new Exception(String.valueOf(map.get("message")));
             }
         }
 

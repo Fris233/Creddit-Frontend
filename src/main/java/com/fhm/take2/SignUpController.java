@@ -428,8 +428,8 @@ public class SignUpController {
                         System.out.println("Registration successful for user: " + username);
 
                         showAlertAndReturnToLogin("Registration Successful",
-                                "Welcome to Creddit! Your account has been created successfully.\n\n" +
-                                        "Please log in with your credentials.");
+                                "Welcome to Creddit! Your account has been created successfully.\nAn Authorization Email has been sent\n" +
+                                        "Please authorize your account then log in with your credentials.");
                     } else {
                         showAlert("Registration Failed", "Registration failed. Please try again.");
                     }
@@ -438,7 +438,7 @@ public class SignUpController {
             } catch (Exception e) {
                 e.printStackTrace();
                 // Update UI on JavaFX Application Thread
-                javafx.application.Platform.runLater(() -> {
+                /*javafx.application.Platform.runLater(() -> {
                     signUpButton.setDisable(false);
                     signUpButton.setText("SIGN UP");
 
@@ -450,7 +450,7 @@ public class SignUpController {
                     } else {
                         showAlert("Signup Error", "An error occurred during registration: " + errorMessage);
                     }
-                });
+                });*/
             }
         }).start();
     }
@@ -524,7 +524,6 @@ public class SignUpController {
 
         } catch (IOException e) {
             e.printStackTrace();
-            showAlert("Navigation Error", "Unable to load login page: " + e.getMessage());
         }
     }
 

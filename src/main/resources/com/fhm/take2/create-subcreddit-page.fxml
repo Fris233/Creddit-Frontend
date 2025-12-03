@@ -1,0 +1,344 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: #0E1113; -fx-background-radius: 15;" stylesheets="@CredditCSS.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <VBox layoutX="10.0" layoutY="10.0" prefHeight="400.0" prefWidth="600.0" visible="false" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="10.0">
+         <children>
+            <Label prefHeight="34.0" prefWidth="112.0" text="Add topics" textFill="WHITE">
+               <cursor>
+                  <Cursor fx:constant="TEXT" />
+               </cursor>
+               <font>
+                  <Font size="23.0" />
+               </font>
+            </Label>
+            <Label text="Add up to 3 topics to help interested redditors find your subcreddit." textFill="WHITE">
+               <cursor>
+                  <Cursor fx:constant="TEXT" />
+               </cursor></Label>
+            <AnchorPane>
+               <children>
+                  <TextField fx:id="topicsSearchBar" onKeyPressed="#CategorySearchKeyHandler" prefHeight="40.0" prefWidth="570.0" promptText="Filter topics" style="-fx-background-radius: 20; -fx-text-fill: white; -fx-background-color: #2C3539; -fx-padding: 5 10 5 42;">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </TextField>
+                  <ImageView fitHeight="40.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@assets/search.png" />
+                     </image>
+                  </ImageView>
+               </children>
+               <VBox.margin>
+                  <Insets top="30.0" />
+               </VBox.margin>
+            </AnchorPane>
+            <Label text="Topics ?/3" textFill="WHITE">
+               <VBox.margin>
+                  <Insets top="10.0" />
+               </VBox.margin>
+               <font>
+                  <Font name="System Bold" size="17.0" />
+               </font>
+            </Label>
+            <HBox fx:id="topicsHBox" prefHeight="100.0" prefWidth="200.0">
+               <VBox.margin>
+                  <Insets />
+               </VBox.margin>
+            </HBox>
+            <HBox alignment="BOTTOM_RIGHT" prefHeight="100.0" prefWidth="200.0">
+               <children>
+                  <Button mnemonicParsing="false" style="-fx-background-color: #343536; -fx-background-radius: 15;" text="Cancel" textFill="WHITE">
+                     <HBox.margin>
+                        <Insets right="10.0" />
+                     </HBox.margin>
+                     <font>
+                        <Font name="System Bold" size="15.0" />
+                     </font>
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </Button>
+                  <Button mnemonicParsing="false" style="-fx-background-color: #0079D3; -fx-background-radius: 15;" text="Next" textFill="WHITE">
+                     <font>
+                        <Font name="System Bold" size="15.0" />
+                     </font>
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </Button>
+               </children>
+            </HBox>
+         </children>
+         <opaqueInsets>
+            <Insets />
+         </opaqueInsets>
+      </VBox>
+      <VBox prefHeight="400.0" prefWidth="600.0" visible="false" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="10.0">
+         <children>
+            <Label prefHeight="34.0" prefWidth="329.0" text="What kind of community is this?" textFill="WHITE">
+               <cursor>
+                  <Cursor fx:constant="TEXT" />
+               </cursor>
+               <font>
+                  <Font size="23.0" />
+               </font>
+            </Label>
+            <Label prefHeight="35.0" prefWidth="560.0" text="Decide who can view and contribute in your community. Only public communities show up in search. Important: Once set, you will need to submit a request to change your community type." textFill="WHITE" wrapText="true">
+               <cursor>
+                  <Cursor fx:constant="TEXT" />
+               </cursor>
+            </Label>
+            <AnchorPane prefHeight="114.0" prefWidth="560.0">
+               <children>
+                  <VBox prefHeight="100.0" prefWidth="560.0">
+                     <children>
+                        <HBox prefHeight="100.0" prefWidth="200.0" style="-fx-background-color: #343536;">
+                           <children>
+                              <ImageView fitHeight="22.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@assets/Globe_icon.svg.png" />
+                                 </image>
+                                 <HBox.margin>
+                                    <Insets top="10.0" />
+                                 </HBox.margin>
+                              </ImageView>
+                              <VBox prefHeight="37.0" prefWidth="538.0">
+                                 <children>
+                                    <Label text="Public" textFill="WHITE">
+                                       <font>
+                                          <Font name="System Bold" size="15.0" />
+                                       </font>
+                                    </Label>
+                                    <Label text="Anyone can view, post, and comment to this community" textFill="WHITE" />
+                                 </children>
+                                 <HBox.margin>
+                                    <Insets left="10.0" />
+                                 </HBox.margin>
+                              </VBox>
+                           </children>
+                           <padding>
+                              <Insets left="5.0" />
+                           </padding>
+                           <cursor>
+                              <Cursor fx:constant="HAND" />
+                           </cursor>
+                        </HBox>
+                        <HBox layoutX="10.0" layoutY="10.0" prefHeight="100.0" prefWidth="200.0">
+                           <children>
+                              <ImageView fitHeight="22.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@assets/lock-icon.png" />
+                                 </image>
+                                 <HBox.margin>
+                                    <Insets top="10.0" />
+                                 </HBox.margin>
+                              </ImageView>
+                              <VBox prefHeight="37.0" prefWidth="538.0">
+                                 <children>
+                                    <Label text="Private" textFill="WHITE">
+                                       <font>
+                                          <Font name="System Bold" size="15.0" />
+                                       </font>
+                                    </Label>
+                                    <Label text="Only approved users can view and contribute" textFill="WHITE" />
+                                 </children>
+                                 <HBox.margin>
+                                    <Insets left="10.0" />
+                                 </HBox.margin>
+                              </VBox>
+                           </children>
+                           <VBox.margin>
+                              <Insets top="10.0" />
+                           </VBox.margin>
+                           <padding>
+                              <Insets left="5.0" />
+                           </padding>
+                           <cursor>
+                              <Cursor fx:constant="HAND" />
+                           </cursor>
+                        </HBox>
+                     </children>
+                  </VBox>
+               </children>
+               <VBox.margin>
+                  <Insets top="30.0" />
+               </VBox.margin>
+            </AnchorPane>
+            <Label text="By continuing, you agree to our Creddit Rules." textFill="WHITE">
+               <VBox.margin>
+                  <Insets top="100.0" />
+               </VBox.margin>
+               <cursor>
+                  <Cursor fx:constant="TEXT" />
+               </cursor>
+            </Label>
+            <HBox alignment="BOTTOM_RIGHT" prefHeight="34.0" prefWidth="195.0">
+               <children>
+                  <Button mnemonicParsing="false" style="-fx-background-color: #343536; -fx-background-radius: 15;" text="Back" textFill="WHITE">
+                     <HBox.margin>
+                        <Insets right="10.0" />
+                     </HBox.margin>
+                     <font>
+                        <Font name="System Bold" size="15.0" />
+                     </font>
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </Button>
+                  <Button mnemonicParsing="false" style="-fx-background-color: #0079D3; -fx-background-radius: 15;" text="Next" textFill="WHITE">
+                     <font>
+                        <Font name="System Bold" size="15.0" />
+                     </font>
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </Button>
+               </children>
+            </HBox>
+         </children>
+         <opaqueInsets>
+            <Insets />
+         </opaqueInsets>
+      </VBox>
+      <VBox prefHeight="400.0" prefWidth="600.0" visible="false" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="10.0">
+         <children>
+            <Label text="Tell us about your community" textFill="WHITE" wrapText="true">
+               <font>
+                  <Font name="System Bold" size="20.0" />
+               </font>
+            </Label>
+            <Label text="A name and description help people understand what your community is all about." textFill="WHITE" wrapText="true">
+               <VBox.margin>
+                  <Insets top="5.0" />
+               </VBox.margin>
+            </Label>
+            <TextField prefHeight="42.0" prefWidth="506.0" promptText="Community name*" style="-fx-background-color: #2C3539; -fx-background-radius: 15;">
+               <VBox.margin>
+                  <Insets top="50.0" />
+               </VBox.margin>
+            </TextField>
+            <Label text="?/21" textFill="WHITE">
+               <VBox.margin>
+                  <Insets left="530.0" />
+               </VBox.margin>
+            </Label>
+            <TextArea prefHeight="200.0" prefWidth="200.0" promptText="Description*" style="-fx-background-color: #2C3539; -fx-background-radius: 15;" wrapText="true">
+               <VBox.margin>
+                  <Insets top="10.0" />
+               </VBox.margin>
+            </TextArea>
+            <Label layoutX="540.0" layoutY="134.0" text="?" textFill="WHITE">
+               <VBox.margin>
+                  <Insets left="545.0" />
+               </VBox.margin>
+            </Label>
+            <HBox alignment="BOTTOM_RIGHT" prefHeight="34.0" prefWidth="195.0">
+               <children>
+                  <Button mnemonicParsing="false" style="-fx-background-color: #343536; -fx-background-radius: 15;" text="Back" textFill="WHITE">
+                     <HBox.margin>
+                        <Insets right="10.0" />
+                     </HBox.margin>
+                     <font>
+                        <Font name="System Bold" size="15.0" />
+                     </font>
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </Button>
+                  <Button mnemonicParsing="false" style="-fx-background-color: #0079D3; -fx-background-radius: 15;" text="Next" textFill="WHITE">
+                     <font>
+                        <Font name="System Bold" size="15.0" />
+                     </font>
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </Button>
+               </children>
+               <VBox.margin>
+                  <Insets top="40.0" />
+               </VBox.margin>
+            </HBox>
+         </children>
+      </VBox>
+      <VBox prefHeight="400.0" prefWidth="600.0" visible="false" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="10.0">
+         <children>
+            <Label text="Style your community" textFill="WHITE" wrapText="true">
+               <font>
+                  <Font name="System Bold" size="20.0" />
+               </font>
+            </Label>
+            <Label text="Adding visual flair will catch new members attention and help establish your community’s culture! You can update this at any time." textFill="WHITE" wrapText="true">
+               <VBox.margin>
+                  <Insets top="5.0" />
+               </VBox.margin>
+            </Label>
+            <HBox alignment="CENTER" prefHeight="39.0" prefWidth="560.0">
+               <children>
+                  <Label text="Banner" textFill="WHITE" />
+                  <Button mnemonicParsing="false" style="-fx-background-color: #343536; -fx-background-radius: 15;" text="Add Media" textFill="WHITE">
+                     <HBox.margin>
+                        <Insets left="440.0" />
+                     </HBox.margin>
+                  </Button>
+               </children>
+               <VBox.margin>
+                  <Insets top="50.0" />
+               </VBox.margin>
+            </HBox>
+            <HBox alignment="CENTER" layoutX="10.0" layoutY="129.0" prefHeight="39.0" prefWidth="560.0">
+               <children>
+                  <Label text="Icon" textFill="WHITE" />
+                  <Button mnemonicParsing="false" style="-fx-background-color: #343536; -fx-background-radius: 15;" text="Add Media" textFill="WHITE">
+                     <HBox.margin>
+                        <Insets left="455.0" />
+                     </HBox.margin>
+                  </Button>
+               </children>
+            </HBox>
+            <HBox alignment="BOTTOM_RIGHT" prefHeight="34.0" prefWidth="195.0">
+               <children>
+                  <Button mnemonicParsing="false" style="-fx-background-color: #343536; -fx-background-radius: 15;" text="Back" textFill="WHITE">
+                     <HBox.margin>
+                        <Insets right="10.0" />
+                     </HBox.margin>
+                     <font>
+                        <Font name="System Bold" size="15.0" />
+                     </font>
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </Button>
+                  <Button mnemonicParsing="false" style="-fx-background-color: #0079D3; -fx-background-radius: 15;" text="Create Community" textFill="WHITE">
+                     <font>
+                        <Font name="System Bold" size="15.0" />
+                     </font>
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </Button>
+               </children>
+               <VBox.margin>
+                  <Insets top="130.0" />
+               </VBox.margin>
+            </HBox>
+         </children>
+      </VBox>
+   </children>
+</AnchorPane>

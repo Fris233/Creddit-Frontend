@@ -210,9 +210,7 @@ public class LoginController {
             }
             return;
         }
-        System.out.println("Login attempt with:");
-        System.out.println("Email/Username: " + email);
-        System.out.println("Password: " + maskPassword(password));
+
         User user = performLogin(email, password);
 
         if (user != null) {
@@ -222,7 +220,7 @@ public class LoginController {
                 onLoginSuccess.accept(user);
             }
         } else {
-            showAlert("Login Failed", "Invalid credentials. Please try again.");
+            //showAlert("Login Failed", "Invalid credentials. Please try again.");
             passwordField.clear();
             visiblePasswordField.clear();
             if (isPasswordVisible) {
@@ -235,21 +233,15 @@ public class LoginController {
 
     private User performLogin(String email, String password) {
         try {
-            User user = Client.login(email, password);
-
-            if (user != null) {
-                System.out.println("Login successful for user: " + user.getUsername());
-                System.out.println("User ID: " + user.getId());
-                System.out.println("User Email: " + user.getEmail());
-                return user;
-            } else {
-                System.out.println("Login failed - null user returned");
-                return null;
-            }
-
-        } catch (Exception e) {
+            return Client.login(email, password);
+        }
+        catch (Exception e) {
+            System.out.println(e.getMessage());
             e.printStackTrace();
-            showAlert("Login Error", "An error occurred during login: " + e.getMessage());
+            if(e.getMessage().equalsIgnoreCase("online"))
+                showAlert("Login Failed", "You are already logged in on another device");
+            else
+                showAlert("Login Failed", "Invalid credentials. Please try again.");
             return null;
         }
     }
@@ -266,11 +258,7 @@ public class LoginController {
 
         } catch (IOException e) {
             e.printStackTrace();
-            showAlert("Navigation Error", "Unable to load sign up page: " + e.getMessage());
         }
-    }
-    private String maskPassword(String password) {
-        return password.replaceAll(".", "*");
     }
 
     private void showAlert(String title, String message) {

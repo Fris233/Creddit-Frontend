@@ -12,11 +12,16 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 public abstract class Client {
 
     private static Gson gson ;
     private static String BASE_URL;
+
+    private static final ExecutorService THREAD_POOL = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
     public static void init() {
         RuntimeTypeAdapterFactory<User> userAdapter =
@@ -31,6 +36,21 @@ public abstract class Client {
                         .registerSubtype(Comment.class, "comment");
         gson = new GsonBuilder().registerTypeAdapterFactory(userAdapter).registerTypeAdapterFactory(reportableAdapter).create();
         BASE_URL = System.getenv("BASE_URL");
+    }
+
+    public static void cleanup() {
+        THREAD_POOL.shutdown();
+        try {
+            if (!THREAD_POOL.awaitTermination(5, TimeUnit.SECONDS)) {
+                THREAD_POOL.shutdownNow();
+            }
+        } catch (InterruptedException e) {
+            THREAD_POOL.shutdownNow();
+            Thread.currentThread().interrupt();
+        }
+        catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 
 
@@ -135,7 +155,14 @@ public abstract class Client {
     }
 
     public static boolean Vote(User user, Post post, int value) throws Exception {
-        return user.Vote(post, value, BASE_URL, gson);
+        THREAD_POOL.submit(() -> {
+            try {
+                user.Vote(post, value, BASE_URL, gson);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+        return true;
     }
 
     public static Map<Post, Integer> GetPostFeed(User user, int lastID) throws Exception {
