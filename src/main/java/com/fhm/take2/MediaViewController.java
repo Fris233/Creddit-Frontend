@@ -1,7 +1,6 @@
 package com.fhm.take2;
 
 import com.crdt.Media;
-import com.crdt.User;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -15,6 +14,8 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
 import javafx.util.Duration;
@@ -27,6 +28,8 @@ public class MediaViewController {
     @FXML private ImageView mediaImage;
     @FXML private Label mediaIndexLabel;
     @FXML private AnchorPane mediaPane;
+    @FXML private StackPane stackPane;
+    @FXML private HBox topHBox;
     @FXML private Label mediaTimeLabel;
     @FXML private MediaView mediaViewer;
     @FXML private Slider progressSlider;
@@ -46,6 +49,12 @@ public class MediaViewController {
     private boolean isAudio = false;
     private boolean creating = false;
     BooleanProperty done = new SimpleBooleanProperty(false);
+
+    private final int prevOrigX = 0;
+    private final int nextOrigX = 798;
+
+    private final int origWidth = 765;
+    private final int origHeight = 380;
 
     public void init(ArrayList<Media> mediaArrayList, boolean creating, ArrayList<File> fileArrayList) {
         if(!creating)
@@ -234,9 +243,24 @@ public class MediaViewController {
             if (type.equals("Image")) {
                 Image image = new Image(url, true);
                 mediaImage.setImage(image);
+                mediaImage.setFitWidth(origWidth);
+                mediaImage.setFitHeight(origHeight);
                 mediaImage.setVisible(true);
+                image.progressProperty().addListener((obs, oldV, newV) -> {
+                    if (newV.doubleValue() == 1.0) {
+                        topHBox.setVisible(true);
+                    }
+                });
+
+                image.errorProperty().addListener((obs, oldV, newV) -> {
+                    if (image.getException() != null) {
+                        System.out.println("Failed to load image: " + image.getException());
+                    }
+                });
             }
             else if (type.equals("Video") || type.equals("Audio")) {
+                mediaViewer.setFitWidth(origWidth);
+                mediaViewer.setFitHeight(origHeight);
                 javafx.scene.media.Media mediaObj = new javafx.scene.media.Media(url);
                 mediaObj.setOnError(() -> {
                     Platform.runLater(this::RemoveMedia);
@@ -280,6 +304,8 @@ public class MediaViewController {
                         mediaImage.setVisible(true);
                     }
                     mediaPane.setVisible(true);
+                    mediaViewer.setVisible(true);
+                    topHBox.setVisible(true);
                 });
             } else {
                 unknownMediaLabel.setDisable(false);
@@ -402,12 +428,18 @@ public class MediaViewController {
     }
 
     void Clean() {
+        topHBox.setVisible(false);
         isAudio = false;
         paused.set(true);
         mediaImage.setImage(null);
         mediaImage.setVisible(false);
         mediaViewer.setMediaPlayer(null);
         mediaPane.setVisible(false);
+        mediaViewer.setVisible(false);
+        mediaViewer.setFitWidth(0);
+        mediaViewer.setFitHeight(0);
+        mediaImage.setFitWidth(0);
+        mediaImage.setFitHeight(0);
         unknownMediaLabel.setDisable(true);
         unknownMediaLabel.setVisible(false);
         if(mp != null && mp.getTotalDuration() != null && !mp.getTotalDuration().isUnknown() && !mp.getTotalDuration().isIndefinite())
