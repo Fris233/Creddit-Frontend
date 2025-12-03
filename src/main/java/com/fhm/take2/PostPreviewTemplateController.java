@@ -6,6 +6,8 @@ import com.crdt.User;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
@@ -13,6 +15,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
+import javafx.stage.Stage;
 
 import java.sql.Timestamp;
 import java.time.Duration;
@@ -185,9 +188,23 @@ public class PostPreviewTemplateController {
     @FXML
     void OpenPost(MouseEvent event) {
         System.out.println("Open Post Pressed!");
-        //TODO: DO NOT FORGET TO UNCOMMENT THIS!!
-        /*if(mediaViewController != null)
-            mediaViewController.Clean();*/
+        if(mediaViewController != null)
+            mediaViewController.Clean();
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("ActualPost_Template.fxml"));
+            Parent root = loader.load();
+
+            ActualPostTemplateController actualPostTemplateController = loader.getController();
+            actualPostTemplateController.InitData(post, currentUser, myVote);
+
+            // Get the current stage
+            Stage stage = (Stage) JoinButton.getScene().getWindow();
+            // Set the new scene
+            stage.setScene(new Scene(root));
+        }
+        catch (Exception ex) {
+            System.out.println(ex.getMessage());
+        }
         event.consume();
     }
 
