@@ -82,6 +82,7 @@ public class HelloApplication extends Application {
 
         stage.setOnCloseRequest(event -> {
             cleanup();
+            Client.cleanup();
         });
 
         stage.show();
