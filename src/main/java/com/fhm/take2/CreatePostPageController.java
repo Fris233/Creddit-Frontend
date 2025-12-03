@@ -109,7 +109,14 @@ public class CreatePostPageController {
         });
 
         titleField.textProperty().addListener((obs, oldText, newText) -> {
+            if(newText.length() > 255)
+                titleField.setText(oldText);
             validPostInfo.set(!newText.isBlank());
+        });
+
+        categorySearchField.textProperty().addListener((obs, oldText, newText) -> {
+            if(newText.length() > 50)
+                categorySearchField.setText(oldText);
         });
 
         validPostInfo.addListener((obs, oldVal, newVal) -> {
