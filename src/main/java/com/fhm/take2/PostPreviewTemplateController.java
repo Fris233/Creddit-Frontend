@@ -221,5 +221,7 @@ public class PostPreviewTemplateController {
         event.consume();
     }
 
+    int GetPostID() {return this.post.GetID();}
+
 }
 

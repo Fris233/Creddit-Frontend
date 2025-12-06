@@ -3,6 +3,7 @@ package com.fhm.take2;
 import com.Client;
 import com.crdt.Post;
 import com.crdt.User;
+import javafx.animation.PauseTransition;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -18,6 +19,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.stage.Modality;
+import javafx.util.Duration;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -37,6 +39,8 @@ public class HomePageController {
 
     private User currentUser;
     private ArrayList<PostPreviewTemplateController> postPreviewControllers;
+    private boolean updating = false;
+    private boolean scrollCooldown = false;
 
     public void InitData(User user, String searchPrompt) {
         currentUser = user;
@@ -67,6 +71,31 @@ public class HomePageController {
         postsScrollPane.addEventFilter(ScrollEvent.SCROLL, e -> {
             double delta = e.getDeltaY() * 2;
             postsScrollPane.setVvalue(postsScrollPane.getVvalue() - delta / postsScrollPane.getContent().getBoundsInLocal().getHeight());
+        });
+
+        postsScrollPane.vvalueProperty().addListener((obs, oldVal, newVal) -> {
+            if(!updating && !scrollCooldown && newVal.doubleValue() >= postsScrollPane.getVmax()) {
+                updating = true;
+                scrollCooldown = true;
+                try {
+                    Map<Post, Integer> postFeed = Client.GetPostFeed(currentUser, postPreviewControllers.getLast().GetPostID());
+                    for (Post post : postFeed.keySet()) {
+                        FXMLLoader loader = new FXMLLoader(getClass().getResource("Post_Preview_Template.fxml"));
+                        Node postNode = loader.load();
+                        PostPreviewTemplateController controller = loader.getController();
+                        controller.init(post, user, postFeed.get(post));
+                        postsContainer.getChildren().add(postNode);
+                        postPreviewControllers.add(controller);
+                    }
+                    updating = false;
+                }
+                catch (Exception e) {
+                    e.printStackTrace();
+                }
+                PauseTransition pause = new PauseTransition(Duration.seconds(5));
+                pause.setOnFinished(e -> scrollCooldown = false);
+                pause.play();
+            }
         });
     }
 

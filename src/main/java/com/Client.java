@@ -21,7 +21,7 @@ public abstract class Client {
     private static Gson gson ;
     private static String BASE_URL;
 
-    private static final ExecutorService THREAD_POOL = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+    public static final ExecutorService THREAD_POOL = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
     public static void init() {
         RuntimeTypeAdapterFactory<User> userAdapter =
@@ -154,7 +154,7 @@ public abstract class Client {
         return user.CheckVote(post, BASE_URL, gson);
     }
 
-    public static boolean Vote(User user, Post post, int value) throws Exception {
+    public static boolean Vote(User user, Post post, int value) {
         THREAD_POOL.submit(() -> {
             try {
                 user.Vote(post, value, BASE_URL, gson);
