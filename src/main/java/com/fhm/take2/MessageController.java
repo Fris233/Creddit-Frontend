@@ -144,10 +144,10 @@ public class MessageController implements Initializable {
 
     private void setupFriendlist() {
         try {
-            User friend1 = new User(1, "Hassan", "hassan@gmail.com", "0001", Gender.MALE, "lelelelelelelelelelelelelele", null, null, true);
+            User friend1 = new User(1, "Hassan", "hassan@gmail.com", "0001", Gender.MALE, "lelelelelelelelelelelelelele", null, null, null, true);
             friends.add(friend1);
 
-            User friend2 = new User(1, "Hasan", "hasan@gmail.com", "0010", Gender.MALE, "صلي على محمد", null, null, false);
+            User friend2 = new User(1, "Hasan", "hasan@gmail.com", "0010", Gender.MALE, "صلي على محمد", null, null, null, false);
             friends.add(friend2);
 
             displayFriendList();

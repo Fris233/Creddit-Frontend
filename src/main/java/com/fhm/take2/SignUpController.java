@@ -410,11 +410,10 @@ public class SignUpController {
                 // Create User object with registration data
                 String bio = ""; // Empty bio
                 Media pfp = null; // No profile picture
-                Timestamp timeCreated = null; // Will be set by server
                 boolean active = true;
 
                 // Create user object
-                User user = new User(0, username, email, password, gender, bio, pfp, timeCreated, active);
+                User user = new User(0, username, email, password, gender, bio, pfp, null, null, active);
 
                 // Use Client.register instead of Client.signup
                 boolean registrationSuccess = Client.register(user);

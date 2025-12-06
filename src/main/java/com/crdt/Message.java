@@ -43,4 +43,12 @@ public class Message {
 
     public void update() {
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(obj instanceof Message) {
+            return this.id == ((Message) obj).id;
+        }
+        return false;
+    }
 }

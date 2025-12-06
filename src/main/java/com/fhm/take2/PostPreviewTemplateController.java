@@ -76,9 +76,10 @@ public class PostPreviewTemplateController {
             JoinButton.setDisable(true);
             JoinButton.setVisible(false);
         }
+        // TODO: Check Moderation
     }
 
-    private static String timeAgo(Timestamp timestamp) {
+    public static String timeAgo(Timestamp timestamp) {
         Instant now = Instant.now();
         Instant created = timestamp.toInstant();
         Duration duration = Duration.between(created, now);
@@ -213,7 +214,21 @@ public class PostPreviewTemplateController {
         if(mediaViewController != null)
             mediaViewController.Clean();
         if(post.GetSubcreddit() == null) {
-            System.out.println("Open user profile");
+            try {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("user-profile-page.fxml"));
+                Parent root = loader.load();
+
+                UserProfilePageController userProfilePageController = loader.getController();
+                userProfilePageController.InitData(post.GetAuthor(), currentUser, "", true);
+
+                // Get the current stage
+                Stage stage = (Stage) JoinButton.getScene().getWindow();
+                // Set the new scene
+                stage.setScene(new Scene(root));
+            }
+            catch (Exception ex) {
+                System.out.println(ex.getMessage());
+            }
         }
         else {
             System.out.println("Open Subcreddit Pressed!");

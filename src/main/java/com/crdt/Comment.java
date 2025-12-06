@@ -33,4 +33,12 @@ public class Comment implements Voteable, Reportable {
     public Comment getParent() {return parent;}
     public String getContent() {return content;}
     public Media getMedia() {return media;}
+
+    @Override
+    public boolean equals(Object obj) {
+        if(obj instanceof Comment) {
+            return this.id == ((Comment) obj).id;
+        }
+        return false;
+    }
 }

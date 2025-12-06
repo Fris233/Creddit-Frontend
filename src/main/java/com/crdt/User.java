@@ -2,14 +2,14 @@ package com.crdt;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import javafx.scene.control.Alert;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Map;
@@ -23,9 +23,10 @@ public class User implements Reportable {
     protected String bio;
     protected Media pfp;
     protected Timestamp timeCreated;
+    protected Timestamp lastSeen;
     protected boolean active;
 
-    public User(int id, String username, String email, String password, Gender gender, String bio, Media pfp, Timestamp timeCreated, boolean active) {
+    public User(int id, String username, String email, String password, Gender gender, String bio, Media pfp, Timestamp timeCreated, Timestamp lastSeen, boolean active) {
         if (id < 0)
             return;
         if (username == null || username.isEmpty() || username.length() > 32)
@@ -45,6 +46,7 @@ public class User implements Reportable {
         this.bio = bio;
         this.pfp = pfp;
         this.timeCreated = timeCreated;
+        this.lastSeen = lastSeen;
         this.active = active;
     }
 
@@ -140,14 +142,7 @@ public class User implements Reportable {
             os.write(jsonBody.getBytes());
         }
 
-        BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-        StringBuilder sb = new StringBuilder();
-        String line;
-        while ((line = reader.readLine()) != null) sb.append(line);
-        reader.close();
-
-        Map<?,?> map = gson.fromJson(sb.toString(), Map.class);
-        return map.get("status").equals("ok");
+        return conn.getResponseCode() == 200;
     }
 
     public int CheckVote(Post post, String BASE_URL, Gson gson) throws Exception {
@@ -186,34 +181,150 @@ public class User implements Reportable {
             return;
     }
 
-    public ArrayList<Subcreddit> GetSubcreddits() {
-        ArrayList<Subcreddit> subcreddits = new ArrayList<>();
-        return subcreddits;
+    public Subcreddit[] GetSubcreddits(String BASE_URL, Gson gson) throws Exception {
+        String jsonBody = gson.toJson(this);
+        URL url = new URL(BASE_URL + "/user/subcreddits");
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("POST");
+        conn.setDoOutput(true);
+        conn.setRequestProperty("Content-Type", "application/json");
+        try (OutputStream os = conn.getOutputStream()) {
+            os.write(jsonBody.getBytes());
+        }
+
+        BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+        StringBuilder sb = new StringBuilder();
+        String line;
+        while ((line = reader.readLine()) != null) sb.append(line);
+        reader.close();
+
+        return gson.fromJson(sb.toString(), Subcreddit[].class);
     }
 
-    public void sendFriendRequest(User user) {
+    public boolean sendFriendRequest(User receiver, String BASE_URL, Gson gson) throws Exception {
         if(!this.active)
-            return;
+            return false;
+        JsonObject json = new JsonObject();
+        json.add("sender", gson.toJsonTree(this));
+        json.add("receiver", gson.toJsonTree(receiver));
+
+        String jsonBody = gson.toJson(json);
+
+        URL url = new URL(BASE_URL + "/friends/send");
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("POST");
+        conn.setDoOutput(true);
+        conn.setRequestProperty("Content-Type", "application/json");
+
+        try (OutputStream os = conn.getOutputStream()) {
+            os.write(jsonBody.getBytes());
+        }
+
+        return conn.getResponseCode() == 200;
     }
 
-    public void unfriend(User friend) {
+    public boolean acceptFriend(User sender, String BASE_URL, Gson gson) throws Exception {
         if(!this.active)
-            return;
+            return false;
+        JsonObject json = new JsonObject();
+        json.add("sender", gson.toJsonTree(sender));
+        json.add("receiver", gson.toJsonTree(this));
+
+        String jsonBody = gson.toJson(json);
+
+        URL url = new URL(BASE_URL + "/friends/accept");
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("POST");
+        conn.setDoOutput(true);
+        conn.setRequestProperty("Content-Type", "application/json");
+
+        try (OutputStream os = conn.getOutputStream()) {
+            os.write(jsonBody.getBytes());
+        }
+
+        return conn.getResponseCode() == 200;
     }
 
-    public ArrayList<User> GetFriends() {
-        ArrayList<User> friends = new ArrayList<>();
-        return friends;
+    public boolean unfriend(User friend, String BASE_URL, Gson gson) throws Exception {
+        if(!this.active)
+            return false;
+        JsonObject json = new JsonObject();
+        json.add("user1", gson.toJsonTree(this));
+        json.add("user2", gson.toJsonTree(friend));
+
+        String jsonBody = gson.toJson(json);
+
+        URL url = new URL(BASE_URL + "/friends/remove");
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("POST");
+        conn.setDoOutput(true);
+        conn.setRequestProperty("Content-Type", "application/json");
+
+        try (OutputStream os = conn.getOutputStream()) {
+            os.write(jsonBody.getBytes());
+        }
+
+        return conn.getResponseCode() == 200;
     }
 
-    public ArrayList<User> GetSentFriendRequests() {
-        ArrayList<User> friends = new ArrayList<>();
-        return friends;
+    public User[] GetFriends(String BASE_URL, Gson gson) throws Exception {
+        String jsonBody = gson.toJson(this);
+        URL url = new URL(BASE_URL + "/friends");
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("POST");
+        conn.setDoOutput(true);
+        conn.setRequestProperty("Content-Type", "application/json");
+        try (OutputStream os = conn.getOutputStream()) {
+            os.write(jsonBody.getBytes());
+        }
+
+        BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+        StringBuilder sb = new StringBuilder();
+        String line;
+        while ((line = reader.readLine()) != null) sb.append(line);
+        reader.close();
+
+        return gson.fromJson(sb.toString(), User[].class);
     }
 
-    public ArrayList<User> GetReceivedFriendRequests() {
-        ArrayList<User> friends = new ArrayList<>();
-        return friends;
+    public User[] GetSentFriendRequests(String BASE_URL, Gson gson) throws Exception {
+        String jsonBody = gson.toJson(this);
+        URL url = new URL(BASE_URL + "/friends/sent");
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("POST");
+        conn.setDoOutput(true);
+        conn.setRequestProperty("Content-Type", "application/json");
+        try (OutputStream os = conn.getOutputStream()) {
+            os.write(jsonBody.getBytes());
+        }
+
+        BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+        StringBuilder sb = new StringBuilder();
+        String line;
+        while ((line = reader.readLine()) != null) sb.append(line);
+        reader.close();
+
+        return gson.fromJson(sb.toString(), User[].class);
+    }
+
+    public User[] GetReceivedFriendRequests(String BASE_URL, Gson gson) throws Exception {
+        String jsonBody = gson.toJson(this);
+        URL url = new URL(BASE_URL + "/friends/received");
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("POST");
+        conn.setDoOutput(true);
+        conn.setRequestProperty("Content-Type", "application/json");
+        try (OutputStream os = conn.getOutputStream()) {
+            os.write(jsonBody.getBytes());
+        }
+
+        BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+        StringBuilder sb = new StringBuilder();
+        String line;
+        while ((line = reader.readLine()) != null) sb.append(line);
+        reader.close();
+
+        return gson.fromJson(sb.toString(), User[].class);
     }
 
     public ArrayList<Message> GetPrivateMessageFeed(User friend, int lastMessageID) {
@@ -260,5 +371,14 @@ public class User implements Reportable {
     public String getBio() {return this.bio;}
     public Media getPfp() {return this.pfp;}
     public Timestamp getTimeCreated() {return this.timeCreated;}
+    public Timestamp getLastSeen() {return this.lastSeen;}
     public boolean getActive() {return this.active;}
+
+    @Override
+    public boolean equals(Object obj) {
+        if(obj instanceof User) {
+            return this.id == ((User) obj).id;
+        }
+        return false;
+    }
 }

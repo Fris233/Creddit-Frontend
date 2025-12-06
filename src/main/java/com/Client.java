@@ -10,6 +10,8 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
@@ -165,14 +167,115 @@ public abstract class Client {
         return true;
     }
 
-    public static Map<Post, Integer> GetPostFeed(User user, int lastID) throws Exception {
+    public static ArrayList<User> GetFriends(User user) throws Exception {
+        return new ArrayList<>(Arrays.asList(user.GetFriends(BASE_URL, gson)));
+    }
+
+    public static ArrayList<User> GetSentFriendRequests(User user) throws Exception {
+        return new ArrayList<>(Arrays.asList(user.GetSentFriendRequests(BASE_URL, gson)));
+    }
+
+    public static ArrayList<User> GetReceivedFriendRequests(User user) throws Exception {
+        return new ArrayList<>(Arrays.asList(user.GetReceivedFriendRequests(BASE_URL, gson)));
+    }
+
+    public static boolean SendFriendRequest(User sender, User receiver) throws Exception {
+        return sender.sendFriendRequest(receiver, BASE_URL, gson);
+    }
+
+    public static boolean AcceptFriendRequest(User sender, User receiver) throws Exception {
+        return receiver.acceptFriend(receiver, BASE_URL, gson);
+    }
+
+    public static boolean Unfriend(User me, User friend) throws Exception {
+        return me.unfriend(friend, BASE_URL, gson);
+    }
+
+    public static ArrayList<Subcreddit> GetUserSubcreddits(User user) throws Exception {
+        return new ArrayList<>(Arrays.asList(user.GetSubcreddits(BASE_URL, gson)));
+    }
+
+    public static Map<Post, Integer> GetPostFeed(User user, String prompt, int lastID) throws Exception {
         JsonObject json = new JsonObject();
         json.add("user", gson.toJsonTree(user));
-        json.addProperty("lastID", gson.toJson(lastID));
+        json.addProperty("prompt", prompt);
+        json.addProperty("lastID", lastID);
 
         String jsonBody = gson.toJson(json);
 
         URL url = new URL(BASE_URL + "/post/feed");
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("POST");
+        conn.setDoOutput(true);
+        conn.setRequestProperty("Content-Type", "application/json");
+
+        try (OutputStream os = conn.getOutputStream()) {
+            os.write(jsonBody.getBytes());
+        }
+
+        BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+        StringBuilder sb = new StringBuilder();
+        String line;
+        while ((line = reader.readLine()) != null) sb.append(line);
+        reader.close();
+
+        JsonObject jsonObj = gson.fromJson(sb.toString(), JsonObject.class);
+        Post[] posts = gson.fromJson(jsonObj.get("posts"), Post[].class);
+        Integer[] myVotes = gson.fromJson(jsonObj.get("votes"), Integer[].class);
+
+        Map<Post, Integer> postMap = new LinkedHashMap<>();
+        int sz = posts.length;
+        for(int i = 0; i < sz; i++)
+            postMap.put(posts[i], myVotes[i]);
+
+        return postMap;
+    }
+
+    public static Map<Post, Integer> GetPostFeedFilterSub(User user, Subcreddit sub, int lastID) throws Exception {
+        JsonObject json = new JsonObject();
+        json.add("user", gson.toJsonTree(user));
+        json.add("sub", gson.toJsonTree(sub));
+        json.addProperty("lastID", gson.toJson(lastID));
+
+        String jsonBody = gson.toJson(json);
+
+        URL url = new URL(BASE_URL + "/post/feed/filter-sub");
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("POST");
+        conn.setDoOutput(true);
+        conn.setRequestProperty("Content-Type", "application/json");
+
+        try (OutputStream os = conn.getOutputStream()) {
+            os.write(jsonBody.getBytes());
+        }
+
+        BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+        StringBuilder sb = new StringBuilder();
+        String line;
+        while ((line = reader.readLine()) != null) sb.append(line);
+        reader.close();
+
+        JsonObject jsonObj = gson.fromJson(sb.toString(), JsonObject.class);
+        Post[] posts = gson.fromJson(jsonObj.get("posts"), Post[].class);
+        Integer[] myVotes = gson.fromJson(jsonObj.get("votes"), Integer[].class);
+
+        Map<Post, Integer> postMap = new LinkedHashMap<>();
+        int sz = posts.length;
+        for(int i = 0; i < sz; i++)
+            postMap.put(posts[i], myVotes[i]);
+
+        return postMap;
+    }
+
+    public static Map<Post, Integer> GetPostFeedFilterAuthor(User user, User author, int lastID) throws Exception {
+        JsonObject json = new JsonObject();
+        json.add("user", gson.toJsonTree(user));
+        json.add("author", gson.toJsonTree(author));
+        json.addProperty("lastID", gson.toJson(lastID));
+
+        String jsonBody = gson.toJson(json);
+
+        URL url = new URL(BASE_URL + "/post/feed/filter-author");
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         conn.setRequestMethod("POST");
         conn.setDoOutput(true);

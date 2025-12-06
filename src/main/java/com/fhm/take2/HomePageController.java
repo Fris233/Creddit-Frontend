@@ -12,6 +12,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
@@ -51,7 +52,7 @@ public class HomePageController {
         updateLoginUI();
 
         try {
-            Map<Post, Integer> postFeed = Client.GetPostFeed(currentUser, 0);
+            Map<Post, Integer> postFeed = Client.GetPostFeed(currentUser, searchPrompt, 0);
             for (Post post : postFeed.keySet()) {
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("Post_Preview_Template.fxml"));
                 Node postNode = loader.load();
@@ -78,7 +79,7 @@ public class HomePageController {
                 updating = true;
                 scrollCooldown = true;
                 try {
-                    Map<Post, Integer> postFeed = Client.GetPostFeed(currentUser, postPreviewControllers.getLast().GetPostID());
+                    Map<Post, Integer> postFeed = Client.GetPostFeed(currentUser, searchPrompt, postPreviewControllers.getLast().GetPostID());
                     for (Post post : postFeed.keySet()) {
                         FXMLLoader loader = new FXMLLoader(getClass().getResource("Post_Preview_Template.fxml"));
                         Node postNode = loader.load();
@@ -270,9 +271,11 @@ public class HomePageController {
 
     @FXML
     void SearchPressed(KeyEvent event) {
-        System.out.println("Search Pressed");
-        Clean();
-        event.consume();
+        if(event.getCode() == KeyCode.ENTER) {
+            System.out.println("Search Pressed");
+            Clean();
+            event.consume();
+        }
     }
 
     private void showAlert(String title, String message) {
