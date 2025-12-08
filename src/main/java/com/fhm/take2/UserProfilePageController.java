@@ -163,10 +163,12 @@ public class UserProfilePageController {
             if(newVal) {
                 pendingFriendButton.setAlignment(Pos.CENTER);
                 pendingFriendButton.setText("X");
+                pendingFriendButton.setStyle("-fx-background-color: gray; -fx-text-fill: #ffffff; -fx-background-radius: 20;");
             }
             else {
                 pendingFriendButton.setAlignment(Pos.CENTER_RIGHT);
                 pendingFriendButton.setText("Pending Friend");
+                pendingFriendButton.setStyle("-fx-background-color: red; -fx-text-fill: #ffffff; -fx-background-radius: 20;");
             }
         });
     }
