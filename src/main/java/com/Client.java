@@ -188,7 +188,7 @@ public abstract class Client {
     }
 
     public static boolean AcceptFriendRequest(User sender, User receiver) throws Exception {
-        return receiver.acceptFriend(receiver, BASE_URL, gson);
+        return receiver.acceptFriend(sender, BASE_URL, gson);
     }
 
     public static boolean Unfriend(User me, User friend) throws Exception {
