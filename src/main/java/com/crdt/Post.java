@@ -2,8 +2,6 @@ package com.crdt;
 
 import com.Client;
 import com.google.gson.Gson;
-import javafx.scene.control.Alert;
-
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;

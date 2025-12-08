@@ -42,9 +42,11 @@ public class HomePageController {
     private ArrayList<PostPreviewTemplateController> postPreviewControllers;
     private boolean updating = false;
     private boolean scrollCooldown = false;
+    private int filter; // 0 for posts, 1 for subcreddits, 2 for comments, 3 for users
 
-    public void InitData(User user, String searchPrompt) {
+    public void InitData(User user, String searchPrompt, int filter) {
         currentUser = user;
+        this.filter = filter;
         this.searchField.setText(searchPrompt);
         postPreviewControllers = new ArrayList<>();
 
@@ -143,7 +145,6 @@ public class HomePageController {
     @FXML
     void CheckRules(MouseEvent event) {
         System.out.println("Rules Button Pressed");
-        Clean();
         event.consume();
     }
 
@@ -193,7 +194,6 @@ public class HomePageController {
 
     @FXML
     void Login() {
-        System.out.println("Login Button Pressed");
         navigateToLoginDialog();
     }
 
@@ -223,7 +223,7 @@ public class HomePageController {
                 loginStage.close();
                 HelloApplication.startSession(currentUser);
                 // Refresh the page to show user-specific content
-                Refresh(null);
+                Refresh();
             });
 
             loginStage.showAndWait();
@@ -240,21 +240,20 @@ public class HomePageController {
             Login();
             return;
         }
-        System.out.println("Profile Button Pressed");
-        Clean();
+        System.out.println("My Profile Button Pressed");
+        //Clean();
         event.consume();
     }
 
     @FXML
-    void Refresh(MouseEvent event) {
-        System.out.println("Dashboard Button Pressed");
+    void Refresh() {
         Clean();
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("home-page.fxml"));
             Parent root = loader.load();
 
             HomePageController homePageController = loader.getController();
-            homePageController.InitData(currentUser, searchField.getText());
+            homePageController.InitData(currentUser, searchField.getText(), filter);
 
             // Get the current stage
             Stage stage = (Stage) postsContainer.getScene().getWindow();
@@ -265,15 +264,35 @@ public class HomePageController {
         catch (Exception e) {
             e.printStackTrace();
         }
-        if(event != null)
-            event.consume();
+    }
+
+    @FXML
+    void GoHome(MouseEvent event) {
+        Clean();
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("home-page.fxml"));
+            Parent root = loader.load();
+
+            HomePageController homePageController = loader.getController();
+            homePageController.InitData(currentUser, null, 0);
+
+            // Create the second scene
+            Scene scene2 = new Scene(root);
+            // Get the current stage
+            Stage stage = (Stage)postsContainer.getScene().getWindow();
+            // Set the new scene
+            stage.setScene(scene2);
+        }
+        catch (Exception ex) {
+            System.out.println(ex.getMessage());
+        }
+        event.consume();
     }
 
     @FXML
     void SearchPressed(KeyEvent event) {
         if(event.getCode() == KeyCode.ENTER) {
-            System.out.println("Search Pressed");
-            Clean();
+            Refresh();
             event.consume();
         }
     }

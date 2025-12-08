@@ -392,7 +392,7 @@ public class ActualPostTemplateController {
     }
 
     @FXML
-    void Refresh(MouseEvent event) {
+    void Refresh(MouseEvent event) { // TODO: Ya 3m fares dh refresh m4 dashboard, ezboto 5alyh refresh, w e3ml function GoHome 34an zrayr el dashboard
         System.out.println("Dashboard Button Pressed");
         Clean();
         try {
@@ -400,7 +400,7 @@ public class ActualPostTemplateController {
             Parent root = loader.load();
 
             HomePageController homePageController = loader.getController();
-            homePageController.InitData(currentUser, searchField.getText());
+            homePageController.InitData(currentUser, searchField.getText(), 0);
 
             // Get the current stage
             Stage stage = (Stage) postsContainer.getScene().getWindow();

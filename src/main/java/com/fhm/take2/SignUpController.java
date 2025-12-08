@@ -505,7 +505,7 @@ public class SignUpController {
                     Parent root2 = loader2.load();
 
                     HomePageController homePageController = loader2.getController();
-                    homePageController.InitData(user, null);
+                    homePageController.InitData(user, null, 0);
 
                     HelloApplication.startSession(user);
 

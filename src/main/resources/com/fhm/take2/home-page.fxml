@@ -31,7 +31,7 @@
             <children>
                 <AnchorPane layoutX="6.0" layoutY="33.0">
                     <children>
-                        <Button mnemonicParsing="false" onMouseClicked="#Refresh" prefHeight="52.0" prefWidth="262.0" style="-fx-text-fill: #ffffff;" text="Home" textFill="#c6151500">
+                        <Button mnemonicParsing="false" onMouseClicked="#GoHome" prefHeight="52.0" prefWidth="262.0" style="-fx-text-fill: #ffffff;" text="Home" textFill="#c6151500">
                             <font>
                                 <Font size="18.0" />
                             </font>
@@ -105,7 +105,7 @@
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
             </rowConstraints>
             <children>
-                <Button mnemonicParsing="false" onMouseClicked="#Refresh" prefHeight="78.0" prefWidth="214.0" style="-fx-text-fill: #ffffff;" text="Creddit" textFill="#c6151500">
+                <Button mnemonicParsing="false" onMouseClicked="#GoHome" prefHeight="78.0" prefWidth="214.0" style="-fx-text-fill: #ffffff;" text="Creddit" textFill="#c6151500">
                     <font>
                         <Font size="18.0" />
                     </font>
@@ -133,6 +133,18 @@
                                 </ImageView>
                             </children>
                         </AnchorPane>
+                  <Button layoutX="14.0" layoutY="7.0" mnemonicParsing="false" onMouseClicked="#Refresh" prefHeight="57.0" prefWidth="85.0" style="-fx-text-fill: #ffffff;" textFill="#c6151500">
+                     <font>
+                        <Font size="18.0" />
+                     </font>
+                     <graphic>
+                        <ImageView fitHeight="57.0" fitWidth="85.0" mouseTransparent="true" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@assets/refresh.png" />
+                           </image>
+                        </ImageView>
+                     </graphic>
+                  </Button>
                     </children>
                 </AnchorPane>
                 <AnchorPane layoutX="280.0" layoutY="11.0" GridPane.columnIndex="2">

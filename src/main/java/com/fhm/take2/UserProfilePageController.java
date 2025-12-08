@@ -7,24 +7,28 @@ import com.crdt.User;
 import javafx.animation.PauseTransition;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 import javafx.util.Duration;
 
+import java.io.IOException;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.Objects;
 
 public class UserProfilePageController {
 
@@ -53,10 +57,12 @@ public class UserProfilePageController {
     private ArrayList<PostPreviewTemplateController> postPreviewControllers;
     private boolean updating = false;
     private boolean scrollCooldown = false;
+    private boolean filterPosts;
 
     public void InitData(User profileUser, User currentUser, String searchPrompt, boolean filterPosts) {
         this.currentUser = currentUser;
         this.profileUser = profileUser;
+        this.filterPosts = filterPosts;
         this.searchField.setText(searchPrompt);
         postPreviewControllers = new ArrayList<>();
 
@@ -101,16 +107,21 @@ public class UserProfilePageController {
         bioTextArea.setText(this.profileUser.getBio());
 
         try {
-            Map<Post, Integer> postFeed = Client.GetPostFeedFilterAuthor(this.currentUser, this.profileUser, searchPrompt, 0);
-            for (Post post : postFeed.keySet()) {
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("Post_Preview_Template.fxml"));
-                Node postNode = loader.load();
+            if(filterPosts) {
+                Map<Post, Integer> postFeed = Client.GetPostFeedFilterAuthor(this.currentUser, this.profileUser, searchPrompt, 0);
+                for (Post post : postFeed.keySet()) {
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource("Post_Preview_Template.fxml"));
+                    Node postNode = loader.load();
 
-                PostPreviewTemplateController controller = loader.getController();
-                controller.init(post, this.currentUser, postFeed.get(post));
+                    PostPreviewTemplateController controller = loader.getController();
+                    controller.init(post, this.currentUser, postFeed.get(post));
 
-                postsContainer.getChildren().add(postNode);
-                postPreviewControllers.add(controller);
+                    postsContainer.getChildren().add(postNode);
+                    postPreviewControllers.add(controller);
+                }
+            }
+            else {
+                //TODO: Filter by comments here
             }
         }
         catch (Exception e) {
@@ -147,6 +158,17 @@ public class UserProfilePageController {
                 pause.play();
             }
         });
+
+        pendingFriendButton.hoverProperty().addListener((obs, oldVal, newVal) -> {
+            if(newVal) {
+                pendingFriendButton.setAlignment(Pos.CENTER);
+                pendingFriendButton.setText("X");
+            }
+            else {
+                pendingFriendButton.setAlignment(Pos.CENTER_RIGHT);
+                pendingFriendButton.setText("Pending Friend");
+            }
+        });
     }
 
     private void updateLoginUI() {
@@ -168,92 +190,300 @@ public class UserProfilePageController {
 
     @FXML
     void AcceptFriend(MouseEvent event) {
-
-    }
-
-    @FXML
-    void Block(MouseEvent event) {
-
-    }
-
-    @FXML
-    void CancelFriendRequest(MouseEvent event) {
-
-    }
-
-    @FXML
-    void Chat(MouseEvent event) {
-
-    }
-
-    @FXML
-    void CheckRules(MouseEvent event) {
-
-    }
-
-    @FXML
-    void CreatePost(MouseEvent event) {
-
-    }
-
-    @FXML
-    void CreateSubcreddit(MouseEvent event) {
-
-    }
-
-    @FXML
-    void FilterComments(MouseEvent event) {
-
-    }
-
-    @FXML
-    void FilterPosts(MouseEvent event) {
-
-    }
-
-    @FXML
-    void FriendRequest(MouseEvent event) {
-
-    }
-
-    @FXML
-    void GoHome(MouseEvent event) {
-
-    }
-
-    @FXML
-    void Login(MouseEvent event) {
-
-    }
-
-    @FXML
-    void ProfilePressed(MouseEvent event) {
-
+        try {
+            Client.AcceptFriendRequest(profileUser, currentUser);
+            friendRequestAnchor.setDisable(true);
+            friendRequestAnchor.setVisible(false);
+            unfriendButtonAnchor.setDisable(false);
+            unfriendButtonAnchor.setVisible(true);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        event.consume();
     }
 
     @FXML
     void RejectFriend(MouseEvent event) {
-
+        try {
+            Client.Unfriend(currentUser, profileUser);
+            friendRequestAnchor.setDisable(true);
+            friendRequestAnchor.setVisible(false);
+            friendButtonAnchor.setDisable(false);
+            friendButtonAnchor.setVisible(true);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        event.consume();
     }
 
     @FXML
-    void Report(MouseEvent event) {
-
+    void FriendRequest(MouseEvent event) {
+        try {
+            Client.SendFriendRequest(currentUser, profileUser);
+            friendButtonAnchor.setDisable(true);
+            friendButtonAnchor.setVisible(false);
+            pendingFriendButton.setDisable(false);
+            pendingFriendButton.setVisible(true);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        event.consume();
     }
 
     @FXML
-    void SearchPressed(KeyEvent event) {
-
-    }
-
-    @FXML
-    void Share(MouseEvent event) {
-
+    void CancelFriendRequest(MouseEvent event) {
+        try {
+            Client.Unfriend(currentUser, profileUser);
+            pendingFriendButton.setDisable(true);
+            pendingFriendButton.setVisible(false);
+            friendButtonAnchor.setDisable(false);
+            friendButtonAnchor.setVisible(true);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        event.consume();
     }
 
     @FXML
     void Unfriend(MouseEvent event) {
-
+        try {
+            Client.Unfriend(currentUser, profileUser);
+            unfriendButtonAnchor.setDisable(true);
+            unfriendButtonAnchor.setVisible(false);
+            friendButtonAnchor.setDisable(false);
+            friendButtonAnchor.setVisible(true);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        event.consume();
     }
 
+    @FXML
+    void Block(MouseEvent event) {
+        System.out.println("Block Button Pressed");
+        event.consume();
+    }
+
+    @FXML
+    void Chat(MouseEvent event) {
+        if (currentUser == null) {
+            Login();
+            return;
+        }
+        try {
+            Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("message.fxml")));
+            Stage stage = new Stage();
+            stage.setTitle("Chats");
+            stage.setScene(new Scene(root, 800, 600));
+            stage.setMinWidth(600);
+            stage.setMinHeight(400);
+            stage.initOwner(postsContainer.getScene().getWindow());
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        event.consume();
+    }
+
+    @FXML
+    void CheckRules(MouseEvent event) {
+        System.out.println("Rules Button Pressed");
+        event.consume();
+    }
+
+    @FXML
+    void CreatePost(MouseEvent event) {
+        if (currentUser == null) {
+            Login();
+            return;
+        }
+        System.out.println("Create Post Button Pressed");
+        Clean();
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("create-post-page.fxml"));
+            Parent root = loader.load();
+
+            CreatePostPageController createPostPageController = loader.getController();
+            createPostPageController.InitData(currentUser);
+
+            // Get the current stage
+            Stage stage = (Stage) postsContainer.getScene().getWindow();
+            // Set the new scene
+            stage.setScene(new Scene(root));
+            stage.setTitle("Create Post - Reddit");
+        }
+        catch (Exception ex) {
+            System.out.println(ex.getMessage());
+        }
+        event.consume();
+    }
+
+    @FXML
+    void CreateSubcreddit(MouseEvent event) {
+        if (currentUser == null) {
+            Login();
+            return;
+        }
+        System.out.println("Create Subcreddit Button Pressed");
+        Clean();
+        event.consume();
+    }
+
+    @FXML
+    void FilterComments(MouseEvent event) {
+        Clean();
+        System.out.println("Filter Comments pressed");
+        event.consume();
+    }
+
+    @FXML
+    void FilterPosts(MouseEvent event) {
+        Clean();
+        Refresh();
+        event.consume();
+    }
+
+    @FXML
+    void GoHome(MouseEvent event) {
+        Clean();
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("home-page.fxml"));
+            Parent root = loader.load();
+
+            HomePageController homePageController = loader.getController();
+            homePageController.InitData(currentUser, null, 0);
+
+            // Create the second scene
+            Scene scene2 = new Scene(root);
+            // Get the current stage
+            Stage stage = (Stage)postsContainer.getScene().getWindow();
+            // Set the new scene
+            stage.setScene(scene2);
+        }
+        catch (Exception ex) {
+            System.out.println(ex.getMessage());
+        }
+        event.consume();
+    }
+
+    @FXML
+    void Login() {
+        navigateToLoginDialog();
+    }
+
+    private void navigateToLoginDialog() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("login.fxml"));
+            Parent root = loader.load();
+
+            // Get the login controller
+            LoginController loginController = loader.getController();
+
+            // Create a new stage for login (dialog)
+            Stage loginStage = new Stage();
+            loginStage.setTitle("Login - Creddit"); // Changed to Creddit
+            loginStage.setScene(new Scene(root, 400, 500));
+            loginStage.setResizable(false);
+
+            // Set modality so it blocks interaction with homepage
+            loginStage.initModality(Modality.WINDOW_MODAL);
+            loginStage.initOwner(postsContainer.getScene().getWindow());
+
+            // Set up callback for successful login
+            loginController.setOnLoginSuccess(user -> {
+                this.currentUser = user;
+                updateLoginUI();
+                loginStage.close();
+                HelloApplication.startSession(currentUser);
+                // Refresh the page to show user-specific content
+                Refresh();
+            });
+
+            loginStage.showAndWait();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            showAlert("Navigation Error", "Unable to load login page: " + e.getMessage());
+        }
+    }
+
+    @FXML
+    void ProfilePressed(MouseEvent event) {
+        if (currentUser == null) {
+            Login();
+            return;
+        }
+        System.out.println("My Profile Button Pressed");
+        //Clean();
+        event.consume();
+    }
+
+    @FXML
+    void Report(MouseEvent event) {
+        if (currentUser == null) {
+            Login();
+            return;
+        }
+        System.out.println("Report User Button Pressed");
+        //Clean();
+        event.consume();
+    }
+
+    @FXML
+    void SearchPressed(KeyEvent event) {
+        if(event.getCode() == KeyCode.ENTER) {
+            Refresh();
+            event.consume();
+        }
+    }
+
+    @FXML
+    void Share(MouseEvent event) {
+        System.out.println("Share User Pressed");
+        event.consume();
+    }
+
+    @FXML
+    void Refresh() {
+        Clean();
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("user-profile-page.fxml"));
+            Parent root = loader.load();
+
+            UserProfilePageController userProfilePageController = loader.getController();
+            userProfilePageController.InitData(profileUser, currentUser, searchField.getText(), filterPosts);
+
+            // Get the current stage
+            Stage stage = (Stage) filterPostsButton.getScene().getWindow();
+            // Set the new scene
+            stage.setScene(new Scene(root));
+        }
+        catch (Exception ex) {
+            System.out.println(ex.getMessage());
+        }
+    }
+
+    private void showAlert(String title, String message) {
+        javafx.scene.control.Alert alert = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.INFORMATION);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+
+        // Style the alert to match our dark theme
+        javafx.scene.control.DialogPane dialogPane = alert.getDialogPane();
+        dialogPane.setStyle("-fx-background-color: #0E1113;");
+        dialogPane.lookup(".content.label").setStyle("-fx-text-fill: white;");
+
+        alert.showAndWait();
+    }
+
+    private void Clean() {
+        if (postPreviewControllers != null) {
+            for(PostPreviewTemplateController controller : postPreviewControllers) {
+                if(controller != null && controller.mediaViewController != null) {
+                    controller.mediaViewController.Clean();
+                }
+            }
+        }
+    }
 }

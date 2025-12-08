@@ -8,13 +8,12 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Map;
 
 public class User implements Reportable {
+
     protected int id;
     protected String username;
     protected String email;
@@ -51,7 +50,7 @@ public class User implements Reportable {
     }
 
     public boolean register(String BASE_URL, Gson gson) throws Exception {
-        String jsonBody = gson.toJson(this);
+        String jsonBody = gson.toJson(this, User.class);
         URL url = new URL(BASE_URL + "/user/register");
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         conn.setRequestMethod("POST");
@@ -85,7 +84,7 @@ public class User implements Reportable {
     }
 
     public boolean keepAlive(String BASE_URL, Gson gson) throws Exception {
-        String jsonBody = gson.toJson(this);
+        String jsonBody = gson.toJson(this, User.class);
         URL url = new URL(BASE_URL + "/user/keepalive");
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         conn.setRequestMethod("POST");
@@ -126,13 +125,13 @@ public class User implements Reportable {
 
     public boolean Vote(Voteable voteable, int value, String BASE_URL, Gson gson) throws Exception {
         JsonObject json = new JsonObject();
-        json.add("user", gson.toJsonTree(this));
-        json.add("voteable", gson.toJsonTree(voteable));
+        json.add("user", gson.toJsonTree(this, User.class));
+        json.add("voteable", gson.toJsonTree(voteable, Voteable.class));
         json.addProperty("value", gson.toJson(value));
 
         String jsonBody = gson.toJson(json);
 
-        URL url = new URL(BASE_URL + "/post/vote");
+        URL url = new URL(BASE_URL + "/vote");
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         conn.setRequestMethod("POST");
         conn.setDoOutput(true);
@@ -147,8 +146,8 @@ public class User implements Reportable {
 
     public int CheckVote(Voteable voteable, String BASE_URL, Gson gson) throws Exception {
         JsonObject json = new JsonObject();
-        json.add("user", gson.toJsonTree(this));
-        json.add("voteable", gson.toJsonTree(voteable));
+        json.add("user", gson.toJsonTree(this, User.class));
+        json.add("voteable", gson.toJsonTree(voteable, Voteable.class));
 
         String jsonBody = gson.toJson(json);
 
@@ -182,7 +181,7 @@ public class User implements Reportable {
     }
 
     public Subcreddit[] GetSubcreddits(String BASE_URL, Gson gson) throws Exception {
-        String jsonBody = gson.toJson(this);
+        String jsonBody = gson.toJson(this, User.class);
         URL url = new URL(BASE_URL + "/user/subcreddits");
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         conn.setRequestMethod("POST");
@@ -205,8 +204,8 @@ public class User implements Reportable {
         if(!this.active)
             return false;
         JsonObject json = new JsonObject();
-        json.add("sender", gson.toJsonTree(this));
-        json.add("receiver", gson.toJsonTree(receiver));
+        json.add("sender", gson.toJsonTree(this, User.class));
+        json.add("receiver", gson.toJsonTree(receiver, User.class));
 
         String jsonBody = gson.toJson(json);
 
@@ -227,8 +226,8 @@ public class User implements Reportable {
         if(!this.active)
             return false;
         JsonObject json = new JsonObject();
-        json.add("sender", gson.toJsonTree(sender));
-        json.add("receiver", gson.toJsonTree(this));
+        json.add("sender", gson.toJsonTree(sender, User.class));
+        json.add("receiver", gson.toJsonTree(this, User.class));
 
         String jsonBody = gson.toJson(json);
 
@@ -249,8 +248,8 @@ public class User implements Reportable {
         if(!this.active)
             return false;
         JsonObject json = new JsonObject();
-        json.add("user1", gson.toJsonTree(this));
-        json.add("user2", gson.toJsonTree(friend));
+        json.add("user1", gson.toJsonTree(this, User.class));
+        json.add("user2", gson.toJsonTree(friend, User.class));
 
         String jsonBody = gson.toJson(json);
 
@@ -268,7 +267,7 @@ public class User implements Reportable {
     }
 
     public User[] GetFriends(String BASE_URL, Gson gson) throws Exception {
-        String jsonBody = gson.toJson(this);
+        String jsonBody = gson.toJson(this, User.class);
         URL url = new URL(BASE_URL + "/friends");
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         conn.setRequestMethod("POST");
@@ -288,7 +287,7 @@ public class User implements Reportable {
     }
 
     public User[] GetSentFriendRequests(String BASE_URL, Gson gson) throws Exception {
-        String jsonBody = gson.toJson(this);
+        String jsonBody = gson.toJson(this, User.class);
         URL url = new URL(BASE_URL + "/friends/sent");
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         conn.setRequestMethod("POST");
@@ -308,7 +307,7 @@ public class User implements Reportable {
     }
 
     public User[] GetReceivedFriendRequests(String BASE_URL, Gson gson) throws Exception {
-        String jsonBody = gson.toJson(this);
+        String jsonBody = gson.toJson(this, User.class);
         URL url = new URL(BASE_URL + "/friends/received");
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         conn.setRequestMethod("POST");

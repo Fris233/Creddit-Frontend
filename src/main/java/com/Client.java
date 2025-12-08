@@ -201,7 +201,7 @@ public abstract class Client {
 
     public static Map<Post, Integer> GetPostFeed(User user, String prompt, int lastID) throws Exception {
         JsonObject json = new JsonObject();
-        json.add("user", gson.toJsonTree(user));
+        json.add("user", gson.toJsonTree(user, User.class));
         json.addProperty("prompt", prompt);
         json.addProperty("lastID", lastID);
 
@@ -237,7 +237,7 @@ public abstract class Client {
 
     public static Map<Post, Integer> GetPostFeedFilterSub(User user, Subcreddit sub, String prompt, int lastID) throws Exception {
         JsonObject json = new JsonObject();
-        json.add("user", gson.toJsonTree(user));
+        json.add("user", gson.toJsonTree(user, User.class));
         json.add("sub", gson.toJsonTree(sub));
         json.addProperty("prompt", prompt);
         json.addProperty("lastID", gson.toJson(lastID));
@@ -274,8 +274,8 @@ public abstract class Client {
 
     public static Map<Post, Integer> GetPostFeedFilterAuthor(User user, User author, String prompt, int lastID) throws Exception {
         JsonObject json = new JsonObject();
-        json.add("user", gson.toJsonTree(user));
-        json.add("author", gson.toJsonTree(author));
+        json.add("user", gson.toJsonTree(user, User.class));
+        json.add("author", gson.toJsonTree(author, User.class));
         json.addProperty("prompt", prompt);
         json.addProperty("lastID", gson.toJson(lastID));
 
