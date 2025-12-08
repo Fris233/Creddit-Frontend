@@ -124,10 +124,10 @@ public class User implements Reportable {
     public void savePost(Post post) {
     }
 
-    public boolean Vote(Post post, int value, String BASE_URL, Gson gson) throws Exception {
+    public boolean Vote(Voteable voteable, int value, String BASE_URL, Gson gson) throws Exception {
         JsonObject json = new JsonObject();
         json.add("user", gson.toJsonTree(this));
-        json.add("post", gson.toJsonTree(post));
+        json.add("voteable", gson.toJsonTree(voteable));
         json.addProperty("value", gson.toJson(value));
 
         String jsonBody = gson.toJson(json);
@@ -145,10 +145,10 @@ public class User implements Reportable {
         return conn.getResponseCode() == 200;
     }
 
-    public int CheckVote(Post post, String BASE_URL, Gson gson) throws Exception {
+    public int CheckVote(Voteable voteable, String BASE_URL, Gson gson) throws Exception {
         JsonObject json = new JsonObject();
         json.add("user", gson.toJsonTree(this));
-        json.add("post", gson.toJsonTree(post));
+        json.add("voteable", gson.toJsonTree(voteable));
 
         String jsonBody = gson.toJson(json);
 

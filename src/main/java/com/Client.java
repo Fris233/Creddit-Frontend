@@ -36,7 +36,11 @@ public abstract class Client {
                         .registerSubtype(User.class, "user")
                         .registerSubtype(Post.class, "post")
                         .registerSubtype(Comment.class, "comment");
-        gson = new GsonBuilder().registerTypeAdapterFactory(userAdapter).registerTypeAdapterFactory(reportableAdapter).create();
+        RuntimeTypeAdapterFactory<Voteable> voteableAdapter =
+                RuntimeTypeAdapterFactory.of(Voteable.class, "type")
+                        .registerSubtype(Post.class, "post")
+                        .registerSubtype(Comment.class, "comment");
+        gson = new GsonBuilder().registerTypeAdapterFactory(userAdapter).registerTypeAdapterFactory(reportableAdapter).registerTypeAdapterFactory(voteableAdapter).create();
         BASE_URL = System.getenv("BASE_URL");
     }
 
@@ -152,14 +156,14 @@ public abstract class Client {
         return user.register(BASE_URL, gson);
     }
 
-    public static int CheckVote(User user, Post post) throws Exception {
-        return user.CheckVote(post, BASE_URL, gson);
+    public static int CheckVote(User user, Voteable voteable) throws Exception {
+        return user.CheckVote(voteable, BASE_URL, gson);
     }
 
-    public static boolean Vote(User user, Post post, int value) {
+    public static boolean Vote(User user, Voteable voteable, int value) {
         THREAD_POOL.submit(() -> {
             try {
-                user.Vote(post, value, BASE_URL, gson);
+                user.Vote(voteable, value, BASE_URL, gson);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -231,10 +235,11 @@ public abstract class Client {
         return postMap;
     }
 
-    public static Map<Post, Integer> GetPostFeedFilterSub(User user, Subcreddit sub, int lastID) throws Exception {
+    public static Map<Post, Integer> GetPostFeedFilterSub(User user, Subcreddit sub, String prompt, int lastID) throws Exception {
         JsonObject json = new JsonObject();
         json.add("user", gson.toJsonTree(user));
         json.add("sub", gson.toJsonTree(sub));
+        json.addProperty("prompt", prompt);
         json.addProperty("lastID", gson.toJson(lastID));
 
         String jsonBody = gson.toJson(json);
@@ -267,10 +272,11 @@ public abstract class Client {
         return postMap;
     }
 
-    public static Map<Post, Integer> GetPostFeedFilterAuthor(User user, User author, int lastID) throws Exception {
+    public static Map<Post, Integer> GetPostFeedFilterAuthor(User user, User author, String prompt, int lastID) throws Exception {
         JsonObject json = new JsonObject();
         json.add("user", gson.toJsonTree(user));
         json.add("author", gson.toJsonTree(author));
+        json.addProperty("prompt", prompt);
         json.addProperty("lastID", gson.toJson(lastID));
 
         String jsonBody = gson.toJson(json);

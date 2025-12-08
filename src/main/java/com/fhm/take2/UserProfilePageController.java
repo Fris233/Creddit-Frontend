@@ -101,7 +101,7 @@ public class UserProfilePageController {
         bioTextArea.setText(this.profileUser.getBio());
 
         try {
-            Map<Post, Integer> postFeed = Client.GetPostFeedFilterAuthor(this.currentUser, this.profileUser, 0);
+            Map<Post, Integer> postFeed = Client.GetPostFeedFilterAuthor(this.currentUser, this.profileUser, searchPrompt, 0);
             for (Post post : postFeed.keySet()) {
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("Post_Preview_Template.fxml"));
                 Node postNode = loader.load();
@@ -128,7 +128,7 @@ public class UserProfilePageController {
                 updating = true;
                 scrollCooldown = true;
                 try {
-                    Map<Post, Integer> postFeed = Client.GetPostFeedFilterAuthor(currentUser, this.profileUser, postPreviewControllers.getLast().GetPostID());
+                    Map<Post, Integer> postFeed = Client.GetPostFeedFilterAuthor(currentUser, this.profileUser, searchPrompt, postPreviewControllers.getLast().GetPostID());
                     for (Post post : postFeed.keySet()) {
                         FXMLLoader loader = new FXMLLoader(getClass().getResource("Post_Preview_Template.fxml"));
                         Node postNode = loader.load();
