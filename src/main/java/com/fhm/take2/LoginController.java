@@ -253,7 +253,7 @@ public class LoginController {
             Stage currentStage = (Stage) signUpLink.getScene().getWindow();
             Scene scene = new Scene(root);
             currentStage.setScene(scene);
-            currentStage.setTitle("Sign Up - Creddit");
+            currentStage.setTitle("Sign Up");
             currentStage.centerOnScreen();
 
         } catch (IOException e) {

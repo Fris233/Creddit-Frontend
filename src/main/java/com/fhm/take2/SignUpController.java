@@ -493,7 +493,7 @@ public class SignUpController {
             // Set the new scene (replace signup with login)
             Scene scene = new Scene(root);
             currentStage.setScene(scene);
-            currentStage.setTitle("Login - Creddit");
+            currentStage.setTitle("Login");
             currentStage.centerOnScreen();
 
             LoginController loginController = loader.getController();

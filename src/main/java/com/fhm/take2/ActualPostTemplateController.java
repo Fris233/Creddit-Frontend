@@ -318,7 +318,6 @@ public class ActualPostTemplateController {
             Stage stage = (Stage) postsContainer.getScene().getWindow();
             // Set the new scene
             stage.setScene(new Scene(root));
-            stage.setTitle("Create Post - Reddit");
         }
         catch (Exception ex) {
             System.out.println(ex.getMessage());
@@ -354,7 +353,7 @@ public class ActualPostTemplateController {
 
             // Create a new stage for login (dialog)
             Stage loginStage = new Stage();
-            loginStage.setTitle("Login - Creddit"); // Changed to Creddit
+            loginStage.setTitle("Login");
             loginStage.setScene(new Scene(root, 400, 500));
             loginStage.setResizable(false);
 
@@ -406,7 +405,6 @@ public class ActualPostTemplateController {
             Stage stage = (Stage) postsContainer.getScene().getWindow();
             // Set the new scene
             stage.setScene(new Scene(root));
-            stage.setTitle("Reddit - Home");
         }
         catch (Exception e) {
             e.printStackTrace();
