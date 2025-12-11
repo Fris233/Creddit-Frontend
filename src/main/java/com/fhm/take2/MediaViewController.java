@@ -22,6 +22,8 @@ import javafx.util.Duration;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class MediaViewController {
 
@@ -56,9 +58,14 @@ public class MediaViewController {
     private final int origWidth = 765;
     private final int origHeight = 380;
 
+    Map<Integer, Image> images;
+    Map<Integer, MediaPlayer> mediaPlayers;
+
     public void init(ArrayList<Media> mediaArrayList, boolean creating, ArrayList<File> fileArrayList) {
         if(!creating)
             this.mediaArrayList = mediaArrayList;
+        images = new HashMap<>();
+        mediaPlayers = new HashMap<>();
         this.currentMediaIndex = 0;
         this.creating = creating;
         if(creating)
@@ -222,7 +229,23 @@ public class MediaViewController {
     }
 
     private void DisplayMedia() {
-        Clean();
+        topHBox.setVisible(false);
+        isAudio = false;
+        paused.set(true);
+        mediaImage.setImage(null);
+        mediaImage.setVisible(false);
+        mediaViewer.setMediaPlayer(null);
+        mediaPane.setVisible(false);
+        mediaViewer.setVisible(false);
+        mediaViewer.setFitWidth(0);
+        mediaViewer.setFitHeight(0);
+        mediaImage.setFitWidth(0);
+        mediaImage.setFitHeight(0);
+        unknownMediaLabel.setDisable(true);
+        unknownMediaLabel.setVisible(false);
+        if(mp != null && mp.getTotalDuration() != null && !mp.getTotalDuration().isUnknown() && !mp.getTotalDuration().isIndefinite())
+            mp.pause();
+        mp = null;
 
         // Handle media display
         Object item;
@@ -241,57 +264,49 @@ public class MediaViewController {
             String type = detectType(item);
 
             if (type.equals("Image")) {
-                Image image = new Image(url, true);
+                Image image;
+                if(images.containsKey(currentMediaIndex)) {
+                    image = images.get(currentMediaIndex);
+                    topHBox.setVisible(true);
+                }
+                else {
+                    image = new Image(url, true);
+                    image.progressProperty().addListener((obs, oldV, newV) -> {
+                        if (newV.doubleValue() == 1.0) {
+                            topHBox.setVisible(true);
+                        }
+                    });
+
+                    image.errorProperty().addListener((obs, oldV, newV) -> {
+                        if (image.getException() != null) {
+                            System.out.println("Failed to load image: " + image.getException());
+                        }
+                    });
+                    images.put(currentMediaIndex, image);
+                }
                 mediaImage.setImage(image);
                 mediaImage.setFitWidth(origWidth);
                 mediaImage.setFitHeight(origHeight);
                 mediaImage.setVisible(true);
-                image.progressProperty().addListener((obs, oldV, newV) -> {
-                    if (newV.doubleValue() == 1.0) {
-                        topHBox.setVisible(true);
-                    }
-                });
-
-                image.errorProperty().addListener((obs, oldV, newV) -> {
-                    if (image.getException() != null) {
-                        System.out.println("Failed to load image: " + image.getException());
-                    }
-                });
             }
             else if (type.equals("Video") || type.equals("Audio")) {
                 mediaViewer.setFitWidth(origWidth);
                 mediaViewer.setFitHeight(origHeight);
-                javafx.scene.media.Media mediaObj = new javafx.scene.media.Media(url);
-                mediaObj.setOnError(() -> {
-                    Platform.runLater(this::RemoveMedia);
-                    System.out.println("corrupted media detected");
-                });
-                mp = new MediaPlayer(mediaObj);
-                mp.setOnError(() -> {
-                    Platform.runLater(this::RemoveMedia);
-                    System.out.println("corrupted media detected");
-                    mp = null;
-                });
-                progressSlider.setValue(0);
-                UpdateMediaTimeLabel(Duration.seconds(0), Duration.seconds(0));
-                mp.setOnReady(() -> {
-                    if(mp.getTotalDuration() == null || mp.getTotalDuration().isUnknown() || mp.getTotalDuration().isIndefinite()) {
-                        System.out.println("corrupted media detected");
-                        Platform.runLater(this::RemoveMedia);
-                        return;
-                    }
+                if(mediaPlayers.containsKey(currentMediaIndex)) {
+                    mp = mediaPlayers.get(currentMediaIndex);
                     progressSlider.setMin(0);
                     progressSlider.setMax(mp.getTotalDuration().toSeconds());
+                    progressSlider.setValue(mp.getCurrentTime().toSeconds());
                     UpdateMediaTimeLabel(mp.getCurrentTime(), mp.getTotalDuration());
                     mp.setVolume(volumeSlider.getValue() / 100.0);
-                    mp.currentTimeProperty().addListener((obs, oldTime, newTime) -> {
+                    /*mp.currentTimeProperty().addListener((obs, oldTime, newTime) -> {
                         if (!isSeeking && mp.getTotalDuration() != null) {
                             Platform.runLater(() -> {
                                 progressSlider.setValue(newTime.toSeconds());
                                 UpdateMediaTimeLabel(newTime, mp.getTotalDuration());
                             });
                         }
-                    });
+                    });*/
                     progressSlider.setOnMousePressed(this::handleSeek);
                     progressSlider.setOnMouseReleased(this::handleSeek);
                     mp.setAutoPlay(false);
@@ -306,8 +321,58 @@ public class MediaViewController {
                     mediaPane.setVisible(true);
                     mediaViewer.setVisible(true);
                     topHBox.setVisible(true);
-                });
+                }
+                else {
+                    javafx.scene.media.Media mediaObj = new javafx.scene.media.Media(url);
+                    mediaObj.setOnError(() -> {
+                        Platform.runLater(this::RemoveMedia);
+                        System.out.println("corrupted media detected");
+                    });
+                    mp = new MediaPlayer(mediaObj);
+                    mp.setOnError(() -> {
+                        Platform.runLater(this::RemoveMedia);
+                        System.out.println("corrupted media detected");
+                        mp = null;
+                    });
+
+                    mp.setOnReady(() -> {
+                        if(mp.getTotalDuration() == null || mp.getTotalDuration().isUnknown() || mp.getTotalDuration().isIndefinite()) {
+                            System.out.println("corrupted media detected");
+                            Platform.runLater(this::RemoveMedia);
+                            return;
+                        }
+                        progressSlider.setMin(0);
+                        progressSlider.setMax(mp.getTotalDuration().toSeconds());
+                        progressSlider.setValue(0);
+                        UpdateMediaTimeLabel(mp.getCurrentTime(), mp.getTotalDuration());
+                        mp.setVolume(volumeSlider.getValue() / 100.0);
+                        mp.currentTimeProperty().addListener((obs, oldTime, newTime) -> {
+                            if (!isSeeking && mp.getTotalDuration() != null) {
+                                Platform.runLater(() -> {
+                                    progressSlider.setValue(newTime.toSeconds());
+                                    UpdateMediaTimeLabel(newTime, mp.getTotalDuration());
+                                });
+                            }
+                        });
+                        progressSlider.setOnMousePressed(this::handleSeek);
+                        progressSlider.setOnMouseReleased(this::handleSeek);
+                        mp.setAutoPlay(false);
+                        if (type.equals("Video")) {
+                            mediaViewer.setMediaPlayer(mp);
+                        } else {
+                            isAudio = true;
+                            mediaViewer.setMediaPlayer(null); // prevent audio-only issues
+                            mediaImage.setImage(new Image(getClass().getResource("/com/fhm/take2/assets/audio_default_static.png").toExternalForm()));
+                            mediaImage.setVisible(true);
+                        }
+                        mediaPane.setVisible(true);
+                        mediaViewer.setVisible(true);
+                        topHBox.setVisible(true);
+                    });
+                    mediaPlayers.put(currentMediaIndex, mp);
+                }
             } else {
+                //TODO: For some reason, this doesn't seem to work? Haven't tested it outside of creating, but it seems to be broken.
                 unknownMediaLabel.setDisable(false);
                 unknownMediaLabel.setVisible(true);
                 unknownMediaLabel.setText(url);
@@ -338,6 +403,8 @@ public class MediaViewController {
 
     @FXML
     void OpenUnknownMedia(MouseEvent event) {
+        if(creating) return;
+
         String url = unknownMediaLabel.getText();
         try {
             java.awt.Desktop.getDesktop().browse(new java.net.URI(url));
@@ -428,22 +495,10 @@ public class MediaViewController {
     }
 
     void Clean() {
-        topHBox.setVisible(false);
-        isAudio = false;
-        paused.set(true);
-        mediaImage.setImage(null);
-        mediaImage.setVisible(false);
-        mediaViewer.setMediaPlayer(null);
-        mediaPane.setVisible(false);
-        mediaViewer.setVisible(false);
-        mediaViewer.setFitWidth(0);
-        mediaViewer.setFitHeight(0);
-        mediaImage.setFitWidth(0);
-        mediaImage.setFitHeight(0);
-        unknownMediaLabel.setDisable(true);
-        unknownMediaLabel.setVisible(false);
-        if(mp != null && mp.getTotalDuration() != null && !mp.getTotalDuration().isUnknown() && !mp.getTotalDuration().isIndefinite())
-            mp.dispose();
-        mp = null;
+        for(int k : mediaPlayers.keySet()) {
+            mp = mediaPlayers.get(k);
+            if(mp != null && mp.getTotalDuration() != null && !mp.getTotalDuration().isUnknown() && !mp.getTotalDuration().isIndefinite())
+                mp.dispose();
+        }
     }
 }

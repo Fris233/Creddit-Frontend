@@ -17,7 +17,7 @@
    <children>
       <VBox>
          <children>
-            <VBox>
+            <VBox onKeyPressed="#HandleKeyPress" onKeyReleased="#HandleKeyRelease">
                <children>
                   <HBox fx:id="topHBox" alignment="TOP_CENTER">
                      <children>

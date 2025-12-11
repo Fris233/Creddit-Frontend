@@ -100,6 +100,10 @@ public class HomePageController {
                 pause.play();
             }
         });
+        postsScrollPane.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+            if (event.getCode() == KeyCode.SPACE) event.consume();
+            if (event.getCode() == KeyCode.TAB) event.consume();
+        });
     }
 
     private void updateLoginUI() {
