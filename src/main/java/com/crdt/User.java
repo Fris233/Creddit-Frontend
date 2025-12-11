@@ -1,5 +1,6 @@
 package com.crdt;
 
+import com.Client;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
@@ -326,14 +327,71 @@ public class User implements Reportable {
         return gson.fromJson(sb.toString(), User[].class);
     }
 
-    public ArrayList<Message> GetPrivateMessageFeed(User friend, int lastMessageID) {
-        ArrayList<Message> messages = new ArrayList<>();
-        return messages;
+    public Message[] GetPrivateMessageFeed(User friend, int lastMessageID, String BASE_URL, Gson gson) throws Exception {
+        JsonObject json = new JsonObject();
+        json.add("user", gson.toJsonTree(this, User.class));
+        json.add("friend", gson.toJsonTree(friend, User.class));
+        json.addProperty("lastID", gson.toJson(lastMessageID, int.class));
+
+        String jsonBody = gson.toJson(json);
+        URL url = new URL(BASE_URL + "/pm/feed");
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("POST");
+        conn.setDoOutput(true);
+        conn.setRequestProperty("Content-Type", "application/json");
+        try (OutputStream os = conn.getOutputStream()) {
+            os.write(jsonBody.getBytes());
+        }
+
+        BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+        StringBuilder sb = new StringBuilder();
+        String line;
+        while ((line = reader.readLine()) != null) sb.append(line);
+        reader.close();
+
+        return gson.fromJson(sb.toString(), Message[].class);
     }
 
     public ArrayList<Message> GetLatestPrivateMessages(User friend, int lastMessageID) {
         ArrayList<Message> messages = new ArrayList<>();
         return messages;
+    }
+
+    public Message[] GetUnreadPrivateMessages(String BASE_URL, Gson gson) throws Exception {
+        String jsonBody = gson.toJson(this, User.class);
+        URL url = new URL(BASE_URL + "/pm/unread");
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("POST");
+        conn.setDoOutput(true);
+        conn.setRequestProperty("Content-Type", "application/json");
+        try (OutputStream os = conn.getOutputStream()) {
+            os.write(jsonBody.getBytes());
+        }
+
+        BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+        StringBuilder sb = new StringBuilder();
+        String line;
+        while ((line = reader.readLine()) != null) sb.append(line);
+        reader.close();
+
+        return gson.fromJson(sb.toString(), Message[].class);
+    }
+
+    public boolean ReadMessages(User friend, String BASE_URL, Gson gson) throws Exception {
+        JsonObject json = new JsonObject();
+        json.add("user", gson.toJsonTree(this, User.class));
+        json.add("friend", gson.toJsonTree(friend, User.class));
+
+        String jsonBody = gson.toJson(json);
+        URL url = new URL(BASE_URL + "/pm/read");
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("POST");
+        conn.setDoOutput(true);
+        conn.setRequestProperty("Content-Type", "application/json");
+        try (OutputStream os = conn.getOutputStream()) {
+            os.write(jsonBody.getBytes());
+        }
+        return conn.getResponseCode() == 200;
     }
 
     public void addReport(Report report) {

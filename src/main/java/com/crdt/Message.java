@@ -1,5 +1,11 @@
 package com.crdt;
 
+import com.Client;
+import com.google.gson.Gson;
+
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -38,10 +44,36 @@ public class Message {
     public Timestamp GetEdit_time() {return edit_time;}
     public boolean GetRead(){return read;}
 
-    public void send() {
+    public boolean send(String BASE_URL, Gson gson) throws Exception {
+        String jsonBody = gson.toJson(this, Message.class);
+
+        URL url = new URL(BASE_URL + "/pm/send");
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("POST");
+        conn.setDoOutput(true);
+        conn.setRequestProperty("Content-Type", "application/json");
+
+        try (OutputStream os = conn.getOutputStream()) {
+            os.write(jsonBody.getBytes());
+        }
+
+        return conn.getResponseCode() == 200;
     }
 
-    public void update() {
+    public boolean delete(String BASE_URL, Gson gson) throws Exception {
+        String jsonBody = gson.toJson(this, Message.class);
+
+        URL url = new URL(BASE_URL + "/pm/delete");
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("POST");
+        conn.setDoOutput(true);
+        conn.setRequestProperty("Content-Type", "application/json");
+
+        try (OutputStream os = conn.getOutputStream()) {
+            os.write(jsonBody.getBytes());
+        }
+
+        return conn.getResponseCode() == 200;
     }
 
     @Override

@@ -44,7 +44,7 @@ public class Post implements Voteable, Reportable {
     }
 
     public boolean create(String BASE_URL, Gson gson) throws Exception {
-        String jsonBody = Client.GetJSON(this);
+        String jsonBody = gson.toJson(this, Post.class);
 
         URL url = new URL(BASE_URL + "/post/create");
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();

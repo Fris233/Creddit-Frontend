@@ -87,9 +87,9 @@ public abstract class Client {
         return json;
     }
 
-    public static String GetJSON(Object obj) {
+    /*public static String GetJSON(Object obj) {
         return gson.toJson(obj);
-    }
+    }*/
 
     public static String UploadFile(File file) throws Exception {
         String boundary = "----Boundary" + System.currentTimeMillis();
@@ -330,5 +330,30 @@ public abstract class Client {
         reader.close();
 
         return gson.fromJson(sb.toString(), String[].class);
+    }
+
+
+
+
+    //BOOKMARK: Private Messages
+
+    public static boolean SendPM(Message msg) throws Exception {
+        return msg.send(BASE_URL, gson);
+    }
+
+    public static boolean DeletePM(Message msg) throws Exception {
+        return msg.delete(BASE_URL, gson);
+    }
+
+    public static boolean ReadMessage(User user, User friend) throws Exception {
+        return user.ReadMessages(friend, BASE_URL, gson);
+    }
+
+    public static ArrayList<Message> GetUnreadPM(User user) throws Exception {
+        return new ArrayList<>(Arrays.asList(user.GetUnreadPrivateMessages(BASE_URL, gson)));
+    }
+
+    public static ArrayList<Message> GetPMFeed(User user, User friend, int lastID) throws Exception {
+        return new ArrayList<>(Arrays.asList(user.GetPrivateMessageFeed(friend, lastID, BASE_URL, gson)));
     }
 }
