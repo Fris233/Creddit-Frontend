@@ -219,7 +219,7 @@ public class PostPreviewTemplateController {
                 Parent root = loader.load();
 
                 UserProfilePageController userProfilePageController = loader.getController();
-                userProfilePageController.InitData(post.GetAuthor(), currentUser, "", true);
+                userProfilePageController.InitData(post.GetAuthor().getId(), currentUser, "", true);
 
                 // Get the current stage
                 Stage stage = (Stage) JoinButton.getScene().getWindow();

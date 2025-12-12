@@ -1,5 +1,10 @@
 package com.crdt;
 
+import com.google.gson.Gson;
+
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 
@@ -16,16 +21,59 @@ public class Subcreddit {
     public Subcreddit(int id, String name, String description, Timestamp timecreated, User creator,  Media logo, boolean isPrivate){
         this.id = id;
         this.name = name;
+        this.description = description;
         this.timecreated = timecreated;
-        this.isPrivate = isPrivate;
         this.creator = creator;
         this.subLogo = logo;
+        this.isPrivate = isPrivate;
     }
 
-    public void create() {
+    public boolean create(String BASE_URL, Gson gson) throws Exception {
+        String jsonBody = gson.toJson(this, Subcreddit.class);
+
+        URL url = new URL(BASE_URL + "/subcreddit/create");
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("POST");
+        conn.setDoOutput(true);
+        conn.setRequestProperty("Content-Type", "application/json");
+
+        try (OutputStream os = conn.getOutputStream()) {
+            os.write(jsonBody.getBytes());
+        }
+
+        return conn.getResponseCode() == 200;
     }
 
-    public void delete() {
+    public boolean update(String BASE_URL, Gson gson) throws Exception {
+        String jsonBody = gson.toJson(this, Subcreddit.class);
+
+        URL url = new URL(BASE_URL + "/subcreddit/edit");
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("POST");
+        conn.setDoOutput(true);
+        conn.setRequestProperty("Content-Type", "application/json");
+
+        try (OutputStream os = conn.getOutputStream()) {
+            os.write(jsonBody.getBytes());
+        }
+
+        return conn.getResponseCode() == 200;
+    }
+
+    public boolean delete(String BASE_URL, Gson gson) throws Exception {
+        String jsonBody = gson.toJson(this, Subcreddit.class);
+
+        URL url = new URL(BASE_URL + "/subcreddit/delete");
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("POST");
+        conn.setDoOutput(true);
+        conn.setRequestProperty("Content-Type", "application/json");
+
+        try (OutputStream os = conn.getOutputStream()) {
+            os.write(jsonBody.getBytes());
+        }
+
+        return conn.getResponseCode() == 200;
     }
 
     public ArrayList<User> GetMembers() {
@@ -69,10 +117,9 @@ public class Subcreddit {
         return isPrivate;
     }
 
-    void UpdateDescription (String description){
-    }
-
-     void UpdateLogo (Media logo){
+    @Override
+    public String toString() {
+        return this.name;
     }
 
     @Override

@@ -59,9 +59,13 @@ public class UserProfilePageController {
     private boolean scrollCooldown = false;
     private boolean filterPosts;
 
-    public void InitData(User profileUser, User currentUser, String searchPrompt, boolean filterPosts) {
+    public void InitData(int profileUserID, User currentUser, String searchPrompt, boolean filterPosts) {
         this.currentUser = currentUser;
-        this.profileUser = profileUser;
+        try {
+            this.profileUser = Client.GetUser(profileUserID);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         this.filterPosts = filterPosts;
         this.searchField.setText(searchPrompt);
         postPreviewControllers = new ArrayList<>();
@@ -452,7 +456,7 @@ public class UserProfilePageController {
             Parent root = loader.load();
 
             UserProfilePageController userProfilePageController = loader.getController();
-            userProfilePageController.InitData(profileUser, currentUser, searchField.getText(), filterPosts);
+            userProfilePageController.InitData(profileUser.getId(), currentUser, searchField.getText(), filterPosts);
 
             // Get the current stage
             Stage stage = (Stage) filterPostsButton.getScene().getWindow();

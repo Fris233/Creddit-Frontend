@@ -131,8 +131,7 @@ public abstract class Client {
         while ((line = reader.readLine()) != null) sb.append(line);
         reader.close();
 
-        User user = gson.fromJson(sb.toString(), User.class);
-        return user;
+        return gson.fromJson(sb.toString(), User.class);
     }
 
     public static User login(String usermail, String password) throws Exception {
@@ -318,6 +317,20 @@ public abstract class Client {
         return post.create(BASE_URL, gson);
     }
 
+    public static Post GetPost(int id) throws Exception {
+        URL url = new URL(BASE_URL + String.format("/post?id=%s", java.net.URLEncoder.encode(String.valueOf(id), "UTF-8")));
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("GET");
+
+        BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+        StringBuilder sb = new StringBuilder();
+        String line;
+        while ((line = reader.readLine()) != null) sb.append(line);
+        reader.close();
+
+        return gson.fromJson(sb.toString(), Post.class);
+    }
+
     public static String[] GetAllCategories() throws Exception {
         URL url = new URL(BASE_URL + "/category/all");
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -335,7 +348,52 @@ public abstract class Client {
 
 
 
-    //BOOKMARK: Private Messages
+    //BOOKMARK: Subcreddit
+
+    public static Subcreddit[] GetAllSubcreddits() throws Exception {
+        URL url = new URL(BASE_URL + "/subcreddit/all");
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("GET");
+
+        BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+        StringBuilder sb = new StringBuilder();
+        String line;
+        while ((line = reader.readLine()) != null) sb.append(line);
+        reader.close();
+
+        return gson.fromJson(sb.toString(), Subcreddit[].class);
+    }
+
+    public static Subcreddit GetSubcreddit(int id) throws Exception {
+        URL url = new URL(BASE_URL + String.format("/subcreddit?id=%s", java.net.URLEncoder.encode(String.valueOf(id), "UTF-8")));
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("GET");
+
+        BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+        StringBuilder sb = new StringBuilder();
+        String line;
+        while ((line = reader.readLine()) != null) sb.append(line);
+        reader.close();
+
+        return gson.fromJson(sb.toString(), Subcreddit.class);
+    }
+
+    public static boolean CreateSubcreddit(Subcreddit sub) throws Exception {
+        return sub.create(BASE_URL, gson);
+    }
+
+    public static boolean EditSubcreddit(Subcreddit sub) throws Exception {
+        return sub.update(BASE_URL, gson);
+    }
+
+    public static boolean DeleteSubcreddit(Subcreddit sub) throws Exception {
+        return sub.delete(BASE_URL, gson);
+    }
+
+
+
+
+    //BOOKMARK: Private Message
 
     public static boolean SendPM(Message msg) throws Exception {
         return msg.send(BASE_URL, gson);

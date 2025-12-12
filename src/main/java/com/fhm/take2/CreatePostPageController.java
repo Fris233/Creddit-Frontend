@@ -1,10 +1,7 @@
 package com.fhm.take2;
 
 import com.Client;
-import com.crdt.Media;
-import com.crdt.MediaType;
-import com.crdt.Post;
-import com.crdt.User;
+import com.crdt.*;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
@@ -46,7 +43,7 @@ public class CreatePostPageController {
 
     @FXML private ScrollPane scrollPane;
     @FXML private TextField searchField;
-    @FXML private ComboBox<?> subcredditComboBox;
+    @FXML private ComboBox<Subcreddit> subcredditComboBox;
     @FXML private Label timeLabel;
     @FXML private TextField titleField;
     @FXML private ImageView userPFP;
@@ -59,17 +56,22 @@ public class CreatePostPageController {
     private ArrayList<String> allCategories;
     private ArrayList<String> selectedCategories;
 
+    private ArrayList<Subcreddit> mySubcreddits;
+
     private ObservableList<String> suggestions;
 
     public void InitData(User user) {
+        this.currentUser = user;
         try {
             allCategories = new ArrayList<>(Arrays.asList(Client.GetAllCategories()));
+            mySubcreddits = Client.GetUserSubcreddits(this.currentUser);
+            mySubcreddits.addFirst(null);
+            subcredditComboBox.setItems(FXCollections.observableArrayList(mySubcreddits));
         } catch (Exception e) {
             e.printStackTrace();
         }
         selectedCategories = new ArrayList<>();
         mediaViewController = null;
-        currentUser = user;
 
         contentArea.setWrapText(true);
 
@@ -374,7 +376,7 @@ public class CreatePostPageController {
             }
 
             // Now send post JSON
-            Post post = new Post(1, currentUser, null, title, content, media, selectedCategories, null, null, 0, 0);
+            Post post = new Post(1, currentUser, subcredditComboBox.getSelectionModel().getSelectedItem(), title, content, media, selectedCategories, null, null, 0, 0);
             if (Client.CreatePost(post)) {
                 Alert alert = new Alert(Alert.AlertType.INFORMATION, "Post uploaded successfully!");
                 alert.showAndWait();
