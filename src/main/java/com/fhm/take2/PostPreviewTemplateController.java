@@ -72,10 +72,8 @@ public class PostPreviewTemplateController {
                 System.out.println(ex.getMessage());
             }
         }
-        if(post.GetSubcreddit() == null) {
-            JoinButton.setDisable(true);
+        if(post.GetSubcreddit() == null)
             JoinButton.setVisible(false);
-        }
         // TODO: Check Moderation
     }
 
@@ -188,7 +186,6 @@ public class PostPreviewTemplateController {
 
     @FXML
     void OpenPost(MouseEvent event) {
-        System.out.println("Open Post Pressed!");
         if(mediaViewController != null)
             mediaViewController.Clean();
         try {

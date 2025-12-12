@@ -14,9 +14,9 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: #0E1113; -fx-background-radius: 15;" stylesheets="@CredditCSS.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: #0E1113; -fx-background-radius: 15;" stylesheets="@CredditCSS.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.fhm.take2.CreateSubcredditPageController">
    <children>
-      <VBox layoutX="10.0" layoutY="10.0" prefHeight="400.0" prefWidth="600.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="10.0">
+      <VBox fx:id="page1VBox" layoutX="10.0" layoutY="10.0" prefHeight="400.0" prefWidth="600.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="10.0">
          <children>
             <Label prefHeight="34.0" prefWidth="112.0" text="Add topics" textFill="WHITE">
                <cursor>
@@ -37,13 +37,10 @@
                <children>
                   <AnchorPane>
                      <children>
-                        <TextField fx:id="topicsSearchBar" onKeyPressed="#CategorySearchKeyHandler" prefHeight="40.0" prefWidth="570.0" promptText="Filter topics" style="-fx-background-radius: 20; -fx-text-fill: white; -fx-background-color: #2C3539; -fx-padding: 5 10 5 42;">
+                        <TextField fx:id="categorySearchField" onKeyPressed="#CategorySearchKeyHandler" prefHeight="40.0" prefWidth="570.0" promptText="Filter topics" style="-fx-background-radius: 20; -fx-text-fill: white; -fx-background-color: #2C3539; -fx-padding: 5 10 5 42;">
                            <font>
                               <Font size="14.0" />
                            </font>
-                           <cursor>
-                              <Cursor fx:constant="HAND" />
-                           </cursor>
                         </TextField>
                         <ImageView fitHeight="40.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true">
                            <image>
@@ -52,18 +49,18 @@
                         </ImageView>
                      </children>
                   </AnchorPane>
-                  <ListView fx:id="lvSuggestions" layoutX="42.0" layoutY="40.0" maxHeight="150.0" prefWidth="458.0" />
-                  <Label layoutY="69.0" text="Topics ?/3" textFill="WHITE">
+                  <Label fx:id="topicCountLabel" layoutY="69.0" text="Topics 0/3" textFill="WHITE">
                      <font>
                         <Font name="System Bold" size="17.0" />
                      </font>
                   </Label>
-                  <HBox fx:id="topicsHBox" layoutY="115.0" prefHeight="100.0" prefWidth="200.0" />
+                  <HBox fx:id="hbSelectedCategories" layoutY="115.0" prefHeight="45.0" prefWidth="560.0" />
+                  <ListView fx:id="lvSuggestions" layoutX="42.0" layoutY="40.0" maxHeight="150.0" prefWidth="458.0" />
                </children>
             </AnchorPane>
-            <HBox alignment="BOTTOM_RIGHT" prefHeight="100.0" prefWidth="200.0">
+            <HBox alignment="BOTTOM_RIGHT" prefHeight="117.0" prefWidth="560.0">
                <children>
-                  <Button mnemonicParsing="false" style="-fx-background-color: #343536; -fx-background-radius: 15;" text="Cancel" textFill="WHITE">
+                  <Button mnemonicParsing="false" onMouseClicked="#Cancel" style="-fx-background-color: #343536; -fx-background-radius: 15;" text="Cancel" textFill="WHITE">
                      <HBox.margin>
                         <Insets right="10.0" />
                      </HBox.margin>
@@ -74,7 +71,7 @@
                         <Cursor fx:constant="HAND" />
                      </cursor>
                   </Button>
-                  <Button mnemonicParsing="false" style="-fx-background-color: #0079D3; -fx-background-radius: 15;" text="Next" textFill="WHITE">
+                  <Button mnemonicParsing="false" onMouseClicked="#NextPage" style="-fx-background-color: #0079D3; -fx-background-radius: 15;" text="Next" textFill="WHITE">
                      <font>
                         <Font name="System Bold" size="15.0" />
                      </font>
@@ -89,7 +86,7 @@
             <Insets />
          </opaqueInsets>
       </VBox>
-      <VBox prefHeight="400.0" prefWidth="600.0" visible="false" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="10.0">
+      <VBox fx:id="page2VBox" prefHeight="400.0" prefWidth="600.0" visible="false" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="10.0">
          <children>
             <Label prefHeight="34.0" prefWidth="329.0" text="What kind of community is this?" textFill="WHITE">
                <cursor>
@@ -108,7 +105,7 @@
                <children>
                   <VBox prefHeight="100.0" prefWidth="560.0">
                      <children>
-                        <HBox prefHeight="100.0" prefWidth="200.0" style="-fx-background-color: #343536;">
+                        <HBox fx:id="publicHBox" onMouseClicked="#MakePublic" prefHeight="100.0" prefWidth="200.0" style="-fx-background-color: #343536;">
                            <children>
                               <ImageView fitHeight="22.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
                                  <image>
@@ -139,7 +136,7 @@
                               <Cursor fx:constant="HAND" />
                            </cursor>
                         </HBox>
-                        <HBox layoutX="10.0" layoutY="10.0" prefHeight="100.0" prefWidth="200.0">
+                        <HBox fx:id="privateHBox" layoutX="10.0" layoutY="10.0" prefHeight="100.0" prefWidth="200.0">
                            <children>
                               <ImageView fitHeight="22.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
                                  <image>
@@ -149,7 +146,7 @@
                                     <Insets top="10.0" />
                                  </HBox.margin>
                               </ImageView>
-                              <VBox prefHeight="37.0" prefWidth="538.0">
+                              <VBox onMouseClicked="#MakePrivate" prefHeight="37.0" prefWidth="538.0">
                                  <children>
                                     <Label text="Private" textFill="WHITE">
                                        <font>
@@ -188,9 +185,9 @@
                   <Cursor fx:constant="TEXT" />
                </cursor>
             </Label>
-            <HBox alignment="BOTTOM_RIGHT" prefHeight="34.0" prefWidth="195.0">
+            <HBox alignment="BOTTOM_RIGHT" prefHeight="51.0" prefWidth="560.0">
                <children>
-                  <Button mnemonicParsing="false" style="-fx-background-color: #343536; -fx-background-radius: 15;" text="Back" textFill="WHITE">
+                  <Button mnemonicParsing="false" onMouseClicked="#BackPage" prefHeight="31.0" prefWidth="69.0" style="-fx-background-color: #343536; -fx-background-radius: 15;" text="Back" textFill="WHITE">
                      <HBox.margin>
                         <Insets right="10.0" />
                      </HBox.margin>
@@ -201,7 +198,7 @@
                         <Cursor fx:constant="HAND" />
                      </cursor>
                   </Button>
-                  <Button mnemonicParsing="false" style="-fx-background-color: #0079D3; -fx-background-radius: 15;" text="Next" textFill="WHITE">
+                  <Button mnemonicParsing="false" onMouseClicked="#NextPage" style="-fx-background-color: #0079D3; -fx-background-radius: 15;" text="Next" textFill="WHITE">
                      <font>
                         <Font name="System Bold" size="15.0" />
                      </font>
@@ -216,7 +213,7 @@
             <Insets />
          </opaqueInsets>
       </VBox>
-      <VBox prefHeight="400.0" prefWidth="600.0" visible="false" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="10.0">
+      <VBox fx:id="page3VBox" prefHeight="400.0" prefWidth="600.0" visible="false" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="10.0">
          <children>
             <Label text="Tell us about your community" textFill="WHITE" wrapText="true">
                <font>
@@ -228,29 +225,29 @@
                   <Insets top="5.0" />
                </VBox.margin>
             </Label>
-            <TextField prefHeight="42.0" prefWidth="506.0" promptText="Community name*" style="-fx-background-color: #2C3539; -fx-background-radius: 15;">
+            <TextField fx:id="subNameTextField" prefHeight="42.0" prefWidth="506.0" promptText="Community name*" style="-fx-background-color: #2C3539; -fx-background-radius: 15;">
                <VBox.margin>
                   <Insets top="50.0" />
                </VBox.margin>
             </TextField>
-            <Label text="?/21" textFill="WHITE">
+            <Label fx:id="subNameLengthLabel" text="0/24" textFill="WHITE">
                <VBox.margin>
                   <Insets left="530.0" />
                </VBox.margin>
             </Label>
-            <TextArea prefHeight="200.0" prefWidth="200.0" promptText="Description*" style="-fx-background-color: #2C3539; -fx-background-radius: 15;" wrapText="true">
+            <TextArea fx:id="subDescTextArea" prefHeight="200.0" prefWidth="200.0" promptText="Description*" style="-fx-background-color: #2C3539; -fx-background-radius: 15;" wrapText="true">
                <VBox.margin>
                   <Insets top="10.0" />
                </VBox.margin>
             </TextArea>
-            <Label layoutX="540.0" layoutY="134.0" text="?" textFill="WHITE">
+            <Label fx:id="subDescLengthLabel" layoutX="540.0" layoutY="134.0" text="0" textFill="WHITE">
                <VBox.margin>
                   <Insets left="545.0" />
                </VBox.margin>
             </Label>
             <HBox alignment="BOTTOM_RIGHT" prefHeight="34.0" prefWidth="195.0">
                <children>
-                  <Button mnemonicParsing="false" style="-fx-background-color: #343536; -fx-background-radius: 15;" text="Back" textFill="WHITE">
+                  <Button mnemonicParsing="false" onMouseClicked="#BackPage" prefHeight="31.0" prefWidth="69.0" style="-fx-background-color: #343536; -fx-background-radius: 15;" text="Back" textFill="WHITE">
                      <HBox.margin>
                         <Insets right="10.0" />
                      </HBox.margin>
@@ -261,7 +258,7 @@
                         <Cursor fx:constant="HAND" />
                      </cursor>
                   </Button>
-                  <Button mnemonicParsing="false" style="-fx-background-color: #0079D3; -fx-background-radius: 15;" text="Next" textFill="WHITE">
+                  <Button fx:id="nextButtonPG3" mnemonicParsing="false" onMouseClicked="#NextPage" style="-fx-background-color: #0079D3; -fx-background-radius: 15;" text="Next" textFill="WHITE">
                      <font>
                         <Font name="System Bold" size="15.0" />
                      </font>
@@ -276,7 +273,7 @@
             </HBox>
          </children>
       </VBox>
-      <VBox prefHeight="400.0" prefWidth="600.0" visible="false" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="10.0">
+      <VBox fx:id="page4VBox" prefHeight="400.0" prefWidth="600.0" visible="false" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="10.0">
          <children>
             <Label text="Style your community" textFill="WHITE" wrapText="true">
                <font>
@@ -288,32 +285,19 @@
                   <Insets top="5.0" />
                </VBox.margin>
             </Label>
-            <HBox alignment="CENTER" prefHeight="39.0" prefWidth="560.0">
-               <children>
-                  <Label text="Banner" textFill="WHITE" />
-                  <Button mnemonicParsing="false" style="-fx-background-color: #343536; -fx-background-radius: 15;" text="Add Media" textFill="WHITE">
-                     <HBox.margin>
-                        <Insets left="440.0" />
-                     </HBox.margin>
-                  </Button>
-               </children>
+            <AnchorPane prefHeight="40.0" prefWidth="560.0">
                <VBox.margin>
                   <Insets top="50.0" />
                </VBox.margin>
-            </HBox>
-            <HBox alignment="CENTER" layoutX="10.0" layoutY="129.0" prefHeight="39.0" prefWidth="560.0">
                <children>
-                  <Label text="Icon" textFill="WHITE" />
-                  <Button mnemonicParsing="false" style="-fx-background-color: #343536; -fx-background-radius: 15;" text="Add Media" textFill="WHITE">
-                     <HBox.margin>
-                        <Insets left="455.0" />
-                     </HBox.margin>
-                  </Button>
+                  <Label layoutX="4.0" layoutY="11.0" text="Icon" textFill="WHITE" />
+                  <Button layoutX="482.0" layoutY="7.0" mnemonicParsing="false" onMouseClicked="#AttachMedia" style="-fx-background-color: #343536; -fx-background-radius: 15;" text="Add Media" textFill="WHITE" />
+                  <Label fx:id="mediaLabel" alignment="CENTER_RIGHT" layoutX="53.0" layoutY="11.0" prefHeight="17.0" prefWidth="423.0" text="No Icon Selected" textFill="WHITE" />
                </children>
-            </HBox>
-            <HBox alignment="BOTTOM_RIGHT" prefHeight="34.0" prefWidth="195.0">
+            </AnchorPane>
+            <HBox alignment="BOTTOM_RIGHT" prefHeight="90.0" prefWidth="560.0">
                <children>
-                  <Button mnemonicParsing="false" style="-fx-background-color: #343536; -fx-background-radius: 15;" text="Back" textFill="WHITE">
+                  <Button mnemonicParsing="false" onMouseClicked="#BackPage" style="-fx-background-color: #343536; -fx-background-radius: 15;" text="Back" textFill="WHITE">
                      <HBox.margin>
                         <Insets right="10.0" />
                      </HBox.margin>
@@ -324,7 +308,7 @@
                         <Cursor fx:constant="HAND" />
                      </cursor>
                   </Button>
-                  <Button mnemonicParsing="false" style="-fx-background-color: #0079D3; -fx-background-radius: 15;" text="Create Community" textFill="WHITE">
+                  <Button mnemonicParsing="false" onMouseClicked="#CreateSubcreddit" style="-fx-background-color: #0079D3; -fx-background-radius: 15;" text="Create Community" textFill="WHITE">
                      <font>
                         <Font name="System Bold" size="15.0" />
                      </font>

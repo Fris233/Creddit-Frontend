@@ -109,18 +109,13 @@ public class HomePageController {
     private void updateLoginUI() {
         if(currentUser != null) {
             // User is logged in
-            loggedOutPane.setDisable(true);
             loggedOutPane.setVisible(false);
-            loggedInPane.setDisable(false);
             loggedInPane.setVisible(true);
             //userPFP.setImage(currentUser.getPfp());
         } else {
             // User is logged out
-            loggedOutPane.setDisable(false);
             loggedOutPane.setVisible(true);
-            loggedInPane.setDisable(true);
             loggedInPane.setVisible(false);
-            recentScrollPane.setDisable(true);
             recentScrollPane.setVisible(false);
         }
     }
@@ -190,8 +185,35 @@ public class HomePageController {
             Login();
             return;
         }
-        System.out.println("Create Subcreddit Button Pressed");
-        Clean();
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("create-subcreddit-page.fxml"));
+            Parent root = loader.load();
+
+            // Get the login controller
+            CreateSubcredditPageController createSubcredditPageController = loader.getController();
+            createSubcredditPageController.InitData(this.currentUser);
+
+            // Create a new stage for login (dialog)
+            Stage createSubcredditStage = new Stage();
+            createSubcredditStage.setTitle("Create Subcreddit");
+            createSubcredditStage.setScene(new Scene(root, 600, 400));
+            createSubcredditStage.setResizable(false);
+
+            // Set modality so it blocks interaction with homepage
+            createSubcredditStage.initModality(Modality.WINDOW_MODAL);
+            createSubcredditStage.initOwner(postsContainer.getScene().getWindow());
+
+            // Set up callback for successful login
+            createSubcredditPageController.setOnCreationSuccess(sub -> {
+                createSubcredditStage.close();
+                //TODO: Open Subcreddit Page here
+            });
+
+            createSubcredditStage.showAndWait();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         event.consume();
     }
 
@@ -233,7 +255,6 @@ public class HomePageController {
 
         } catch (IOException e) {
             e.printStackTrace();
-            showAlert("Navigation Error", "Unable to load login page: " + e.getMessage());
         }
     }
 

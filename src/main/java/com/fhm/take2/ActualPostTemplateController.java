@@ -97,7 +97,6 @@ public class ActualPostTemplateController {
 
         }
         if(post.GetSubcreddit() == null) {
-            JoinButton.setDisable(true);
             JoinButton.setVisible(false);
         }
         postsScrollPane.addEventFilter(ScrollEvent.SCROLL, e -> {
@@ -250,18 +249,13 @@ public class ActualPostTemplateController {
     private void updateLoginUI() {
         if(currentUser != null) {
             // User is logged in
-            loggedOutPane.setDisable(true);
             loggedOutPane.setVisible(false);
-            loggedInPane.setDisable(false);
             loggedInPane.setVisible(true);
             //userPFP.setImage(currentUser.getPfp());
         } else {
             // User is logged out
-            loggedOutPane.setDisable(false);
             loggedOutPane.setVisible(true);
-            loggedInPane.setDisable(true);
             loggedInPane.setVisible(false);
-            recentScrollPane.setDisable(true);
             recentScrollPane.setVisible(false);
         }
     }

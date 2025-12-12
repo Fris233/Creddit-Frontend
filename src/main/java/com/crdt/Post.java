@@ -2,6 +2,9 @@ package com.crdt;
 
 import com.Client;
 import com.google.gson.Gson;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -43,7 +46,7 @@ public class Post implements Voteable, Reportable {
         this.comments = comments;
     }
 
-    public boolean create(String BASE_URL, Gson gson) throws Exception {
+    public int create(String BASE_URL, Gson gson) throws Exception {
         String jsonBody = gson.toJson(this, Post.class);
 
         URL url = new URL(BASE_URL + "/post/create");
@@ -56,7 +59,13 @@ public class Post implements Voteable, Reportable {
             os.write(jsonBody.getBytes());
         }
 
-        return conn.getResponseCode() == 200;
+        BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+        StringBuilder sb = new StringBuilder();
+        String line;
+        while ((line = reader.readLine()) != null) sb.append(line);
+        reader.close();
+
+        return gson.fromJson(sb.toString(), int.class);
     }
 
     public void delete() {
@@ -65,6 +74,7 @@ public class Post implements Voteable, Reportable {
     public int GetID() {
         return id;
     }
+    public void SetID(int id) {this.id = id;}
 
     public User GetAuthor() {
         return author;

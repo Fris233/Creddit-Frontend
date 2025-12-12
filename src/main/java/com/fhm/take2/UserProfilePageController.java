@@ -87,22 +87,15 @@ public class UserProfilePageController {
 
         try {
             profileSubs = Client.GetUserSubcreddits(this.profileUser);
-            if(Client.GetFriends(this.currentUser).contains(this.profileUser)) {
-                unfriendButtonAnchor.setDisable(false);
+
+            if(Client.GetFriends(this.currentUser).contains(this.profileUser))
                 unfriendButtonAnchor.setVisible(true);
-            }
-            else if(Client.GetReceivedFriendRequests(this.currentUser).contains(this.profileUser)) {
-                friendRequestAnchor.setDisable(false);
+            else if(Client.GetReceivedFriendRequests(this.currentUser).contains(this.profileUser))
                 friendRequestAnchor.setVisible(true);
-            }
-            else if(Client.GetSentFriendRequests(this.currentUser).contains(this.profileUser)) {
-                pendingFriendButton.setDisable(false);
+            else if(Client.GetSentFriendRequests(this.currentUser).contains(this.profileUser))
                 pendingFriendButton.setVisible(true);
-            }
-            else {
-                friendButtonAnchor.setDisable(false);
+            else
                 friendButtonAnchor.setVisible(true);
-            }
         }
         catch (Exception e) {
             e.printStackTrace();

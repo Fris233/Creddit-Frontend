@@ -313,7 +313,7 @@ public abstract class Client {
 
     //BOOKMARK: Post
 
-    public static boolean CreatePost(Post post) throws Exception {
+    public static int CreatePost(Post post) throws Exception {
         return post.create(BASE_URL, gson);
     }
 
@@ -378,7 +378,7 @@ public abstract class Client {
         return gson.fromJson(sb.toString(), Subcreddit.class);
     }
 
-    public static boolean CreateSubcreddit(Subcreddit sub) throws Exception {
+    public static int CreateSubcreddit(Subcreddit sub) throws Exception {
         return sub.create(BASE_URL, gson);
     }
 

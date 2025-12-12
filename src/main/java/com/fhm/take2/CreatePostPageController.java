@@ -124,9 +124,11 @@ public class CreatePostPageController {
         validPostInfo.addListener((obs, oldVal, newVal) -> {
             if(newVal) {
                 postButton.setStyle("-fx-background-color: #115bca; -fx-text-fill: #ffffff; -fx-background-radius: 30;"); //button blue and pressable
+                postButton.setDisable(false);
             }
             else {
                 postButton.setStyle("-fx-background-color: #191c1e; -fx-text-fill: #525454; -fx-background-radius: 30;"); //button grayed out
+                postButton.setDisable(true);
             }
         });
 
@@ -335,8 +337,6 @@ public class CreatePostPageController {
     void SendPost(MouseEvent event) {
         if(!validPostInfo.get()) return;
 
-        System.out.println("Post Button Pressed!");
-
         if(!Client.isServerReachable()) {
             new Alert(Alert.AlertType.ERROR, "Server unreachable! Check your connection and try again!").showAndWait();
             return;
@@ -354,7 +354,6 @@ public class CreatePostPageController {
             if(mediaViewController != null) {
                 ArrayList<File> fileArrayList = mediaViewController.GetFileArrayList();
                 for (File selectedFile : fileArrayList) {
-                    System.out.println("Uploading file: " + selectedFile.getName());
                     String uploadResponse = Client.UploadFile(selectedFile);
                     if (uploadResponse == null) {
                         new Alert(Alert.AlertType.ERROR, "Server unreachable! Check your connection and try again!").showAndWait();
@@ -377,19 +376,29 @@ public class CreatePostPageController {
 
             // Now send post JSON
             Post post = new Post(1, currentUser, subcredditComboBox.getSelectionModel().getSelectedItem(), title, content, media, selectedCategories, null, null, 0, 0);
-            if (Client.CreatePost(post)) {
+            int id = Client.CreatePost(post);
+            if (id > 0) {
+                post.SetID(id);
                 Alert alert = new Alert(Alert.AlertType.INFORMATION, "Post uploaded successfully!");
                 alert.showAndWait();
-                titleField.clear();
-                contentArea.clear();
-                categorySearchField.clear();
-                lvSuggestions.setVisible(false);
-                selectedCategories.clear();
-                RenderSelectedCategories();
-
                 if(mediaViewController != null) {
                     mediaViewController.Clean();
                     RemoveMediaPane();
+                }
+                try {
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource("ActualPost_Template.fxml"));
+                    Parent root = loader.load();
+
+                    ActualPostTemplateController actualPostTemplateController = loader.getController();
+                    actualPostTemplateController.InitData(post, currentUser, 0);
+
+                    // Get the current stage
+                    Stage stage = (Stage) postButton.getScene().getWindow();
+                    // Set the new scene
+                    stage.setScene(new Scene(root));
+                }
+                catch (Exception ex) {
+                    System.out.println(ex.getMessage());
                 }
             }
             else {

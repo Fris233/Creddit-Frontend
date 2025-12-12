@@ -70,10 +70,8 @@ public class MediaViewController {
         this.creating = creating;
         if(creating)
             this.fileArrayList = fileArrayList;
-        else {
-            removeButton.setDisable(true);
+        else
             removeButton.setVisible(false);
-        }
 
         PrevNextButtons();
         DisplayMedia();
@@ -220,7 +218,8 @@ public class MediaViewController {
 
     private String extractUrl(Object obj) {
         if (obj instanceof File f) {
-            return f.toURI().toString();
+            String[] str = f.toURI().toString().split("/");
+            return str[str.length-1];
         }
         if (obj instanceof Media m) {
             return m.GetURL();
@@ -241,7 +240,6 @@ public class MediaViewController {
         mediaViewer.setFitHeight(0);
         mediaImage.setFitWidth(0);
         mediaImage.setFitHeight(0);
-        unknownMediaLabel.setDisable(true);
         unknownMediaLabel.setVisible(false);
         if(mp != null && mp.getTotalDuration() != null && !mp.getTotalDuration().isUnknown() && !mp.getTotalDuration().isIndefinite())
             mp.pause();
@@ -373,7 +371,6 @@ public class MediaViewController {
                 }
             } else {
                 //TODO: For some reason, this doesn't seem to work? Haven't tested it outside of creating, but it seems to be broken.
-                unknownMediaLabel.setDisable(false);
                 unknownMediaLabel.setVisible(true);
                 unknownMediaLabel.setText(url);
             }
@@ -476,22 +473,9 @@ public class MediaViewController {
             RemoveMedia();
         UpdateIndexLabel();
         int sz = creating? fileArrayList.size() : mediaArrayList.size();
-        if(currentMediaIndex == 0) {
-            prevButton.setDisable(true);
-            prevButton.setVisible(false);
-        }
-        else {
-            prevButton.setDisable(false);
-            prevButton.setVisible(true);
-        }
-        if(currentMediaIndex == sz - 1) {
-            nextButton.setDisable(true);
-            nextButton.setVisible(false);
-        }
-        else {
-            nextButton.setDisable(false);
-            nextButton.setVisible(true);
-        }
+
+        prevButton.setVisible(currentMediaIndex != 0);
+        nextButton.setVisible(currentMediaIndex != sz - 1);
     }
 
     void Clean() {
