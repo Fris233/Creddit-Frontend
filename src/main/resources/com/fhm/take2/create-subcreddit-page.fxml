@@ -230,21 +230,27 @@
                   <Insets top="50.0" />
                </VBox.margin>
             </TextField>
-            <Label fx:id="subNameLengthLabel" text="0/24" textFill="WHITE">
+            <AnchorPane>
                <VBox.margin>
                   <Insets left="530.0" />
                </VBox.margin>
-            </Label>
+               <children>
+                  <Label fx:id="subNameLengthLabel" alignment="CENTER_RIGHT" layoutX="-499.0" prefHeight="17.0" prefWidth="523.0" text="0/24" textFill="WHITE" />
+               </children>
+            </AnchorPane>
             <TextArea fx:id="subDescTextArea" prefHeight="200.0" prefWidth="200.0" promptText="Description*" style="-fx-background-color: #2C3539; -fx-background-radius: 15;" wrapText="true">
                <VBox.margin>
                   <Insets top="10.0" />
                </VBox.margin>
             </TextArea>
-            <Label fx:id="subDescLengthLabel" layoutX="540.0" layoutY="134.0" text="0" textFill="WHITE">
+            <AnchorPane>
                <VBox.margin>
                   <Insets left="545.0" />
                </VBox.margin>
-            </Label>
+               <children>
+                  <Label fx:id="subDescLengthLabel" alignment="CENTER_RIGHT" layoutX="-516.0" prefHeight="17.0" prefWidth="523.0" text="0" textFill="WHITE" />
+               </children>
+            </AnchorPane>
             <HBox alignment="BOTTOM_RIGHT" prefHeight="34.0" prefWidth="195.0">
                <children>
                   <Button mnemonicParsing="false" onMouseClicked="#BackPage" prefHeight="31.0" prefWidth="69.0" style="-fx-background-color: #343536; -fx-background-radius: 15;" text="Back" textFill="WHITE">

@@ -67,6 +67,7 @@ public class CreateSubcredditPageController {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
         selectedCategories = new ArrayList<>();
 
         suggestions = FXCollections.observableArrayList();
@@ -105,6 +106,8 @@ public class CreateSubcredditPageController {
                 categorySearchField.setText(oldText);
         });
 
+        nextButtonPG3.setStyle("-fx-background-color: #191c1e; -fx-text-fill: #525454; -fx-background-radius: 15;"); //button grayed out
+        nextButtonPG3.setDisable(true);
         validSubInfo.addListener((obs, oldVal, newVal) -> {
             if(newVal) {
                 nextButtonPG3.setStyle("-fx-background-color: #0079D3; -fx-text-fill: #ffffff; -fx-background-radius: 15;"); //button blue and pressable
@@ -376,14 +379,14 @@ public class CreateSubcredditPageController {
     @FXML
     void MakePrivate(MouseEvent event) {
         isPrivate = true;
-        privateHBox.setStyle("-fx-background-color #343536;");
+        privateHBox.setStyle("-fx-background-color: #343536;");
         publicHBox.setStyle("");
     }
 
     @FXML
     void MakePublic(MouseEvent event) {
         isPrivate = false;
-        publicHBox.setStyle("-fx-background-color #343536;");
+        publicHBox.setStyle("-fx-background-color: #343536;");
         privateHBox.setStyle("");
     }
 }
