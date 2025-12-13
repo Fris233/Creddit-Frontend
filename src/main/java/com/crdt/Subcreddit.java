@@ -1,6 +1,7 @@
 package com.crdt;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -95,6 +96,35 @@ public class Subcreddit {
 
         ArrayList<User> bannedMembers = new ArrayList<>();
         return bannedMembers;
+    }
+
+    public boolean VerifyModeration(User user, String BASE_URL, Gson gson) throws Exception {
+        if(this.creator.equals(user))
+            return true;
+
+        JsonObject json = new JsonObject();
+        json.add("user", gson.toJsonTree(user, User.class));
+        json.add("subcreddit", gson.toJsonTree(this, Subcreddit.class));
+
+        String jsonBody = gson.toJson(json);
+
+        URL url = new URL(BASE_URL + "/subcreddit/verifymod");
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("POST");
+        conn.setDoOutput(true);
+        conn.setRequestProperty("Content-Type", "application/json");
+
+        try (OutputStream os = conn.getOutputStream()) {
+            os.write(jsonBody.getBytes());
+        }
+
+        BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+        StringBuilder sb = new StringBuilder();
+        String line;
+        while ((line = reader.readLine()) != null) sb.append(line);
+        reader.close();
+
+        return gson.fromJson(sb.toString(), boolean.class);
     }
 
     public int GetSubId() {

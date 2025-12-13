@@ -171,14 +171,64 @@ public class User implements Reportable {
         return gson.fromJson(sb.toString(), int.class);
     }
 
-    public void joinSubcreddit(Subcreddit subcreddit) {
-        if(!this.active || subcreddit == null || subcreddit.GetSubId() <= 0)
-            return;
+    public boolean joinSubcreddit(Subcreddit subcreddit, String BASE_URL, Gson gson) throws Exception {
+        JsonObject json = new JsonObject();
+        json.add("user", gson.toJsonTree(this, User.class));
+        json.add("subcreddit", gson.toJsonTree(subcreddit, Subcreddit.class));
+
+        String jsonBody = gson.toJson(json);
+
+        URL url = new URL(BASE_URL + "/subcreddit/join");
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("POST");
+        conn.setDoOutput(true);
+        conn.setRequestProperty("Content-Type", "application/json");
+
+        try (OutputStream os = conn.getOutputStream()) {
+            os.write(jsonBody.getBytes());
+        }
+
+        return conn.getResponseCode() == 200;
     }
 
-    public void leaveSubcreddit(Subcreddit subcreddit) {
-        if(!this.active || subcreddit == null || subcreddit.GetSubId() <= 0)
-            return;
+    public boolean leaveSubcreddit(Subcreddit subcreddit, String BASE_URL, Gson gson) throws Exception {
+        JsonObject json = new JsonObject();
+        json.add("user", gson.toJsonTree(this, User.class));
+        json.add("subcreddit", gson.toJsonTree(subcreddit, Subcreddit.class));
+
+        String jsonBody = gson.toJson(json);
+
+        URL url = new URL(BASE_URL + "/subcreddit/leave");
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("POST");
+        conn.setDoOutput(true);
+        conn.setRequestProperty("Content-Type", "application/json");
+
+        try (OutputStream os = conn.getOutputStream()) {
+            os.write(jsonBody.getBytes());
+        }
+
+        return conn.getResponseCode() == 200;
+    }
+
+    public boolean isMember(Subcreddit subcreddit, String BASE_URL, Gson gson) throws Exception {
+        JsonObject json = new JsonObject();
+        json.add("user", gson.toJsonTree(this, User.class));
+        json.add("subcreddit", gson.toJsonTree(subcreddit, Subcreddit.class));
+
+        String jsonBody = gson.toJson(json);
+
+        URL url = new URL(BASE_URL + "/user/ismember");
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("POST");
+        conn.setDoOutput(true);
+        conn.setRequestProperty("Content-Type", "application/json");
+
+        try (OutputStream os = conn.getOutputStream()) {
+            os.write(jsonBody.getBytes());
+        }
+
+        return conn.getResponseCode() == 200;
     }
 
     public Subcreddit[] GetSubcreddits(String BASE_URL, Gson gson) throws Exception {

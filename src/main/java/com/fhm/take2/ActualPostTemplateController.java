@@ -58,11 +58,17 @@ public class ActualPostTemplateController {
     private User currentUser;
     private int myOGVote;
     private int myVote;
+    private boolean subMember = false;
+    private boolean modAuthor = false;
 
     MediaViewController mediaViewController;
 
     public void InitData(Post post, User user, int userVote) {
-        this.post = post;
+        try {
+            this.post = Client.GetPost(post.GetID());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         this.currentUser = user;
         this.mediaViewController = null;
         myOGVote = 0;
@@ -96,9 +102,24 @@ public class ActualPostTemplateController {
             }
 
         }
-        if(post.GetSubcreddit() == null) {
-            JoinButton.setVisible(false);
+        if(post.GetSubcreddit() != null) {
+            JoinButton.setVisible(true);
+            try {
+                if(user != null)
+                    subMember = Client.IsSubMember(this.currentUser, post.GetSubcreddit());
+                modAuthor = Client.VerifyModeration(post.GetAuthor(), post.GetSubcreddit());
+                if(modAuthor) {
+                    modLabel.setVisible(true);
+                }
+                if(post.GetSubcreddit().GetCreator().equals(post.GetAuthor())) {
+                    modLabel.setText("CREATOR");
+                }
+            }
+            catch (Exception e) {
+                e.printStackTrace();
+            }
         }
+        UpdateJoinButton();
         postsScrollPane.addEventFilter(ScrollEvent.SCROLL, e -> {
             double delta = e.getDeltaY() * 2;
             postsScrollPane.setVvalue(postsScrollPane.getVvalue() - delta / postsScrollPane.getContent().getBoundsInLocal().getHeight());
@@ -154,6 +175,17 @@ public class ActualPostTemplateController {
         }
     }
 
+    private void UpdateJoinButton() {
+        if(subMember) {
+            JoinButton.setText("Joined");
+            JoinButton.setStyle("-fx-text-fill: #ffffff; -fx-border-color: gray; -fx-border-radius: 20; -fx-background-radius: 20");
+        }
+        else {
+            JoinButton.setText("Join");
+            JoinButton.setStyle("-fx-background-color: #115bca; -fx-text-fill: #ffffff; -fx-border-radius: 20; -fx-background-radius: 20");
+        }
+    }
+
     @FXML
     void Upvote(MouseEvent event) {
         if(currentUser == null) {
@@ -202,7 +234,15 @@ public class ActualPostTemplateController {
             event.consume();
             return;
         }
-        System.out.println("Join Subcreddit Pressed!");
+        if(subMember) {
+            if (Client.LeaveSubcreddit(this.currentUser, post.GetSubcreddit()))
+                subMember = false;
+        }
+        else {
+            if (Client.JoinSubcreddit(this.currentUser, post.GetSubcreddit()))
+                subMember = true;
+        }
+        UpdateJoinButton();
         event.consume();
     }
 
@@ -213,24 +253,30 @@ public class ActualPostTemplateController {
     }
 
     @FXML
-    void OpenPost(MouseEvent event) {
-        System.out.println("Open Post Pressed!");
-        //TODO: DO NOT FORGET TO UNCOMMENT THIS!!
-        /*if(mediaViewController != null)
-            mediaViewController.Clean();*/
+    void Share(MouseEvent event) {
+        //TODO: share?
+        System.out.println("Share clicked");
         event.consume();
     }
 
     @FXML
-    void Share(MouseEvent event) {
-        //TODO: share?
-        System.out.println("Share clicked");
-    }
-
-    @FXML
     void OpenPoster(MouseEvent event) {
-        //TODO: Click on Poster username
-        System.out.println("Share clicked");
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("user-profile-page.fxml"));
+            Parent root = loader.load();
+
+            UserProfilePageController userProfilePageController = loader.getController();
+            userProfilePageController.InitData(post.GetAuthor().getId(), currentUser, "", true);
+
+            // Get the current stage
+            Stage stage = (Stage) JoinButton.getScene().getWindow();
+            // Set the new scene
+            stage.setScene(new Scene(root));
+        }
+        catch (Exception ex) {
+            System.out.println(ex.getMessage());
+        }
+        event.consume();
     }
 
     @FXML
@@ -385,26 +431,48 @@ public class ActualPostTemplateController {
     }
 
     @FXML
-    void Refresh(MouseEvent event) { // TODO: Ya 3m fares dh refresh m4 dashboard, ezboto 5alyh refresh, w e3ml function GoHome 34an zrayr el dashboard
-        System.out.println("Dashboard Button Pressed");
+    void GoHome(MouseEvent event) {
         Clean();
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("home-page.fxml"));
             Parent root = loader.load();
 
             HomePageController homePageController = loader.getController();
-            homePageController.InitData(currentUser, searchField.getText(), 0);
+            homePageController.InitData(currentUser, null, 0);
+
+            // Create the second scene
+            Scene scene2 = new Scene(root);
+            // Get the current stage
+            Stage stage = (Stage)postsContainer.getScene().getWindow();
+            // Set the new scene
+            stage.setScene(scene2);
+        }
+        catch (Exception ex) {
+            System.out.println(ex.getMessage());
+        }
+        event.consume();
+    }
+
+    @FXML
+    void Refresh(MouseEvent event) {
+        if(mediaViewController != null)
+            mediaViewController.Clean();
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("ActualPost_Template.fxml"));
+            Parent root = loader.load();
+
+            ActualPostTemplateController actualPostTemplateController = loader.getController();
+            actualPostTemplateController.InitData(post, currentUser, myVote);
 
             // Get the current stage
-            Stage stage = (Stage) postsContainer.getScene().getWindow();
+            Stage stage = (Stage) JoinButton.getScene().getWindow();
             // Set the new scene
             stage.setScene(new Scene(root));
         }
-        catch (Exception e) {
-            e.printStackTrace();
+        catch (Exception ex) {
+            System.out.println(ex.getMessage());
         }
-        if(event != null)
-            event.consume();
+        event.consume();
     }
 
     @FXML

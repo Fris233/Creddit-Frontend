@@ -1,5 +1,7 @@
 package com.crdt;
 
+import com.google.gson.Gson;
+
 import java.sql.Timestamp;
 
 public class Moderator extends User {
@@ -8,27 +10,15 @@ public class Moderator extends User {
         super(id, userName, email, password, gender, bio, profileMedia, joinDate, lastSeen, active);
     }
 
-    public void BanMember(User user, Subcreddit subcreddit, String reason) {
+    public void BanMember(User user, Subcreddit subcreddit, String reason, String BASE_URL, Gson gson) throws Exception {
         if(user.id <= 0)
             return;
         boolean global = (subcreddit == null);
-        if(!global)
-            if(!VerifyModeration(subcreddit))
-                return;
     }
 
-    public void UnbanMember(User user, Subcreddit subcreddit) {
+    public void UnbanMember(User user, Subcreddit subcreddit, String BASE_URL, Gson gson) throws Exception {
         if(user.id <= 0)
             return;
         boolean global = (subcreddit == null);
-        if(!global)
-            if(!VerifyModeration(subcreddit))
-                return;
-    }
-
-    public boolean VerifyModeration(Subcreddit subcreddit) {
-        if(subcreddit.GetSubId() <= 0)
-            return false;
-        return false;
     }
 }

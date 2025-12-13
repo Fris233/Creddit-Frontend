@@ -170,6 +170,38 @@ public abstract class Client {
         return true;
     }
 
+    public static boolean JoinSubcreddit(User user, Subcreddit sub) {
+        THREAD_POOL.submit(() -> {
+            try {
+                user.joinSubcreddit(sub, BASE_URL, gson);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+        return true;
+    }
+
+    public static boolean LeaveSubcreddit(User user, Subcreddit sub) {
+        if(user.equals(sub.GetCreator()))
+            return false;
+        THREAD_POOL.submit(() -> {
+            try {
+                user.leaveSubcreddit(sub, BASE_URL, gson);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+        return true;
+    }
+
+    public static boolean IsSubMember(User user, Subcreddit sub) throws Exception {
+        return user.isMember(sub, BASE_URL, gson);
+    }
+
+    public static boolean VerifyModeration(User user, Subcreddit sub) throws Exception {
+        return sub.VerifyModeration(user, BASE_URL, gson);
+    }
+
     public static ArrayList<User> GetFriends(User user) throws Exception {
         return new ArrayList<>(Arrays.asList(user.GetFriends(BASE_URL, gson)));
     }

@@ -28,7 +28,7 @@
                   <Insets top="20.0" />
                </padding>
                <children>
-                  <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onMouseClicked="#OpenPost" prefWidth="800.0" style="-fx-background-color: #0E1113;" stylesheets="@CredditCSS.css">
+                  <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="800.0" style="-fx-background-color: #0E1113;">
                      <children>
                         <VBox layoutX="14.0" layoutY="7.0" spacing="15.0">
                            <children>
@@ -42,7 +42,7 @@
                                           <Cursor fx:constant="HAND" />
                                        </cursor>
                                     </ImageView>
-                                    <Button fx:id="JoinButton" layoutX="669.0" layoutY="7.0" mnemonicParsing="false" onMouseClicked="#JoinSubcreddit" prefHeight="40.0" prefWidth="65.0" style="-fx-text-fill: #ffffff; -fx-background-radius: 20;" text="Join" textFill="#c6151500">
+                                    <Button fx:id="JoinButton" layoutX="649.0" layoutY="7.0" mnemonicParsing="false" onMouseClicked="#JoinSubcreddit" prefHeight="40.0" prefWidth="85.0" style="-fx-text-fill: #ffffff; -fx-background-radius: 20;" text="Join" textFill="#c6151500" visible="false">
                                        <font>
                                           <Font size="18.0" />
                                        </font>
@@ -60,7 +60,7 @@
                                           <Cursor fx:constant="HAND" />
                                        </cursor>
                                     </Label>
-                                    <Label fx:id="modLabel" layoutX="278.0" layoutY="14.0" prefHeight="27.0" prefWidth="34.0" text="MOD" textFill="#008a1e" visible="false" wrapText="true">
+                                    <Label fx:id="modLabel" alignment="CENTER" layoutX="245.0" layoutY="14.0" prefHeight="27.0" prefWidth="67.0" text="MOD" textFill="#008a1e" visible="false" wrapText="true">
                                        <font>
                                           <Font size="14.0" />
                                        </font>
@@ -152,7 +152,7 @@
                                                 <Cursor fx:constant="DEFAULT" />
                                              </cursor>
                                           </AnchorPane>
-                                          <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onMouseClicked="#OpenPost" prefHeight="56.0" style="-fx-background-color: black; -fx-background-radius: 25;" stylesheets="@CredditCSS.css">
+                                          <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="56.0" style="-fx-background-color: black; -fx-background-radius: 25;" stylesheets="@CredditCSS.css">
                                              <padding>
                                                 <Insets right="10.0" />
                                              </padding>
@@ -193,7 +193,7 @@
                                                 <Cursor fx:constant="HAND" />
                                              </cursor>
                                           </AnchorPane>
-                                          <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onMouseClicked="#OpenPost" prefHeight="56.0" style="-fx-background-color: black; -fx-background-radius: 25;" stylesheets="@CredditCSS.css">
+                                          <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onMouseClicked="#Share" prefHeight="56.0" style="-fx-background-color: black; -fx-background-radius: 25;" stylesheets="@CredditCSS.css">
                                              <padding>
                                                 <Insets right="10.0" />
                                              </padding>
@@ -202,7 +202,7 @@
                                                    <children>
                                                       <AnchorPane prefHeight="36.0" prefWidth="9.0">
                                                          <children>
-                                                            <ImageView fx:id="shareButton" fitHeight="40.0" fitWidth="34.0" layoutX="-3.0" nodeOrientation="RIGHT_TO_LEFT" onMouseClicked="#Share" pickOnBounds="true" preserveRatio="true" rotate="180.0">
+                                                            <ImageView fx:id="shareButton" fitHeight="40.0" fitWidth="34.0" layoutX="-3.0" nodeOrientation="RIGHT_TO_LEFT" pickOnBounds="true" preserveRatio="true" rotate="180.0">
                                                                <image>
                                                                   <Image url="@assets/share.png" />
                                                                </image>
@@ -251,7 +251,7 @@
          <children>
             <AnchorPane layoutX="6.0" layoutY="33.0">
                <children>
-                  <Button mnemonicParsing="false" onMouseClicked="#Refresh" prefHeight="52.0" prefWidth="262.0" style="-fx-text-fill: #ffffff;" text="Home" textFill="#c6151500">
+                  <Button mnemonicParsing="false" onMouseClicked="#GoHome" prefHeight="52.0" prefWidth="262.0" style="-fx-text-fill: #ffffff;" text="Home" textFill="#c6151500">
                      <font>
                         <Font size="18.0" />
                      </font>
@@ -325,7 +325,7 @@
             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
          </rowConstraints>
          <children>
-            <Button mnemonicParsing="false" onMouseClicked="#Refresh" prefHeight="78.0" prefWidth="214.0" style="-fx-text-fill: #ffffff;" text="Creddit" textFill="#c6151500">
+            <Button mnemonicParsing="false" onMouseClicked="#GoHome" prefHeight="78.0" prefWidth="214.0" style="-fx-text-fill: #ffffff;" text="Creddit" textFill="#c6151500">
                <font>
                   <Font size="18.0" />
                </font>
@@ -353,6 +353,18 @@
                         </ImageView>
                      </children>
                   </AnchorPane>
+                  <Button layoutX="7.0" layoutY="7.0" mnemonicParsing="false" onMouseClicked="#Refresh" prefHeight="57.0" prefWidth="85.0" style="-fx-text-fill: #ffffff;" textFill="#c6151500">
+                     <font>
+                        <Font size="18.0" />
+                     </font>
+                     <graphic>
+                        <ImageView fitHeight="57.0" fitWidth="85.0" mouseTransparent="true" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@assets/refresh.png" />
+                           </image>
+                        </ImageView>
+                     </graphic>
+                  </Button>
                </children>
             </AnchorPane>
             <AnchorPane layoutX="280.0" layoutY="11.0" GridPane.columnIndex="2">
@@ -405,7 +417,7 @@
             </AnchorPane>
          </children>
       </GridPane>
-      <AnchorPane layoutX="1248.0" layoutY="83.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="818.0" prefWidth="352.0" style="-fx-background-color: #0E1113; -fx-border-color: gray;">
+      <AnchorPane layoutX="1248.0" layoutY="83.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="818.0" prefWidth="352.0" style="-fx-background-color: black; -fx-border-color: gray;">
          <children>
             <Button layoutX="253.0" layoutY="6.0" mnemonicParsing="false" onMouseClicked="#ClearRecentPosts" prefHeight="40.0" prefWidth="85.0" style="-fx-text-fill: #ffffff;" text="Clear" textFill="#c6151500">
                <font>
@@ -419,7 +431,7 @@
             </Label>
             <ScrollPane fx:id="recentScrollPane" layoutX="3.0" layoutY="46.0" prefHeight="770.0" prefWidth="346.0" style="-fx-background-color: #0E1113;" stylesheets="@CredditCSS.css">
                <content>
-                  <VBox fx:id="recentPostsContainer" minHeight="768.0" prefWidth="344.0" spacing="30.0" style="-fx-background-color: #0E1113;">
+                  <VBox fx:id="recentPostsContainer" minHeight="768.0" prefWidth="344.0" spacing="30.0" style="-fx-background-color: black;">
                      <padding>
                         <Insets top="10.0" />
                      </padding>

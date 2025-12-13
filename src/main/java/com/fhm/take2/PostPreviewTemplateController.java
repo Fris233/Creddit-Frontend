@@ -41,6 +41,8 @@ public class PostPreviewTemplateController {
     private User currentUser;
     private int myOGVote;
     private int myVote;
+    private boolean subMember = false;
+    private boolean modAuthor = false;
 
     MediaViewController mediaViewController;
 
@@ -72,9 +74,24 @@ public class PostPreviewTemplateController {
                 System.out.println(ex.getMessage());
             }
         }
-        if(post.GetSubcreddit() == null)
-            JoinButton.setVisible(false);
-        // TODO: Check Moderation
+        if(post.GetSubcreddit() != null) {
+            JoinButton.setVisible(true);
+            try {
+                if(user != null)
+                    subMember = Client.IsSubMember(this.currentUser, post.GetSubcreddit());
+                modAuthor = Client.VerifyModeration(post.GetAuthor(), post.GetSubcreddit());
+                if(modAuthor) {
+                    modLabel.setVisible(true);
+                }
+                if(post.GetSubcreddit().GetCreator().equals(post.GetAuthor())) {
+                    modLabel.setText("CREATOR");
+                }
+            }
+            catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        UpdateJoinButton();
     }
 
     public static String timeAgo(Timestamp timestamp) {
@@ -126,6 +143,17 @@ public class PostPreviewTemplateController {
         }
     }
 
+    private void UpdateJoinButton() {
+        if(subMember) {
+            JoinButton.setText("Joined");
+            JoinButton.setStyle("-fx-text-fill: #ffffff; -fx-border-color: gray; -fx-border-radius: 20; -fx-background-radius: 20");
+        }
+        else {
+            JoinButton.setText("Join");
+            JoinButton.setStyle("-fx-background-color: #115bca; -fx-text-fill: #ffffff; -fx-border-radius: 20; -fx-background-radius: 20");
+        }
+    }
+
     @FXML
     void Upvote(MouseEvent event) {
         if(currentUser == null) {
@@ -174,7 +202,15 @@ public class PostPreviewTemplateController {
             event.consume();
             return;
         }
-        System.out.println("Join Subcreddit Pressed!");
+        if(subMember) {
+            if (Client.LeaveSubcreddit(this.currentUser, post.GetSubcreddit()))
+                subMember = false;
+        }
+        else {
+            if (Client.JoinSubcreddit(this.currentUser, post.GetSubcreddit()))
+                subMember = true;
+        }
+        UpdateJoinButton();
         event.consume();
     }
 
@@ -228,6 +264,7 @@ public class PostPreviewTemplateController {
             }
         }
         else {
+            //TODO: Open Subcreddit Page here
             System.out.println("Open Subcreddit Pressed!");
         }
         event.consume();

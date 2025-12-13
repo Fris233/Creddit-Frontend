@@ -1,5 +1,7 @@
 package com.crdt;
 
+import com.google.gson.Gson;
+
 import java.sql.Timestamp;
 
 public class Admin extends Moderator {
@@ -7,13 +9,13 @@ public class Admin extends Moderator {
         super(id, username, email, password, gender, bio, pfp, timeCreated, lastSeen, active);
     }
 
-    public void BanUser(User user, String reason) {
-        BanMember(user, null, reason);
+    public void BanUser(User user, String reason, String BASE_URL, Gson gson) throws Exception {
+        BanMember(user, null, reason, BASE_URL, gson);
         user.delete();
     }
 
-    public void UnbanUser(User user) {
-        UnbanMember(user, null);
+    public void UnbanUser(User user, String BASE_URL, Gson gson) throws Exception {
+        UnbanMember(user, null, BASE_URL, gson);
         user.activate();
     }
 }

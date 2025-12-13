@@ -218,8 +218,7 @@ public class MediaViewController {
 
     private String extractUrl(Object obj) {
         if (obj instanceof File f) {
-            String[] str = f.toURI().toString().split("/");
-            return str[str.length-1];
+            return f.toURI().toString();
         }
         if (obj instanceof Media m) {
             return m.GetURL();

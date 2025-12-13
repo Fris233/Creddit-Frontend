@@ -27,7 +27,7 @@
                         <Cursor fx:constant="HAND" />
                      </cursor>
                   </ImageView>
-                  <Button fx:id="JoinButton" layoutX="669.0" layoutY="7.0" mnemonicParsing="false" onMouseClicked="#JoinSubcreddit" prefHeight="40.0" prefWidth="65.0" style="-fx-text-fill: #ffffff; -fx-background-radius: 20;" text="Join" textFill="#c6151500">
+                  <Button fx:id="JoinButton" layoutX="650.0" layoutY="7.0" mnemonicParsing="false" onMouseClicked="#JoinSubcreddit" prefHeight="41.0" prefWidth="84.0" style="-fx-text-fill: #ffffff; -fx-background-color: #115bca; -fx-border-color: gray; -fx-border-radius: 20; -fx-background-radius: 20;" text="Join" textFill="#c6151500" visible="false">
                      <font>
                         <Font size="18.0" />
                      </font>
@@ -45,7 +45,7 @@
                         <Cursor fx:constant="HAND" />
                      </cursor>
                   </Label>
-                  <Label fx:id="modLabel" layoutX="278.0" layoutY="14.0" prefHeight="27.0" prefWidth="34.0" text="MOD" textFill="#008a1e" visible="false" wrapText="true">
+                  <Label fx:id="modLabel" alignment="CENTER" layoutX="252.0" layoutY="14.0" prefHeight="27.0" prefWidth="60.0" text="MOD" textFill="#008a1e" visible="false" wrapText="true">
                      <font>
                         <Font size="14.0" />
                      </font>
