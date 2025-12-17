@@ -1,22 +1,19 @@
 package com.crdt;
 
-import java.io.IOException;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
-
-import com.Client;
 import com.google.gson.Gson;
+import com.google.gson.annotations.JsonAdapter;
 
 public class Report {
 
     private int id;
     private User reporter;
-    private Reportable target;
+    @JsonAdapter(ReportableForcedAdapter.class) private Reportable target;
     private String reason;
     private ReportType type;
     private ReportStatus status;
