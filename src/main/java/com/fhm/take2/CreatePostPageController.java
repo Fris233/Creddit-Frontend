@@ -368,7 +368,7 @@ public class CreatePostPageController {
                         if (mime.startsWith("image/")) mediaType = MediaType.IMAGE;
                         else if (mime.startsWith("video/")) mediaType = MediaType.VIDEO;
                         else if (mime.startsWith("audio/")) mediaType = MediaType.AUDIO;
-                        else if (mime.equals("application/pdf")) mediaType = MediaType.OTHER;
+                        else mediaType = MediaType.OTHER;
                     }
                     media.add(new Media(mediaType, mediaUrl));
                 }

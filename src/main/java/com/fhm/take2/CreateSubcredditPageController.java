@@ -333,12 +333,12 @@ public class CreateSubcredditPageController {
         }
 
         try {
-            String mediaUrl = null;
-            MediaType mediaType = null;
+            String mediaUrl = "";
+            MediaType mediaType = MediaType.NONE;
 
             if(subIcon != null) {
                 String uploadResponse = Client.UploadFile(subIcon);
-                if (uploadResponse == null) {
+                if (uploadResponse.isBlank()) {
                     new Alert(Alert.AlertType.ERROR, "Server unreachable! Check your connection and try again!").showAndWait();
                     return;
                 }

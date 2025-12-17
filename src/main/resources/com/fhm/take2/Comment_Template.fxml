@@ -13,7 +13,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onMouseClicked="#OpenPost" prefWidth="620.0" style="-fx-background-color: #0E1113; -fx-border-color: gray; -fx-border-width: 2 0 0 0;" stylesheets="@CredditCSS.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.fhm.take2.PostPreviewTemplateController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onMouseClicked="#OpenPost" prefWidth="620.0" style="-fx-background-color: #0E1113; -fx-border-color: gray; -fx-border-width: 2 0 0 0;" stylesheets="@CredditCSS.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.fhm.take2.CommentTemplateController">
    <children>
       <VBox layoutX="7.0" layoutY="7.0" prefWidth="620.0" spacing="15.0">
          <children>
@@ -63,6 +63,9 @@
                      </cursor>
                   </Label>
                </children>
+               <VBox.margin>
+                  <Insets />
+               </VBox.margin>
             </AnchorPane>
             <StackPane fx:id="mediaAnchor" prefHeight="0.0" prefWidth="783.0" />
             <AnchorPane>
@@ -119,16 +122,16 @@
                               <Cursor fx:constant="DEFAULT" />
                            </cursor>
                         </AnchorPane>
-                        <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onMouseClicked="#OpenPost" prefHeight="56.0" style="-fx-background-color: black; -fx-background-radius: 25;" stylesheets="@CredditCSS.css">
+                        <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="56.0" style="-fx-background-color: black; -fx-background-radius: 25;" stylesheets="@CredditCSS.css">
                            <padding>
                               <Insets right="10.0" />
                            </padding>
                            <children>
-                              <HBox layoutX="14.0" layoutY="10.0" mouseTransparent="true">
+                              <HBox layoutX="14.0" layoutY="10.0" mouseTransparent="true" onMouseClicked="#OpenComment">
                                  <children>
                                     <AnchorPane prefHeight="36.0" prefWidth="9.0">
                                        <children>
-                                          <ImageView fitHeight="40.0" fitWidth="34.0" layoutX="-3.0" pickOnBounds="true" preserveRatio="true" rotate="180.0">
+                                          <ImageView fitHeight="40.0" fitWidth="34.0" layoutX="-3.0" mouseTransparent="true" pickOnBounds="true" preserveRatio="true" rotate="180.0">
                                              <image>
                                                 <Image url="@assets/comment.png" />
                                              </image>
@@ -143,7 +146,7 @@
                                     </AnchorPane>
                                     <AnchorPane>
                                        <children>
-                                          <Label fx:id="commentsLabel" layoutX="11.0" layoutY="4.0" prefHeight="27.0" text="0" textFill="WHITE" wrapText="true">
+                                          <Label fx:id="replyCountLabel" layoutX="11.0" layoutY="4.0" prefHeight="27.0" text="0" textFill="WHITE" wrapText="true">
                                              <font>
                                                 <Font size="14.0" />
                                              </font>
@@ -162,7 +165,7 @@
                         </AnchorPane>
                      </children>
                   </HBox>
-                  <Button fx:id="replyButton" layoutX="510.0" layoutY="8.0" mnemonicParsing="false" onMouseClicked="#Reply" prefHeight="41.0" prefWidth="84.0" style="-fx-text-fill: #ffffff; -fx-background-color: #115bca; -fx-border-color: gray; -fx-border-radius: 20; -fx-background-radius: 20;" text="Join" textFill="#c6151500">
+                  <Button fx:id="replyButton" layoutX="510.0" layoutY="8.0" mnemonicParsing="false" onMouseClicked="#Reply" prefHeight="41.0" prefWidth="84.0" style="-fx-text-fill: #ffffff; -fx-background-color: #115bca; -fx-border-color: gray; -fx-border-radius: 20; -fx-background-radius: 20;" text="Reply" textFill="#c6151500">
                      <font>
                         <Font size="18.0" />
                      </font>

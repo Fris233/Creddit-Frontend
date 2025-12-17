@@ -1,8 +1,9 @@
 package com.fhm.take2;
 
 import com.Client;
-import com.crdt.Post;
-import com.crdt.User;
+import com.crdt.*;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -17,13 +18,20 @@ import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.Window;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.sql.Timestamp;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 public class ActualPostTemplateController {
@@ -33,6 +41,7 @@ public class ActualPostTemplateController {
     @FXML private ImageView downvoteButton;
     @FXML private Label modLabel;
     @FXML private StackPane mediaAnchor;
+    @FXML private StackPane commentMediaPane;
     @FXML private AnchorPane voteAnchor;
     @FXML private Label subName;
     @FXML private ImageView subPFP;
@@ -44,7 +53,8 @@ public class ActualPostTemplateController {
     @FXML private ImageView shareButton;
     @FXML private Label posterName;
     @FXML private Label postDesc;
-
+    @FXML private TextArea commentTextArea;
+    @FXML private Button commentButton;
     @FXML private AnchorPane loggedInPane;
     @FXML private AnchorPane loggedOutPane;
     @FXML private VBox postsContainer;
@@ -62,6 +72,11 @@ public class ActualPostTemplateController {
     private boolean modAuthor = false;
 
     MediaViewController mediaViewController;
+
+    MediaViewController commentMediaViewController;
+
+    private MediaViewController commentmediaViewController;
+    private BooleanProperty validCommentInfo = new SimpleBooleanProperty(false);
 
     public void InitData(Post post, User user, int userVote) {
         try {
@@ -120,6 +135,61 @@ public class ActualPostTemplateController {
             }
         }
         UpdateJoinButton();
+
+        commentTextArea.setPrefHeight(commentTextArea.getMinHeight());
+        int[] lastLineCount = { 1 };
+        commentTextArea.textProperty().addListener((obs, oldText, newText) -> {
+            int lines = newText.split("\n", -1).length;
+
+            if (lines != lastLineCount[0]) {
+                lastLineCount[0] = lines;
+
+                commentTextArea.applyCss();
+                commentTextArea.layout();
+
+                var content = commentTextArea.lookup(".content");
+                if (content != null) {
+                    double height = 52 + (32 * (Math.min(lines, 14)));
+                    commentTextArea.setPrefHeight(height);
+                }
+            }
+        });
+
+        commentTextArea.textProperty().addListener((obs, oldText, newText) -> {
+            validCommentInfo.set(!newText.isBlank());
+        });
+
+        validCommentInfo.addListener((obs, oldVal, newVal) -> {
+            if(newVal) {
+                commentButton.setStyle("-fx-background-color: #115bca; -fx-text-fill: #ffffff; -fx-background-radius: 30;"); //button blue and pressable
+                commentButton.setDisable(false);
+            }
+            else {
+                commentButton.setStyle("-fx-background-color: #191c1e; -fx-text-fill: #525454; -fx-background-radius: 30;"); //button grayed out
+                commentButton.setDisable(true);
+            }
+        });
+
+        commentTextArea.setOnDragOver(event -> {
+            if (event.getGestureSource() != commentTextArea && event.getDragboard().hasFiles()) {
+                event.acceptTransferModes(javafx.scene.input.TransferMode.COPY_OR_MOVE);
+            }
+            event.consume();
+        });
+
+        // Handle dropping files
+        commentTextArea.setOnDragDropped(event -> {
+            var db = event.getDragboard();
+            boolean success = false;
+            if (db.hasFiles()) {
+                success = true;
+                List<File> files = db.getFiles();
+                files.forEach(this::AddFile);
+            }
+            event.setDropCompleted(success);
+            event.consume();
+        });
+
         postsScrollPane.addEventFilter(ScrollEvent.SCROLL, e -> {
             double delta = e.getDeltaY() * 2;
             postsScrollPane.setVvalue(postsScrollPane.getVvalue() - delta / postsScrollPane.getContent().getBoundsInLocal().getHeight());
@@ -374,6 +444,126 @@ public class ActualPostTemplateController {
         System.out.println("Create Subcreddit Button Pressed");
         Clean();
         event.consume();
+    }
+
+    @FXML
+    void SendComment(MouseEvent event) {
+        if(!validCommentInfo.get()) return;
+
+        if(!Client.isServerReachable()) {
+            new Alert(Alert.AlertType.ERROR, "Server unreachable! Check your connection and try again!").showAndWait();
+            return;
+        }
+
+        try {
+            String content = commentTextArea.getText();
+
+            String mediaUrl = "";
+            MediaType mediaType = MediaType.NONE;
+
+            Media media = null;
+            if(mediaViewController != null) {
+                File selectedFile = mediaViewController.GetFileArrayList().getFirst();
+                String uploadResponse = Client.UploadFile(selectedFile);
+                if (uploadResponse.isBlank()) {
+                    new Alert(Alert.AlertType.ERROR, "Server unreachable! Check your connection and try again!").showAndWait();
+                    return;
+                }
+                Map<?, ?> json = Client.GetResponse(uploadResponse);
+                mediaUrl = (String) json.get("url");
+                // Detect media type
+                String mime = Files.probeContentType(selectedFile.toPath());
+                if (mime != null) {
+                    if (mime.startsWith("image/")) mediaType = MediaType.IMAGE;
+                    else if (mime.startsWith("video/")) mediaType = MediaType.VIDEO;
+                    else if (mime.startsWith("audio/")) mediaType = MediaType.AUDIO;
+                    else mediaType = MediaType.OTHER;
+                }
+                media = new Media(mediaType, mediaUrl);
+            }
+
+            // Now send post JSON
+            Comment comment = new Comment(0, this.post, this.currentUser, content, media, 0, 0, 0, null, null, false);
+            int id = Client.CreateComment(comment);
+            if (id > 0) {
+                comment.setId(id);
+                Alert alert = new Alert(Alert.AlertType.INFORMATION, "Comment uploaded successfully!");
+                alert.showAndWait();
+                if(mediaViewController != null) {
+                    mediaViewController.Clean();
+                    RemoveMediaPane();
+                }
+                try {
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource("Comment_Template.fxml"));
+                    Parent root = loader.load();
+
+                    CommentTemplateController commentTemplateController = loader.getController();
+                    commentTemplateController.Init(comment, currentUser, 0);
+
+                    // Get the current stage
+                    Stage stage = (Stage) postButton.getScene().getWindow();
+                    // Set the new scene
+                    stage.setScene(new Scene(root));
+                }
+                catch (Exception ex) {
+                    System.out.println(ex.getMessage());
+                }
+            }
+            else {
+                Alert alert = new Alert(Alert.AlertType.ERROR, "Failed to send post!");
+                alert.showAndWait();
+            }
+        }
+        catch (Exception ex) {
+            ex.printStackTrace();
+            new Alert(Alert.AlertType.ERROR, "Error: " + ex.getMessage()).showAndWait();
+        }
+
+        event.consume();
+    }
+
+    @FXML
+    void AttachMedia(MouseEvent event) {
+        Window window = ((javafx.scene.Node) event.getSource()).getScene().getWindow();
+
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Open File");
+
+        fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
+
+        File file = fileChooser.showOpenDialog(window);
+        if(file == null)
+            return;
+        AddFile(file);
+        event.consume();
+    }
+
+    private void AddFile(File file) {
+        if(commentMediaViewController != null) {
+            RemoveMediaPane();
+        }
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("media-view.fxml"));
+            Node mediaNode = loader.load();
+            commentMediaViewController = loader.getController();
+            commentMediaViewController.init(null, true, new ArrayList<>());
+            commentMediaPane.getChildren().add(mediaNode);
+            commentMediaViewController.done.addListener((obs, oldVal, newVal) -> {
+                if (newVal)
+                    RemoveMediaPane();
+            });
+        }
+        catch (Exception ex) {
+            System.out.println(ex.getMessage());
+        }
+        commentMediaViewController.AddMedia(file);
+    }
+
+    private void RemoveMediaPane() {
+        commentMediaPane.getChildren().clear();
+        if(commentMediaViewController != null)
+            commentMediaViewController.Clean();
+        commentMediaViewController = null;
     }
 
     @FXML

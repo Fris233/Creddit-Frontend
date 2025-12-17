@@ -1,5 +1,12 @@
 package com.crdt;
 
+import com.google.gson.Gson;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -12,10 +19,12 @@ public class Comment implements Voteable, Reportable {
     private String content;
     private Media media;
     private int votes;
+    private int replyCount;
     private Timestamp timeCreated;
     private Timestamp timeEdited;
+    private boolean deleted;
 
-    public Comment(int id, Post post, User author, String content, Media media, int parent, int votes, Timestamp createTime, Timestamp editTime) {
+    public Comment(int id, Post post, User author, String content, Media media, int parentID, int votes, int replyCount, Timestamp createTime, Timestamp editTime, boolean deleted) {
         this.id = id;
         this.post = post;
         this.author = author;
@@ -23,8 +32,64 @@ public class Comment implements Voteable, Reportable {
         this.media = media;
         this.parentID = parentID;
         this.votes = votes;
+        this.replyCount = replyCount;
         this.timeCreated = createTime;
         this.timeEdited = editTime;
+        this.deleted = deleted;
+    }
+
+    public int create(String BASE_URL, Gson gson) throws Exception {
+        String jsonBody = gson.toJson(this, Comment.class);
+
+        URL url = new URL(BASE_URL + "/comment/create");
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("POST");
+        conn.setDoOutput(true);
+        conn.setRequestProperty("Content-Type", "application/json");
+
+        try (OutputStream os = conn.getOutputStream()) {
+            os.write(jsonBody.getBytes());
+        }
+
+        BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+        StringBuilder sb = new StringBuilder();
+        String line;
+        while ((line = reader.readLine()) != null) sb.append(line);
+        reader.close();
+
+        return gson.fromJson(sb.toString(), int.class);
+    }
+
+    public boolean delete(String BASE_URL, Gson gson) throws Exception {
+        String jsonBody = gson.toJson(this, Comment.class);
+
+        URL url = new URL(BASE_URL + "/post/delete");
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("POST");
+        conn.setDoOutput(true);
+        conn.setRequestProperty("Content-Type", "application/json");
+
+        try (OutputStream os = conn.getOutputStream()) {
+            os.write(jsonBody.getBytes());
+        }
+
+        return conn.getResponseCode() == 200;
+    }
+
+    public boolean update(String BASE_URL, Gson gson) throws Exception {
+        String jsonBody = gson.toJson(this, Post.class);
+
+        URL url = new URL(BASE_URL + "/post/edit");
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("POST");
+        conn.setDoOutput(true);
+        conn.setRequestProperty("Content-Type", "application/json");
+
+        try (OutputStream os = conn.getOutputStream()) {
+            os.write(jsonBody.getBytes());
+        }
+
+        return conn.getResponseCode() == 200;
     }
 
     public int getID() {return id;}
@@ -33,6 +98,11 @@ public class Comment implements Voteable, Reportable {
     public int getParent() {return parentID;}
     public String getContent() {return content;}
     public Media getMedia() {return media;}
+    public Timestamp getTimeCreated() {return timeCreated;}
+    public int getVotes() {return votes;}
+    public int getReplyCount() {return replyCount;}
+
+    public void setId(int id) {this.id = id;}
 
     @Override
     public boolean equals(Object obj) {

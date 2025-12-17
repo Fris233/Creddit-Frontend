@@ -373,6 +373,12 @@ public abstract class Client {
     public static int CreatePost(Post post) throws Exception {
         return post.create(BASE_URL, gson);
     }
+    public static boolean DeletePost(Post post) throws Exception {
+        return post.delete(BASE_URL, gson);
+    }
+    public static boolean EditPost(Post post) throws Exception {
+        return post.update(BASE_URL, gson);
+    }
 
     public static Post GetPost(int id) throws Exception {
         URL url = new URL(BASE_URL + String.format("/post?id=%s", java.net.URLEncoder.encode(String.valueOf(id), "UTF-8")));
@@ -485,7 +491,17 @@ public abstract class Client {
 
     //BOOKMARK: Comment
 
-    public static Map<Comment, Map<Comment, PriorityQueue<Comment>>> GetPostCommentFeed(Post post, int lastID) throws Exception {
-        return post.GetCommentFeed(lastID, BASE_URL, gson);
+    public static Map<Comment, Map<Comment, PriorityQueue<Comment>>> GetPostCommentFeed(User user, Post post, int lastID, Map<Integer, Integer> votes) throws Exception {
+        return post.GetCommentFeed(user, lastID, votes, BASE_URL, gson);
+    }
+
+    public static int CreateComment(Comment comment) throws Exception {
+        return comment.create(BASE_URL, gson);
+    }
+    public static boolean DeleteComment(Comment comment) throws Exception {
+        return comment.delete(BASE_URL, gson);
+    }
+    public static boolean EditComment(Comment comment) throws Exception {
+        return comment.update(BASE_URL, gson);
     }
 }

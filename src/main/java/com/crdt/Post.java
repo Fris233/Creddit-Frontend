@@ -31,6 +31,7 @@ public class Post implements Voteable, Reportable {
     private int comments;
 
     private static Type commentMapType = new TypeToken<Map<Comment, Map<Comment, PriorityQueue<Comment>>>>() {}.getType();
+    private static Type id_vote_type = new TypeToken<Map<Integer, Integer>>() {}.getType();
 
     public Post(int id, User author, Subcreddit subcreddit, String title, String content, ArrayList<Media> media, ArrayList<String> categories, Timestamp timeCreated, Timestamp timeEdited, int votes, int comments) {
         if (id <= 0)
@@ -89,12 +90,6 @@ public class Post implements Voteable, Reportable {
             os.write(jsonBody.getBytes());
         }
 
-        BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-        StringBuilder sb = new StringBuilder();
-        String line;
-        while ((line = reader.readLine()) != null) sb.append(line);
-        reader.close();
-
         return conn.getResponseCode() == 200;
     }
 
@@ -111,17 +106,12 @@ public class Post implements Voteable, Reportable {
             os.write(jsonBody.getBytes());
         }
 
-        BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-        StringBuilder sb = new StringBuilder();
-        String line;
-        while ((line = reader.readLine()) != null) sb.append(line);
-        reader.close();
-
         return conn.getResponseCode() == 200;
     }
 
-    public Map<Comment, Map<Comment, PriorityQueue<Comment>>> GetCommentFeed(int lastID, String BASE_URL, Gson gson) throws Exception {
+    public Map<Comment, Map<Comment, PriorityQueue<Comment>>> GetCommentFeed(User user, int lastID, Map<Integer, Integer> votes, String BASE_URL, Gson gson) throws Exception {
         JsonObject json = new JsonObject();
+        json.add("user", gson.toJsonTree(user, User.class));
         json.add("post", gson.toJsonTree(this, Post.class));
         json.add("lastID", gson.toJsonTree(lastID, int.class));
 
@@ -143,7 +133,11 @@ public class Post implements Voteable, Reportable {
         while ((line = reader.readLine()) != null) sb.append(line);
         reader.close();
 
-        return gson.fromJson(sb.toString(), commentMapType);
+        JsonObject jsonObj = gson.fromJson(sb.toString(), JsonObject.class);
+        Map<Comment, Map<Comment, PriorityQueue<Comment>>> comments = gson.fromJson(jsonObj.get("comments"), commentMapType);
+        votes = gson.fromJson(jsonObj.get("votes"), id_vote_type);
+
+        return comments;
     }
 
     public int GetID() {
