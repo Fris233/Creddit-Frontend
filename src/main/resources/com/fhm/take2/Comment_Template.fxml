@@ -13,7 +13,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onMouseClicked="#OpenPost" prefWidth="620.0" style="-fx-background-color: #0E1113; -fx-border-color: gray; -fx-border-width: 2 0 0 0;" stylesheets="@CredditCSS.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.fhm.take2.CommentTemplateController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="620.0" style="-fx-background-color: #0E1113; -fx-border-color: gray; -fx-border-width: 2 0 0 0;" stylesheets="@CredditCSS.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.fhm.take2.CommentTemplateController">
    <children>
       <VBox layoutX="7.0" layoutY="7.0" prefWidth="620.0" spacing="15.0">
          <children>

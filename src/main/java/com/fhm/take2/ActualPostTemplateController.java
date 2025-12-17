@@ -74,6 +74,7 @@ public class ActualPostTemplateController {
     MediaViewController mediaViewController;
 
     MediaViewController commentMediaViewController;
+    private ArrayList<CommentTemplateController> commentTemplateControllers;
 
     private MediaViewController commentmediaViewController;
     private BooleanProperty validCommentInfo = new SimpleBooleanProperty(false);
@@ -93,7 +94,7 @@ public class ActualPostTemplateController {
         myVote = myOGVote;
         ColorVote();
         subName.setText(post.GetSubcreddit() != null? "cr/" + post.GetSubcreddit().GetSubName() : ""); //TODO: CHANGE TERTIARY OPERATOR
-        timeLabel.setText(timeAgo(post.GetTimeCreated()));
+        timeLabel.setText(PostPreviewTemplateController.timeAgo(post.GetTimeCreated()));
         titleLabel.setText(post.GetTitle());
         votesLabel.setText(String.valueOf(post.GetVotes()));
         commentsLabel.setText(String.valueOf(post.GetComments()));
@@ -194,35 +195,6 @@ public class ActualPostTemplateController {
             double delta = e.getDeltaY() * 2;
             postsScrollPane.setVvalue(postsScrollPane.getVvalue() - delta / postsScrollPane.getContent().getBoundsInLocal().getHeight());
         });
-    }
-
-    private static String timeAgo(Timestamp timestamp) {
-        Instant now = Instant.now();
-        Instant created = timestamp.toInstant();
-        Duration duration = Duration.between(created, now);
-        long seconds = duration.getSeconds();
-
-        if(seconds < 60)
-            return seconds + (seconds == 1? " second ago" : " seconds ago");
-
-        long minutes = seconds / 60;
-        if(minutes < 60)
-            return minutes + (minutes == 1? " minute ago" : " minutes ago");
-
-        long hours = minutes / 60;
-        if(hours < 24)
-            return hours + (hours == 1? " hour ago" : " hours ago");
-
-        long days = hours / 24;
-        if(days < 30)
-            return days + (days == 1? " day ago" : " days ago");
-
-        long months = days / 30;
-        if(months < 12)
-            return months + (months == 1? " month ago" : " months ago");
-
-        long years = months / 12;
-        return years + (years == 1? " year ago" : " years ago");
     }
 
     private void ColorVote() {
@@ -495,15 +467,15 @@ public class ActualPostTemplateController {
                 }
                 try {
                     FXMLLoader loader = new FXMLLoader(getClass().getResource("Comment_Template.fxml"));
-                    Parent root = loader.load();
+                    Node node = loader.load();
 
                     CommentTemplateController commentTemplateController = loader.getController();
                     commentTemplateController.Init(comment, currentUser, 0);
 
                     // Get the current stage
-                    Stage stage = (Stage) postButton.getScene().getWindow();
+                    postsContainer.getChildren().add(node);
                     // Set the new scene
-                    stage.setScene(new Scene(root));
+                    commentTemplateControllers.add(commentTemplateController);
                 }
                 catch (Exception ex) {
                     System.out.println(ex.getMessage());
