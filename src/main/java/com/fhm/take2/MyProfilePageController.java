@@ -115,6 +115,7 @@ public class MyProfilePageController {
         }
 
         bioTextArea.setText(this.currentUser.getBio());
+        bioTextArea.setEditable(false);
 
         try{
             if(filterPosts) {
@@ -232,6 +233,22 @@ public class MyProfilePageController {
     @FXML
     void EditProfile(MouseEvent event) {
         System.out.println("Edit Profile Page Pressed!");
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("edit-profile-page.fxml"));
+            Parent root = loader.load();
+
+            EditProfilePageController editProfilePageController = loader.getController();
+            editProfilePageController.initdata(this.currentUser);
+
+            // Get the current stage
+            Stage stage = (Stage) usernameLabel.getScene().getWindow();
+            // Set the new scene
+            stage.setScene(new Scene(root));
+        }
+        catch (Exception ex) {
+            ex.printStackTrace();
+            System.out.println(ex.getMessage());
+        }
         event.consume();
     }
 
