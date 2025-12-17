@@ -264,8 +264,20 @@ public class PostPreviewTemplateController {
             }
         }
         else {
-            //TODO: Open Subcreddit Page here
-            System.out.println("Open Subcreddit Pressed!");
+            // Navigate to Subcreddit Page
+            try {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("subcreddit-page.fxml"));
+                Parent root = loader.load();
+
+                SubcredditController controller = loader.getController();
+                controller.InitData(currentUser, post.GetSubcreddit());
+
+                Stage stage = (Stage) JoinButton.getScene().getWindow();
+                stage.setScene(new Scene(root));
+            }
+            catch (Exception ex) {
+                System.out.println(ex.getMessage());
+            }
         }
         event.consume();
     }

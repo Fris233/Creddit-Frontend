@@ -159,6 +159,118 @@ public class CreatePostPageController {
             event.consume();
         });
     }
+    public void InitData(User user, Subcreddit subcreddit) {
+        this.currentUser = user;
+
+        try {
+            allCategories = new ArrayList<>(Arrays.asList(Client.GetAllCategories()));
+            mySubcreddits = Client.GetUserSubcreddits(this.currentUser);
+            mySubcreddits.addFirst(null);
+            subcredditComboBox.setItems(FXCollections.observableArrayList(mySubcreddits));
+
+            // If a subcreddit is specified, pre-select it
+            if (subcreddit != null) {
+                for (int i = 0; i < mySubcreddits.size(); i++) {
+                    if (mySubcreddits.get(i) != null &&
+                            mySubcreddits.get(i).GetSubId() == subcreddit.GetSubId()) {
+                        subcredditComboBox.getSelectionModel().select(i);
+                        break;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        selectedCategories = new ArrayList<>();
+        mediaViewController = null;
+
+        contentArea.setWrapText(true);
+
+        suggestions = FXCollections.observableArrayList();
+        lvSuggestions.setItems(suggestions);
+        lvSuggestions.setVisible(false);
+        lvSuggestions.setFocusTraversable(false);
+        lvSuggestions.setFixedCellSize(24);
+        categorySearchField.textProperty().addListener((obs, old, text) -> {
+            UpdateSuggestions(text);
+        });
+
+        lvSuggestions.setOnMouseClicked(e -> {
+            if(e.getClickCount() == 1)
+                HandleSelect();
+        });
+
+        int[] lastLineCount = { 1 };
+
+        contentArea.setPrefHeight(contentArea.getMinHeight());
+
+        contentArea.textProperty().addListener((obs, oldText, newText) -> {
+            int lines = newText.split("\n", -1).length;
+
+            if (lines != lastLineCount[0]) {
+                lastLineCount[0] = lines;
+
+                contentArea.applyCss();
+                contentArea.layout();
+
+                var content = contentArea.lookup(".content");
+                if (content != null) {
+                    double height = 52 + (32 * (Math.min(lines, 14)));
+                    contentArea.setPrefHeight(height);
+                }
+            }
+        });
+
+        titleField.textProperty().addListener((obs, oldText, newText) -> {
+            if(newText.length() > 255)
+                titleField.setText(oldText);
+            validPostInfo.set(!newText.isBlank());
+        });
+
+        categorySearchField.textProperty().addListener((obs, oldText, newText) -> {
+            if(newText.length() > 50)
+                categorySearchField.setText(oldText);
+        });
+
+        validPostInfo.addListener((obs, oldVal, newVal) -> {
+            if(newVal) {
+                postButton.setStyle("-fx-background-color: #115bca; -fx-text-fill: #ffffff; -fx-background-radius: 30;");
+                postButton.setDisable(false);
+            }
+            else {
+                postButton.setStyle("-fx-background-color: #191c1e; -fx-text-fill: #525454; -fx-background-radius: 30;");
+                postButton.setDisable(true);
+            }
+        });
+
+        // Setup scroll behavior
+        scrollPane.addEventFilter(ScrollEvent.SCROLL, e -> {
+            double delta = e.getDeltaY() * 2;
+            scrollPane.setVvalue(scrollPane.getVvalue() - delta / scrollPane.getContent().getBoundsInLocal().getHeight());
+        });
+
+        // Handle dragging over the pane
+        scrollPane.setOnDragOver(event -> {
+            if (event.getGestureSource() != scrollPane && event.getDragboard().hasFiles()) {
+                event.acceptTransferModes(javafx.scene.input.TransferMode.COPY_OR_MOVE);
+            }
+            event.consume();
+        });
+
+        // Handle dropping files
+        scrollPane.setOnDragDropped(event -> {
+            var db = event.getDragboard();
+            boolean success = false;
+            if (db.hasFiles()) {
+                success = true;
+                List<File> files = db.getFiles();
+                files.forEach(this::AddFile);
+            }
+            event.setDropCompleted(success);
+            event.consume();
+        });
+    }
 
     @FXML
     void Chat(MouseEvent event) {

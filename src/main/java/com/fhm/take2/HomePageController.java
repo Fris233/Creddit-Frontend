@@ -2,6 +2,7 @@ package com.fhm.take2;
 
 import com.Client;
 import com.crdt.Post;
+import com.crdt.Subcreddit;
 import com.crdt.User;
 import javafx.animation.PauseTransition;
 import javafx.fxml.FXML;
@@ -222,24 +223,20 @@ public class HomePageController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("create-subcreddit-page.fxml"));
             Parent root = loader.load();
 
-            // Get the login controller
             CreateSubcredditPageController createSubcredditPageController = loader.getController();
             createSubcredditPageController.InitData(this.currentUser);
 
-            // Create a new stage for login (dialog)
             Stage createSubcredditStage = new Stage();
             createSubcredditStage.setTitle("Create Subcreddit");
             createSubcredditStage.setScene(new Scene(root, 600, 400));
             createSubcredditStage.setResizable(false);
-
-            // Set modality so it blocks interaction with homepage
             createSubcredditStage.initModality(Modality.WINDOW_MODAL);
             createSubcredditStage.initOwner(postsContainer.getScene().getWindow());
 
-            // Set up callback for successful login
             createSubcredditPageController.setOnCreationSuccess(sub -> {
                 createSubcredditStage.close();
-                //TODO: Open Subcreddit Page here
+                // Navigate to the new subcreddit page
+                goToSubcreddit(sub);
             });
 
             createSubcredditStage.showAndWait();
@@ -389,6 +386,37 @@ public class HomePageController {
                     controller.mediaViewController.Clean();
                 }
             }
+        }
+    }
+    public void goToSubcreddit(String subcredditName) {
+        Clean();
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("subcreddit-page.fxml"));
+            Parent root = loader.load();
+
+            SubcredditController controller = loader.getController();
+            controller.InitData(currentUser, subcredditName);
+
+            Stage stage = (Stage) postsContainer.getScene().getWindow();
+            stage.setScene(new Scene(root));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void goToSubcreddit(Subcreddit subcreddit) {
+        Clean();
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("subcreddit-page.fxml"));
+            Parent root = loader.load();
+
+            SubcredditController controller = loader.getController();
+            controller.InitData(currentUser, subcreddit);
+
+            Stage stage = (Stage) postsContainer.getScene().getWindow();
+            stage.setScene(new Scene(root));
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }
