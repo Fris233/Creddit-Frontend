@@ -373,7 +373,10 @@ public abstract class Client {
         return gson.fromJson(sb.toString(), String[].class);
     }
 
-
+    //Report
+    public static boolean submitReport(Report report) throws Exception {
+        return report.SubmitReport(System.getenv(BASE_URL), gson);
+    }
 
 
     //BOOKMARK: Subcreddit
