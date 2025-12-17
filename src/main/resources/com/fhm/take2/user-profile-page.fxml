@@ -303,7 +303,7 @@
                         <Font size="18.0" />
                      </font>
                   </Button>
-                  <ImageView fx:id="reportIcon" fitHeight="52.0" fitWidth="47.0" layoutX="-3.0" layoutY="-6.0" mouseTransparent="true" onMouseClicked="#onReportPressed" pickOnBounds="true" preserveRatio="true">
+                  <ImageView fx:id="reportIcon" fitHeight="52.0" fitWidth="47.0" layoutX="-3.0" layoutY="-6.0" mouseTransparent="true" onContextMenuRequested="#AcceptFriend" pickOnBounds="true" preserveRatio="true">
                      <image>
                         <Image url="@assets/report.PNG" />
                      </image>

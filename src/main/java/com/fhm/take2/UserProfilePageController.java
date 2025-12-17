@@ -455,8 +455,24 @@ public class UserProfilePageController {
             return;
         }
         System.out.println("Report User Button Pressed");
-        //Clean();
-        event.consume();
+            try {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("create-report-page.fxml"));
+                Parent root = loader.load();
+
+                CreateReportPageController reportPageController = loader.getController();
+
+                Stage popup = new Stage();
+                popup.setTitle("Report Page");
+                popup.setScene(new Scene(root));
+                popup.initModality(Modality.APPLICATION_MODAL);
+
+                reportPageController.initData(this.currentUser, profileUser, popup);
+                popup.showAndWait();
+            }
+            catch (Exception ex) {
+                System.out.println(ex.getMessage());
+            }
+            event.consume();
     }
 
     @FXML
@@ -471,29 +487,6 @@ public class UserProfilePageController {
     void Share(MouseEvent event) {
         System.out.println("Share User Pressed");
         event.consume();
-    }
-
-    @FXML
-    public void onReportPressed(MouseEvent event) {
-        if (currentUser != null) {
-            try {
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("report-page.fxml"));
-                Parent root = loader.load();
-
-                ReportPageController reportPageController = loader.getController();
-                reportPageController.initData(this.currentUser, profileUser);
-
-                Stage popup = new Stage();
-                popup.setTitle("Report Page");
-                popup.setScene(new Scene(root));
-                popup.initModality(Modality.APPLICATION_MODAL);
-                popup.showAndWait();
-            }
-            catch (Exception ex) {
-                System.out.println(ex.getMessage());
-            }
-            event.consume();
-        }
     }
 
     @FXML
