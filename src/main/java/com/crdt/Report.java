@@ -77,6 +77,7 @@ public class Report {
         return reason;
     }
 
+    public User getReporter() { return reporter; }
 
     public ReportType getType() {
         return type;
