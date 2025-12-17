@@ -159,6 +159,11 @@ public class CreateReportPageController {
     }
 
     @FXML
+    public void onReturnPressed(MouseEvent event) throws IOException {
+        reportStage.close();
+    }
+
+    @FXML
     public void onRulesPressed(MouseEvent event) throws IOException {
         //todo
     }
