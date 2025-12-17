@@ -52,8 +52,8 @@ public class EditProfilePageController {
 
     public void initdata(User user) throws Exception {
         this.user = user;
-        if(user.getPfp() != null)
-            userPFP.setImage(new Image(user.getPfp().GetURL(), true));
+//        if(user.getPfp() != null) todo
+//            userPFP.setImage(new Image(user.getPfp().GetURL(), true));
         usernameTextField.setText(user.getUsername());
         passwordTextField.setText(user.getPassword());
         bioTextArea.setText(user.getBio());
@@ -246,8 +246,8 @@ public class EditProfilePageController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("edit-profile-page.fxml"));
             Parent root = loader.load();
 
-            MyProfilePageController myProfilePageController = loader.getController();
-            myProfilePageController.initData(this.user, searchField.getText(), true, false, false, false, false, false);
+            EditProfilePageController editProfilePageController = loader.getController();
+            editProfilePageController.initdata(this.user);
 
             // Get the current stage
             Stage stage = (Stage) usernameLabel.getScene().getWindow();
