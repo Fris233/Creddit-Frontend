@@ -159,19 +159,52 @@ public class HomePageController {
             Login();
             return;
         }
-        System.out.println("Create Post Button Pressed");
         Clean();
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("create-post-page.fxml"));
-            Parent root = loader.load();
+            if(!Client.isServerReachable()) {
+                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("error_404.fxml"));
+                Parent root = fxmlLoader.load();
 
-            CreatePostPageController createPostPageController = loader.getController();
-            createPostPageController.InitData(currentUser);
+                Error404Controller error404Controller = fxmlLoader.getController();
+                error404Controller.refreshButton.setOnAction(e -> {
+                    if(!Client.isServerReachable()) {
+                        return;
+                    }
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource("create-post-page.fxml"));
+                    Parent root2 = null;
+                    try {
+                        root2 = loader.load();
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                    }
 
-            // Get the current stage
-            Stage stage = (Stage) postsContainer.getScene().getWindow();
-            // Set the new scene
-            stage.setScene(new Scene(root));
+                    CreatePostPageController createPostPageController = loader.getController();
+                    createPostPageController.InitData(currentUser);
+
+                    // Get the current stage
+                    Stage stage = (Stage) error404Controller.refreshButton.getScene().getWindow();
+
+                    // Set the new scene
+                    stage.setScene(new Scene(root2));
+                });
+
+                // Get the current stage
+                Stage stage = (Stage) postsContainer.getScene().getWindow();
+                // Set the new scene
+                stage.setScene(new Scene(root));
+            }
+            else {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("create-post-page.fxml"));
+                Parent root = loader.load();
+
+                CreatePostPageController createPostPageController = loader.getController();
+                createPostPageController.InitData(currentUser);
+
+                // Get the current stage
+                Stage stage = (Stage) postsContainer.getScene().getWindow();
+                // Set the new scene
+                stage.setScene(new Scene(root));
+            }
         }
         catch (Exception ex) {
             System.out.println(ex.getMessage());
@@ -265,7 +298,22 @@ public class HomePageController {
             return;
         }
         System.out.println("My Profile Button Pressed");
-        //Clean();
+        Clean();
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("my-profile-page.fxml"));
+            Parent root = loader.load();
+
+            MyProfilePageController myProfilePageController = loader.getController();
+            myProfilePageController.initData(this.currentUser, "", true, false, false, false, false, false);
+
+            // Get the current stage
+            Stage stage = (Stage) postsContainer.getScene().getWindow();
+            // Set the new scene
+            stage.setScene(new Scene(root));
+        }
+        catch (Exception ex) {
+            System.out.println(ex.getMessage());
+        }
         event.consume();
     }
 
