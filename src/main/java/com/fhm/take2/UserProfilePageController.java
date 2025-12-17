@@ -474,6 +474,29 @@ public class UserProfilePageController {
     }
 
     @FXML
+    public void onReportPressed(MouseEvent event) {
+        if (currentUser != null) {
+            try {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("report-page.fxml"));
+                Parent root = loader.load();
+
+                ReportPageController reportPageController = loader.getController();
+                reportPageController.initData(this.currentUser, profileUser);
+
+                Stage popup = new Stage();
+                popup.setTitle("Report Page");
+                popup.setScene(new Scene(root));
+                popup.initModality(Modality.APPLICATION_MODAL);
+                popup.showAndWait();
+            }
+            catch (Exception ex) {
+                System.out.println(ex.getMessage());
+            }
+            event.consume();
+        }
+    }
+
+    @FXML
     void Refresh() {
         Clean();
         try {

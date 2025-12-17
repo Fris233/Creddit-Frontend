@@ -1,8 +1,16 @@
 package com.crdt;
 
+import java.io.IOException;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+
+import com.Client;
+import com.google.gson.Gson;
 
 public class Report {
 
@@ -42,7 +50,20 @@ public class Report {
     }
 
 
-    public void SubmitReport() throws SQLException {
+    public boolean SubmitReport(String BASE_URL, Gson gson) throws Exception {
+        String jsonBody = gson.toJson(this, Report.class);
+
+        URL url = new URL(BASE_URL + "/report/submit");
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("POST");
+        conn.setDoOutput(true);
+        conn.setRequestProperty("Content-Type", "application/json");
+
+        try (OutputStream frisos = conn.getOutputStream()) {
+            frisos.write(jsonBody.getBytes());
+        }
+
+        return conn.getResponseCode() == 200;
     }
 
     public static ArrayList<Report> GetUserReportFeed(Admin admin, int lastID) throws SQLException {
