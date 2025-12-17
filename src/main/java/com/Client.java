@@ -10,10 +10,7 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -405,7 +402,12 @@ public abstract class Client {
         return gson.fromJson(sb.toString(), String[].class);
     }
 
-    //Report
+
+
+
+
+    //BOOKMARK: Report
+
     public static boolean submitReport(Report report) throws Exception {
         return report.SubmitReport(BASE_URL, gson);
     }
@@ -476,5 +478,14 @@ public abstract class Client {
 
     public static ArrayList<Message> GetPMFeed(User user, User friend, int lastID) throws Exception {
         return new ArrayList<>(Arrays.asList(user.GetPrivateMessageFeed(friend, lastID, BASE_URL, gson)));
+    }
+
+
+
+
+    //BOOKMARK: Comment
+
+    public static Map<Comment, Map<Comment, PriorityQueue<Comment>>> GetPostCommentFeed(Post post, int lastID) throws Exception {
+        return post.GetCommentFeed(lastID, BASE_URL, gson);
     }
 }

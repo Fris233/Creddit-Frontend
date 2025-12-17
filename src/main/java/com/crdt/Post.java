@@ -2,14 +2,20 @@ package com.crdt;
 
 import com.Client;
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.reflect.TypeToken;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Map;
+import java.util.PriorityQueue;
 
 public class Post implements Voteable, Reportable {
     private int id;
@@ -23,6 +29,8 @@ public class Post implements Voteable, Reportable {
     private Timestamp timeEdited;
     private int votes;
     private int comments;
+
+    private static Type commentMapType = new TypeToken<Map<Comment, Map<Comment, PriorityQueue<Comment>>>>() {}.getType();
 
     public Post(int id, User author, Subcreddit subcreddit, String title, String content, ArrayList<Media> media, ArrayList<String> categories, Timestamp timeCreated, Timestamp timeEdited, int votes, int comments) {
         if (id <= 0)
@@ -68,7 +76,74 @@ public class Post implements Voteable, Reportable {
         return gson.fromJson(sb.toString(), int.class);
     }
 
-    public void delete() {
+    public boolean delete(String BASE_URL, Gson gson) throws Exception {
+        String jsonBody = gson.toJson(this, Post.class);
+
+        URL url = new URL(BASE_URL + "/post/delete");
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("POST");
+        conn.setDoOutput(true);
+        conn.setRequestProperty("Content-Type", "application/json");
+
+        try (OutputStream os = conn.getOutputStream()) {
+            os.write(jsonBody.getBytes());
+        }
+
+        BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+        StringBuilder sb = new StringBuilder();
+        String line;
+        while ((line = reader.readLine()) != null) sb.append(line);
+        reader.close();
+
+        return conn.getResponseCode() == 200;
+    }
+
+    public boolean update(String BASE_URL, Gson gson) throws Exception {
+        String jsonBody = gson.toJson(this, Post.class);
+
+        URL url = new URL(BASE_URL + "/post/edit");
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("POST");
+        conn.setDoOutput(true);
+        conn.setRequestProperty("Content-Type", "application/json");
+
+        try (OutputStream os = conn.getOutputStream()) {
+            os.write(jsonBody.getBytes());
+        }
+
+        BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+        StringBuilder sb = new StringBuilder();
+        String line;
+        while ((line = reader.readLine()) != null) sb.append(line);
+        reader.close();
+
+        return conn.getResponseCode() == 200;
+    }
+
+    public Map<Comment, Map<Comment, PriorityQueue<Comment>>> GetCommentFeed(int lastID, String BASE_URL, Gson gson) throws Exception {
+        JsonObject json = new JsonObject();
+        json.add("post", gson.toJsonTree(this, Post.class));
+        json.add("lastID", gson.toJsonTree(lastID, int.class));
+
+        String jsonBody = gson.toJson(json);
+
+        URL url = new URL(BASE_URL + "/post/comment/feed");
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("POST");
+        conn.setDoOutput(true);
+        conn.setRequestProperty("Content-Type", "application/json");
+
+        try (OutputStream os = conn.getOutputStream()) {
+            os.write(jsonBody.getBytes());
+        }
+
+        BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+        StringBuilder sb = new StringBuilder();
+        String line;
+        while ((line = reader.readLine()) != null) sb.append(line);
+        reader.close();
+
+        return gson.fromJson(sb.toString(), commentMapType);
     }
 
     public int GetID() {
