@@ -407,7 +407,7 @@ public abstract class Client {
 
     //Report
     public static boolean submitReport(Report report) throws Exception {
-        return report.SubmitReport(System.getenv(BASE_URL), gson);
+        return report.SubmitReport(BASE_URL, gson);
     }
 
 
