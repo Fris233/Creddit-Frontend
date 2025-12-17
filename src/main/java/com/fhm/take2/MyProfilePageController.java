@@ -136,9 +136,29 @@ public class MyProfilePageController {
             } else if(filterHistory) {
                 //todo
             } else if(filterUpvoted) {
-                //todo
+                ArrayList<Post> postFeed = Client.GetPostFeedFilterVote(this.currentUser, searchPrompt, 1, 0);
+                for(Post post : postFeed) {
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource("Post_Preview_Template.fxml"));
+                    Node postNode = loader.load();
+
+                    PostPreviewTemplateController controller = loader.getController();
+                    controller.init(post, this.currentUser, 1);
+
+                    postsContainer.getChildren().add(postNode);
+                    postPreviewControllers.add(controller);
+                }
             } else if(filterDownvoted) {
-                //todo
+                ArrayList<Post> postFeed = Client.GetPostFeedFilterVote(this.currentUser, searchPrompt, -1, 0);
+                for(Post post : postFeed) {
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource("Post_Preview_Template.fxml"));
+                    Node postNode = loader.load();
+
+                    PostPreviewTemplateController controller = loader.getController();
+                    controller.init(post, this.currentUser, -1);
+
+                    postsContainer.getChildren().add(postNode);
+                    postPreviewControllers.add(controller);
+                }
             }
         } catch (Exception e){
             e.printStackTrace();
@@ -172,9 +192,29 @@ public class MyProfilePageController {
                     } else if(filterHistory) {
                         //todo
                     } else if(filterUpvoted) {
-                        //todo
+                        ArrayList<Post> postFeed = Client.GetPostFeedFilterVote(this.currentUser, searchPrompt, 1, postPreviewControllers.getLast().GetPostID());
+                        for(Post post : postFeed) {
+                            FXMLLoader loader = new FXMLLoader(getClass().getResource("Post_Preview_Template.fxml"));
+                            Node postNode = loader.load();
+
+                            PostPreviewTemplateController controller = loader.getController();
+                            controller.init(post, this.currentUser, 1);
+
+                            postsContainer.getChildren().add(postNode);
+                            postPreviewControllers.add(controller);
+                        }
                     }else if(filterDownvoted) {
-                        //todo
+                        ArrayList<Post> postFeed = Client.GetPostFeedFilterVote(this.currentUser, searchPrompt, -1, postPreviewControllers.getLast().GetPostID());
+                        for(Post post : postFeed) {
+                            FXMLLoader loader = new FXMLLoader(getClass().getResource("Post_Preview_Template.fxml"));
+                            Node postNode = loader.load();
+
+                            PostPreviewTemplateController controller = loader.getController();
+                            controller.init(post, this.currentUser, -1);
+
+                            postsContainer.getChildren().add(postNode);
+                            postPreviewControllers.add(controller);
+                        }
                     }
                 }
                 catch (Exception e) {
@@ -263,6 +303,11 @@ public class MyProfilePageController {
     @FXML
     void FilterPosts(MouseEvent event) {
         this.filterPosts = true;
+        this.filterComments = false;
+        this.filterSaved = false;
+        this.filterHistory = false;
+        this.filterUpvoted = false;
+        this.filterDownvoted = false;
         Refresh();
         event.consume();
     }
@@ -287,13 +332,25 @@ public class MyProfilePageController {
 
     @FXML
     void FilterUpvoted(MouseEvent event) {
-        //todo
+        this.filterPosts = false;
+        this.filterComments = false;
+        this.filterSaved = false;
+        this.filterHistory = false;
+        this.filterUpvoted = true;
+        this.filterDownvoted = false;
+        Refresh();
         event.consume();
     }
 
     @FXML
     void FilterDownvoted(MouseEvent event) {
-        //todo
+        this.filterPosts = false;
+        this.filterComments = false;
+        this.filterSaved = false;
+        this.filterHistory = false;
+        this.filterUpvoted = false;
+        this.filterDownvoted = true;
+        Refresh();
         event.consume();
     }
 

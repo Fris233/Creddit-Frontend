@@ -336,6 +336,38 @@ public abstract class Client {
         return postMap;
     }
 
+    public static ArrayList<Post> GetPostFeedFilterVote(User user, String prompt, int voteValue, int lastID) throws Exception {
+        JsonObject json = new JsonObject();
+        json.add("user", gson.toJsonTree(user, User.class));
+        json.addProperty("prompt", prompt);
+        json.addProperty("lastID", gson.toJson(lastID));
+
+        String jsonBody = gson.toJson(json);
+
+        URL url;
+        if(voteValue > 0)
+            url = new URL(BASE_URL + "/post/feed/filter-upvote");
+        else
+            url = new URL(BASE_URL + "/post/feed/filter-downvote");
+
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("POST");
+        conn.setDoOutput(true);
+        conn.setRequestProperty("Content-Type", "application/json");
+
+        try (OutputStream os = conn.getOutputStream()) {
+            os.write(jsonBody.getBytes());
+        }
+
+        BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+        StringBuilder sb = new StringBuilder();
+        String line;
+        while ((line = reader.readLine()) != null) sb.append(line);
+        reader.close();
+
+        return new ArrayList<>(Arrays.asList(gson.fromJson(sb.toString(), Post[].class)));
+    }
+
 
 
 
