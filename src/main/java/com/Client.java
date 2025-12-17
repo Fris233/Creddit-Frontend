@@ -10,10 +10,7 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -86,10 +83,6 @@ public abstract class Client {
         Map<?, ?> json = gson.fromJson(uploadResponse, Map.class);
         return json;
     }
-
-    /*public static String GetJSON(Object obj) {
-        return gson.toJson(obj);
-    }*/
 
     public static String UploadFile(File file) throws Exception {
         String boundary = "----Boundary" + System.currentTimeMillis();
@@ -340,6 +333,38 @@ public abstract class Client {
         return postMap;
     }
 
+    public static ArrayList<Post> GetPostFeedFilterVote(User user, String prompt, int voteValue, int lastID) throws Exception {
+        JsonObject json = new JsonObject();
+        json.add("user", gson.toJsonTree(user, User.class));
+        json.addProperty("prompt", prompt);
+        json.addProperty("lastID", gson.toJson(lastID));
+
+        String jsonBody = gson.toJson(json);
+
+        URL url;
+        if(voteValue > 0)
+            url = new URL(BASE_URL + "/post/feed/filter-upvote");
+        else
+            url = new URL(BASE_URL + "/post/feed/filter-downvote");
+
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("POST");
+        conn.setDoOutput(true);
+        conn.setRequestProperty("Content-Type", "application/json");
+
+        try (OutputStream os = conn.getOutputStream()) {
+            os.write(jsonBody.getBytes());
+        }
+
+        BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+        StringBuilder sb = new StringBuilder();
+        String line;
+        while ((line = reader.readLine()) != null) sb.append(line);
+        reader.close();
+
+        return new ArrayList<>(Arrays.asList(gson.fromJson(sb.toString(), Post[].class)));
+    }
+
 
 
 
@@ -378,6 +403,14 @@ public abstract class Client {
     }
 
 
+
+
+
+    //BOOKMARK: Report
+
+    public static boolean submitReport(Report report) throws Exception {
+        return report.SubmitReport(BASE_URL, gson);
+    }
 
 
     //BOOKMARK: Subcreddit
@@ -445,5 +478,14 @@ public abstract class Client {
 
     public static ArrayList<Message> GetPMFeed(User user, User friend, int lastID) throws Exception {
         return new ArrayList<>(Arrays.asList(user.GetPrivateMessageFeed(friend, lastID, BASE_URL, gson)));
+    }
+
+
+
+
+    //BOOKMARK: Comment
+
+    public static Map<Comment, Map<Comment, PriorityQueue<Comment>>> GetPostCommentFeed(Post post, int lastID) throws Exception {
+        return post.GetCommentFeed(lastID, BASE_URL, gson);
     }
 }

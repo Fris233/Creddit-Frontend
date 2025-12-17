@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onMouseClicked="#OpenPost" prefWidth="800.0" style="-fx-background-color: #0E1113; -fx-border-color: gray; -fx-border-width: 2 0 0 0;" stylesheets="@CredditCSS.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.fhm.take2.PostPreviewTemplateController">
+   <children>
+      <VBox layoutX="14.0" layoutY="7.0" spacing="15.0">
+         <children>
+            <AnchorPane>
+               <children>
+                  <ImageView fx:id="subPFP" fitHeight="56.0" fitWidth="65.0" onMouseClicked="#OpenSubcreddit" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@assets/creddit_icon_final_nobg.png" />
+                     </image>
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </ImageView>
+                  <Label fx:id="subName" layoutX="62.0" layoutY="14.0" maxWidth="206.0" onMouseClicked="#OpenSubcreddit" prefHeight="27.0" text="cr/Unknown" textFill="WHITE" wrapText="true">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </Label>
+                  <Label fx:id="timeLabel" layoutX="392.0" layoutY="14.0" mouseTransparent="true" prefHeight="27.0" text="X days ago" textFill="WHITE" wrapText="true">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Label>
+                  <Label layoutX="77.0" layoutY="6.0" text="Reporter" textFill="WHITE" />
+                  <Label fx:id="reporttype" layoutX="214.0" layoutY="20.0" prefWidth="84.0" text="ReportType" textFill="WHITE" />
+               </children>
+            </AnchorPane>
+            <AnchorPane>
+               <children>
+                  <Label fx:id="titleLabel" maxHeight="70.0" maxWidth="780.0" mouseTransparent="true" text="Reason" textFill="WHITE" wrapText="true">
+                     <font>
+                        <Font size="24.0" />
+                     </font>
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </Label>
+                  <Label fx:id="target" layoutX="358.0" layoutY="27.0" maxHeight="70.0" maxWidth="780.0" mouseTransparent="true" text="Target" textFill="WHITE" wrapText="true">
+                     <font>
+                        <Font size="24.0" />
+                     </font>
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </Label>
+               </children>
+            </AnchorPane>
+            <StackPane fx:id="mediaAnchor" prefHeight="0.0" prefWidth="783.0" />
+            <AnchorPane>
+               <children>
+                  <HBox spacing="20.0">
+                     <children>
+                        <AnchorPane fx:id="voteAnchor" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="56.0" style="-fx-background-color: black; -fx-background-radius: 25;" stylesheets="@CredditCSS.css">
+                           <children>
+                              <HBox layoutX="14.0" layoutY="10.0">
+                                 <children>
+                                    <AnchorPane prefHeight="36.0" prefWidth="9.0">
+                                       <children>
+                                          <ImageView fx:id="upvoteButton" fitHeight="40.0" fitWidth="34.0" layoutX="-3.0" onMouseClicked="#Resolve" pickOnBounds="true" preserveRatio="true">
+                                             <image>
+                                                <Image url="@assets/approve.png" />
+                                             </image>
+                                             <cursor>
+                                                <Cursor fx:constant="HAND" />
+                                             </cursor>
+                                          </ImageView>
+                                       </children>
+                                    </AnchorPane>
+                                    <AnchorPane />
+                                    <AnchorPane>
+                                       <children>
+                                          <ImageView fx:id="downvoteButton" fitHeight="40.0" fitWidth="34.0" layoutX="9.0" layoutY="1.0" onMouseClicked="#Dismiss" pickOnBounds="true" preserveRatio="true">
+                                             <image>
+                                                <Image url="@assets/dismiss.png" />
+                                             </image>
+                                             <cursor>
+                                                <Cursor fx:constant="HAND" />
+                                             </cursor>
+                                          </ImageView>
+                                       </children>
+                                    </AnchorPane>
+                                 </children>
+                                 <padding>
+                                    <Insets right="5.0" />
+                                 </padding>
+                              </HBox>
+                           </children>
+                           <padding>
+                              <Insets right="5.0" />
+                           </padding>
+                           <cursor>
+                              <Cursor fx:constant="DEFAULT" />
+                           </cursor>
+                        </AnchorPane>
+                        <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onMouseClicked="#OpenPost" prefHeight="56.0" style="-fx-background-color: black; -fx-background-radius: 25;" stylesheets="@CredditCSS.css">
+                           <padding>
+                              <Insets right="10.0" />
+                           </padding>
+                           <children>
+                              <HBox layoutX="14.0" layoutY="10.0" mouseTransparent="true">
+                                 <children>
+                                    <AnchorPane prefHeight="36.0" prefWidth="9.0">
+                                       <children>
+                                          <Label fx:id="status" layoutY="8.0" text="Current Status" textFill="WHITE">
+                                             <font>
+                                                <Font size="15.0" />
+                                             </font>
+                                          </Label>
+                                       </children>
+                                    </AnchorPane>
+                                 </children>
+                                 <padding>
+                                    <Insets right="10.0" />
+                                 </padding>
+                              </HBox>
+                           </children>
+                           <cursor>
+                              <Cursor fx:constant="HAND" />
+                           </cursor>
+                        </AnchorPane>
+                     </children>
+                  </HBox>
+               </children>
+            </AnchorPane>
+         </children>
+         <padding>
+            <Insets top="10.0" />
+         </padding>
+      </VBox>
+   </children>
+   <cursor>
+      <Cursor fx:constant="HAND" />
+   </cursor>
+   <padding>
+      <Insets bottom="5.0" />
+   </padding>
+</AnchorPane>

@@ -8,20 +8,20 @@ public class Comment implements Voteable, Reportable {
     private int id;
     private Post post;
     private User author;
-    private Comment parent;
+    private int parentID;
     private String content;
     private Media media;
     private int votes;
     private Timestamp timeCreated;
     private Timestamp timeEdited;
 
-    public Comment(int id, Post post, User author, String content, Media media, Comment parent, int votes, Timestamp createTime, Timestamp editTime) {
+    public Comment(int id, Post post, User author, String content, Media media, int parent, int votes, Timestamp createTime, Timestamp editTime) {
         this.id = id;
         this.post = post;
         this.author = author;
         this.content = content;
         this.media = media;
-        this.parent = parent;
+        this.parentID = parentID;
         this.votes = votes;
         this.timeCreated = createTime;
         this.timeEdited = editTime;
@@ -30,7 +30,7 @@ public class Comment implements Voteable, Reportable {
     public int getID() {return id;}
     public Post getPost() {return post;}
     public User getAuthor() {return author;}
-    public Comment getParent() {return parent;}
+    public int getParent() {return parentID;}
     public String getContent() {return content;}
     public Media getMedia() {return media;}
 

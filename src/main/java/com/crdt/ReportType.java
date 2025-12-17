@@ -22,9 +22,7 @@ public enum ReportType {
         if(s.equalsIgnoreCase("NSFW"))
             return HARASSMENT;
         else {
-            ReportType rt = ReportType.OTHER;
-            rt.type = s;
-            return rt;
+            return OTHER;
         }
     }
     public String toString() {

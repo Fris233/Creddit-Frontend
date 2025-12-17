@@ -18,8 +18,8 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
 import javafx.stage.Modality;
+import javafx.stage.Stage;
 import javafx.util.Duration;
 
 import java.io.IOException;
@@ -27,19 +27,19 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.Objects;
 
-public class HomePageController {
+public class ReportPageController {
 
     @FXML private AnchorPane loggedInPane;
     @FXML private AnchorPane loggedOutPane;
-    @FXML private VBox postsContainer;
+    @FXML private VBox reportContainer;
     @FXML private VBox recentPostsContainer;
     @FXML private ScrollPane recentScrollPane;
-    @FXML private ScrollPane postsScrollPane;
+    @FXML private ScrollPane reportScrollPane;
     @FXML private TextField searchField;
     @FXML private ImageView userPFP;
 
     private User currentUser;
-    private ArrayList<PostPreviewTemplateController> postPreviewControllers;
+    private ArrayList<ReportPreviewTemplateController> reportPreviewControllers;
     private boolean updating = false;
     private boolean scrollCooldown = false;
     private int filter; // 0 for posts, 1 for subcreddits, 2 for comments, 3 for users
@@ -48,22 +48,20 @@ public class HomePageController {
         currentUser = user;
         this.filter = filter;
         this.searchField.setText(searchPrompt);
-        postPreviewControllers = new ArrayList<>();
+        reportPreviewControllers = new ArrayList<>();
 
-        // Update UI based on login status
-        updateLoginUI();
-
+/*
         try {
             Map<Post, Integer> postFeed = Client.GetPostFeed(currentUser, searchPrompt, 0);
             for (Post post : postFeed.keySet()) {
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("Post_Preview_Template.fxml"));
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("Report_Preview_Template.fxml"));
                 Node postNode = loader.load();
 
-                PostPreviewTemplateController controller = loader.getController();
-                controller.init(post, user, postFeed.get(post));
+                ReportPreviewTemplateController controller = loader.getController();
+                controller.init(report, user,);
 
-                postsContainer.getChildren().add(postNode);
-                postPreviewControllers.add(controller);
+                reportContainer.getChildren().add(postNode);
+                reportPreviewControllers.add(controller);
             }
         }
         catch (Exception e) {
@@ -71,24 +69,24 @@ public class HomePageController {
         }
 
         // Setup scroll behavior
-        postsScrollPane.addEventFilter(ScrollEvent.SCROLL, e -> {
+        reportScrollPane.addEventFilter(ScrollEvent.SCROLL, e -> {
             double delta = e.getDeltaY() * 2;
-            postsScrollPane.setVvalue(postsScrollPane.getVvalue() - delta / postsScrollPane.getContent().getBoundsInLocal().getHeight());
+            reportScrollPane.setVvalue(reportScrollPane.getVvalue() - delta / reportScrollPane.getContent().getBoundsInLocal().getHeight());
         });
 
-        postsScrollPane.vvalueProperty().addListener((obs, oldVal, newVal) -> {
-            if(!updating && !scrollCooldown && newVal.doubleValue() >= postsScrollPane.getVmax()) {
+        reportScrollPane.vvalueProperty().addListener((obs, oldVal, newVal) -> {
+            if(!updating && !scrollCooldown && newVal.doubleValue() >= reportScrollPane.getVmax()) {
                 updating = true;
                 scrollCooldown = true;
                 try {
-                    Map<Post, Integer> postFeed = Client.GetPostFeed(currentUser, searchPrompt, postPreviewControllers.getLast().GetPostID());
+                    Map<Post, Integer> postFeed = Client.GetPostFeed(currentUser, searchPrompt, reportPreviewControllers.getLast().GetPostID());
                     for (Post post : postFeed.keySet()) {
                         FXMLLoader loader = new FXMLLoader(getClass().getResource("Post_Preview_Template.fxml"));
                         Node postNode = loader.load();
-                        PostPreviewTemplateController controller = loader.getController();
+                        ReportPreviewTemplateController controller = loader.getController();
                         controller.init(post, user, postFeed.get(post));
-                        postsContainer.getChildren().add(postNode);
-                        postPreviewControllers.add(controller);
+                        reportContainer.getChildren().add(postNode);
+                        reportPreviewControllers.add(controller);
                     }
                     updating = false;
                 }
@@ -100,24 +98,10 @@ public class HomePageController {
                 pause.play();
             }
         });
-        postsScrollPane.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+        reportScrollPane.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
             if (event.getCode() == KeyCode.SPACE) event.consume();
             if (event.getCode() == KeyCode.TAB) event.consume();
         });
-    }
-
-    private void updateLoginUI() {
-        if(currentUser != null) {
-            // User is logged in
-            loggedOutPane.setVisible(false);
-            loggedInPane.setVisible(true);
-            //userPFP.setImage(currentUser.getPfp());
-        } else {
-            // User is logged out
-            loggedOutPane.setVisible(true);
-            loggedInPane.setVisible(false);
-            recentScrollPane.setVisible(false);
-        }
     }
 
     @FXML
@@ -133,7 +117,7 @@ public class HomePageController {
             stage.setScene(new Scene(root, 800, 600));
             stage.setMinWidth(600);
             stage.setMinHeight(400);
-            stage.initOwner(postsContainer.getScene().getWindow());
+            stage.initOwner(reportContainer.getScene().getWindow());
             stage.show();
         } catch (IOException e) {
             e.printStackTrace();
@@ -159,52 +143,19 @@ public class HomePageController {
             Login();
             return;
         }
+        System.out.println("Create Post Button Pressed");
         Clean();
         try {
-            if(!Client.isServerReachable()) {
-                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("error_404.fxml"));
-                Parent root = fxmlLoader.load();
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("create-post-page.fxml"));
+            Parent root = loader.load();
 
-                Error404Controller error404Controller = fxmlLoader.getController();
-                error404Controller.refreshButton.setOnAction(e -> {
-                    if(!Client.isServerReachable()) {
-                        return;
-                    }
-                    FXMLLoader loader = new FXMLLoader(getClass().getResource("create-post-page.fxml"));
-                    Parent root2 = null;
-                    try {
-                        root2 = loader.load();
-                    } catch (IOException ex) {
-                        ex.printStackTrace();
-                    }
+            CreatePostPageController createPostPageController = loader.getController();
+            createPostPageController.InitData(currentUser);
 
-                    CreatePostPageController createPostPageController = loader.getController();
-                    createPostPageController.InitData(currentUser);
-
-                    // Get the current stage
-                    Stage stage = (Stage) error404Controller.refreshButton.getScene().getWindow();
-
-                    // Set the new scene
-                    stage.setScene(new Scene(root2));
-                });
-
-                // Get the current stage
-                Stage stage = (Stage) postsContainer.getScene().getWindow();
-                // Set the new scene
-                stage.setScene(new Scene(root));
-            }
-            else {
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("create-post-page.fxml"));
-                Parent root = loader.load();
-
-                CreatePostPageController createPostPageController = loader.getController();
-                createPostPageController.InitData(currentUser);
-
-                // Get the current stage
-                Stage stage = (Stage) postsContainer.getScene().getWindow();
-                // Set the new scene
-                stage.setScene(new Scene(root));
-            }
+            // Get the current stage
+            Stage stage = (Stage) reportContainer.getScene().getWindow();
+            // Set the new scene
+            stage.setScene(new Scene(root));
         }
         catch (Exception ex) {
             System.out.println(ex.getMessage());
@@ -234,7 +185,7 @@ public class HomePageController {
 
             // Set modality so it blocks interaction with homepage
             createSubcredditStage.initModality(Modality.WINDOW_MODAL);
-            createSubcredditStage.initOwner(postsContainer.getScene().getWindow());
+            createSubcredditStage.initOwner(reportContainer.getScene().getWindow());
 
             // Set up callback for successful login
             createSubcredditPageController.setOnCreationSuccess(sub -> {
@@ -250,46 +201,7 @@ public class HomePageController {
         event.consume();
     }
 
-    @FXML
-    void Login() {
-        navigateToLoginDialog();
-    }
 
-    // In the navigateToLoginDialog method, update the stage title:
-    private void navigateToLoginDialog() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("login.fxml"));
-            Parent root = loader.load();
-
-            // Get the login controller
-            LoginController loginController = loader.getController();
-
-            // Create a new stage for login (dialog)
-            Stage loginStage = new Stage();
-            loginStage.setTitle("Login"); // Changed to Creddit
-            loginStage.setScene(new Scene(root, 400, 500));
-            loginStage.setResizable(false);
-
-            // Set modality so it blocks interaction with homepage
-            loginStage.initModality(Modality.WINDOW_MODAL);
-            loginStage.initOwner(postsContainer.getScene().getWindow());
-
-            // Set up callback for successful login
-            loginController.setOnLoginSuccess(user -> {
-                this.currentUser = user;
-                updateLoginUI();
-                loginStage.close();
-                HelloApplication.startSession(currentUser);
-                // Refresh the page to show user-specific content
-                Refresh();
-            });
-
-            loginStage.showAndWait();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 
     @FXML
     void ProfilePressed(MouseEvent event) {
@@ -298,22 +210,7 @@ public class HomePageController {
             return;
         }
         System.out.println("My Profile Button Pressed");
-        Clean();
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("my-profile-page.fxml"));
-            Parent root = loader.load();
-
-            MyProfilePageController myProfilePageController = loader.getController();
-            myProfilePageController.initData(this.currentUser, "", true, false, false, false, false, false);
-
-            // Get the current stage
-            Stage stage = (Stage) postsContainer.getScene().getWindow();
-            // Set the new scene
-            stage.setScene(new Scene(root));
-        }
-        catch (Exception ex) {
-            System.out.println(ex.getMessage());
-        }
+        //Clean();
         event.consume();
     }
 
@@ -324,11 +221,11 @@ public class HomePageController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("home-page.fxml"));
             Parent root = loader.load();
 
-            HomePageController homePageController = loader.getController();
+            ReportPageController homePageController = loader.getController();
             homePageController.InitData(currentUser, searchField.getText(), filter);
 
             // Get the current stage
-            Stage stage = (Stage) postsContainer.getScene().getWindow();
+            Stage stage = (Stage) reportContainer.getScene().getWindow();
             // Set the new scene
             stage.setScene(new Scene(root));
         }
@@ -344,13 +241,13 @@ public class HomePageController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("home-page.fxml"));
             Parent root = loader.load();
 
-            HomePageController homePageController = loader.getController();
+            ReportPageController homePageController = loader.getController();
             homePageController.InitData(currentUser, null, 0);
 
             // Create the second scene
             Scene scene2 = new Scene(root);
             // Get the current stage
-            Stage stage = (Stage)postsContainer.getScene().getWindow();
+            Stage stage = (Stage) reportContainer.getScene().getWindow();
             // Set the new scene
             stage.setScene(scene2);
         }
@@ -383,12 +280,12 @@ public class HomePageController {
     }
 
     private void Clean() {
-        if (postPreviewControllers != null) {
-            for(PostPreviewTemplateController controller : postPreviewControllers) {
+        if (reportPreviewControllers != null) {
+            for(ReportPreviewTemplateController controller : reportPreviewControllers) {
                 if(controller != null && controller.mediaViewController != null) {
                     controller.mediaViewController.Clean();
                 }
             }
-        }
+        }*/
     }
 }
