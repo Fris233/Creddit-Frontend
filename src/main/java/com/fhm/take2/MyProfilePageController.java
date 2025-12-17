@@ -115,6 +115,7 @@ public class MyProfilePageController {
         }
 
         bioTextArea.setText(this.currentUser.getBio());
+        bioTextArea.setEditable(false);
 
         try{
             if(filterPosts) {

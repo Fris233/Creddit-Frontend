@@ -365,6 +365,9 @@ public abstract class Client {
         return new ArrayList<>(Arrays.asList(gson.fromJson(sb.toString(), Post[].class)));
     }
 
+    public static boolean editUser(User user) throws Exception {
+        return user.update(BASE_URL, gson);
+    }
 
 
 
