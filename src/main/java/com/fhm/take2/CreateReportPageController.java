@@ -140,7 +140,8 @@ public class CreateReportPageController {
             showAlert("Report Submitted", "Report Submitted Successfully");
             reportStage.close();
         }
-        showAlert("Report Not Submitted", "Report Failed to Submit");
+        else
+            showAlert("Report Not Submitted", "Report Failed to Submit");
     }
 
     private void showAlert(String title, String message) {
