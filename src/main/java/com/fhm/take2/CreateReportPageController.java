@@ -136,7 +136,7 @@ public class CreateReportPageController {
 
     @FXML
     public void onSubmitPressed(MouseEvent event) throws Exception {
-        if(Client.submitReport(new Report(5, reporter, target, reasonTextField.toString(), reportType, ReportStatus.PENDING, null))){
+        if(Client.submitReport(new Report(5, reporter, target, reasonTextField.getText(), reportType, ReportStatus.PENDING, null))){
             showAlert("Report Submitted", "Report Submitted Successfully");
             reportStage.close();
         }
