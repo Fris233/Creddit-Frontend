@@ -17,7 +17,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="900.0" prefWidth="1600.0" style="-fx-background-color: #0E1113;" stylesheets="@CredditCSS.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.fhm.take2.UserProfilePageController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="900.0" prefWidth="1600.0" style="-fx-background-color: #0E1113;" stylesheets="@CredditCSS.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.fhm.take2.MyProfilePageController">
    <children>
       <ScrollPane fx:id="postsScrollPane" layoutX="307.0" layoutY="84.0" prefHeight="817.0" prefWidth="908.0" style="-fx-background-color: #0E1113; -fx-background: #0E1113;" stylesheets="@CredditCSS.css">
          <content>
@@ -28,7 +28,7 @@
                <children>
                   <AnchorPane prefHeight="215.0" prefWidth="893.0">
                      <children>
-                        <ImageView fx:id="profilePFP" fitHeight="136.0" fitWidth="155.0" layoutX="29.0" onMouseClicked="#EditProfile" pickOnBounds="true" preserveRatio="true">
+                        <ImageView fx:id="profilePFP" fitHeight="136.0" fitWidth="155.0" layoutX="29.0" onMouseClicked="#ProfilePressed" pickOnBounds="true" preserveRatio="true">
                            <image>
                               <Image url="@assets/creddit_icon_final_nobg.png" />
                            </image>
@@ -51,22 +51,22 @@
                               <Font size="18.0" />
                            </font>
                         </Button>
-                        <Button fx:id="filterSavedButton" alignment="CENTER" contentDisplay="RIGHT" layoutX="214.0" layoutY="160.0" mnemonicParsing="false" onMouseClicked="#FilterSaved" prefHeight="40.0" prefWidth="77.0" style="-fx-text-fill: #ffffff; -fx-background-radius: 20;" text="Saved" textAlignment="CENTER" textFill="#c6151500">
+                        <Button fx:id="filterSavedButton" alignment="CENTER" contentDisplay="RIGHT" layoutX="214.0" layoutY="160.0" mnemonicParsing="false" onMouseClicked="#FilterComments" prefHeight="40.0" prefWidth="77.0" style="-fx-text-fill: #ffffff; -fx-background-radius: 20;" text="Saved" textAlignment="CENTER" textFill="#c6151500">
                            <font>
                               <Font size="18.0" />
                            </font>
                         </Button>
-                        <Button fx:id="filterHistoryButton" alignment="CENTER" contentDisplay="RIGHT" layoutX="287.0" layoutY="160.0" mnemonicParsing="false" onMouseClicked="#FilterHistory" prefHeight="40.0" prefWidth="85.0" style="-fx-text-fill: #ffffff; -fx-background-radius: 20;" text="History" textAlignment="CENTER" textFill="#c6151500">
+                        <Button fx:id="filterHistoryButton" alignment="CENTER" contentDisplay="RIGHT" layoutX="287.0" layoutY="160.0" mnemonicParsing="false" onMouseClicked="#FilterComments" prefHeight="40.0" prefWidth="85.0" style="-fx-text-fill: #ffffff; -fx-background-radius: 20;" text="History" textAlignment="CENTER" textFill="#c6151500">
                            <font>
                               <Font size="18.0" />
                            </font>
                         </Button>
-                        <Button fx:id="filterUpvotedButton" alignment="CENTER" contentDisplay="RIGHT" layoutX="366.0" layoutY="160.0" mnemonicParsing="false" onMouseClicked="#FilterUpvoted" prefHeight="40.0" prefWidth="93.0" style="-fx-text-fill: #ffffff; -fx-background-radius: 20;" text="Upvoted" textAlignment="CENTER" textFill="#c6151500">
+                        <Button fx:id="filterUpvotedButton" alignment="CENTER" contentDisplay="RIGHT" layoutX="366.0" layoutY="160.0" mnemonicParsing="false" onMouseClicked="#FilterComments" prefHeight="40.0" prefWidth="93.0" style="-fx-text-fill: #ffffff; -fx-background-radius: 20;" text="Upvoted" textAlignment="CENTER" textFill="#c6151500">
                            <font>
                               <Font size="18.0" />
                            </font>
                         </Button>
-                        <Button fx:id="filterDownvotedButton" alignment="CENTER" contentDisplay="RIGHT" layoutX="459.0" layoutY="160.0" mnemonicParsing="false" onMouseClicked="#FilterDownvoted" prefHeight="40.0" prefWidth="116.0" style="-fx-text-fill: #ffffff; -fx-background-radius: 20;" text="Downvoted" textAlignment="CENTER" textFill="#c6151500">
+                        <Button fx:id="filterDownvotedButton" alignment="CENTER" contentDisplay="RIGHT" layoutX="459.0" layoutY="160.0" mnemonicParsing="false" onMouseClicked="#FilterComments" prefHeight="40.0" prefWidth="116.0" style="-fx-text-fill: #ffffff; -fx-background-radius: 20;" text="Downvoted" textAlignment="CENTER" textFill="#c6151500">
                            <font>
                               <Font size="18.0" />
                            </font>
@@ -245,41 +245,6 @@
                   <Font size="14.0" />
                </font>
             </Label>
-            <AnchorPane fx:id="friendButtonAnchor" layoutX="17.0" layoutY="49.0" visible="false">
-               <children>
-                  <Button alignment="CENTER_RIGHT" contentDisplay="RIGHT" mnemonicParsing="false" onMouseClicked="#FriendRequest" prefHeight="40.0" prefWidth="93.0" style="-fx-text-fill: #ffffff; -fx-background-color: #115bca; -fx-background-radius: 20;" text="Friend" textAlignment="CENTER" textFill="#c6151500" />
-                  <ImageView fitHeight="31.0" fitWidth="31.0" layoutX="12.0" layoutY="5.0" mouseTransparent="true" pickOnBounds="true" preserveRatio="true">
-                     <image>
-                        <Image url="@assets/add.png" />
-                     </image>
-                  </ImageView>
-               </children>
-            </AnchorPane>
-            <Button fx:id="pendingFriendButton" alignment="CENTER_RIGHT" contentDisplay="RIGHT" disable="true" layoutX="17.0" layoutY="49.0" mnemonicParsing="false" onMouseClicked="#CancelFriendRequest" prefHeight="40.0" prefWidth="99.0" style="-fx-text-fill: #ffffff; -fx-background-color: red; -fx-background-radius: 20;" text="Pending Friend" textAlignment="CENTER" textFill="#c6151500" visible="false" />
-            <AnchorPane fx:id="friendRequestAnchor" disable="true" layoutX="17.0" layoutY="49.0" prefHeight="41.0" prefWidth="99.0" visible="false">
-               <children>
-                  <Button alignment="CENTER" contentDisplay="RIGHT" mnemonicParsing="false" onMouseClicked="#AcceptFriend" prefHeight="41.0" prefWidth="46.0" style="-fx-text-fill: #ffffff; -fx-background-color: green; -fx-background-radius: 20; -fx-border-radius: 20; -fx-border-color: white;" text="✓" textAlignment="CENTER" textFill="#c6151500">
-                     <font>
-                        <Font size="18.0" />
-                     </font>
-                  </Button>
-                  <Button alignment="CENTER" contentDisplay="RIGHT" layoutX="52.0" mnemonicParsing="false" onMouseClicked="#RejectFriend" prefHeight="41.0" prefWidth="46.0" style="-fx-text-fill: #ffffff; -fx-background-color: red; -fx-background-radius: 20; -fx-border-radius: 20; -fx-border-color: white;" text="X" textAlignment="CENTER" textFill="#c6151500">
-                     <font>
-                        <Font size="18.0" />
-                     </font>
-                  </Button>
-               </children>
-            </AnchorPane>
-            <AnchorPane fx:id="unfriendButtonAnchor" disable="true" layoutX="17.0" layoutY="49.0" visible="false">
-               <children>
-                  <Button alignment="CENTER_RIGHT" contentDisplay="RIGHT" mnemonicParsing="false" onMouseClicked="#Unfriend" prefHeight="40.0" prefWidth="99.0" style="-fx-text-fill: #ffffff; -fx-background-radius: 20; -fx-border-radius: 20; -fx-border-color: white;" text="Unfriend" textAlignment="CENTER" textFill="#c6151500" />
-                  <ImageView fitHeight="31.0" fitWidth="31.0" layoutX="6.0" layoutY="5.0" mouseTransparent="true" pickOnBounds="true" preserveRatio="true">
-                     <image>
-                        <Image url="@assets/minus.png" />
-                     </image>
-                  </ImageView>
-               </children>
-            </AnchorPane>
             <AnchorPane layoutX="298.0" layoutY="4.0">
                <children>
                   <Button mnemonicParsing="false" onMouseClicked="#Share" prefHeight="40.0" prefWidth="40.0" style="-fx-text-fill: #ffffff; -fx-padding: 0 0 10 0; -fx-background-radius: 40;" textFill="#c6151500">
@@ -305,28 +270,6 @@
                      <image>
                         <Image url="@assets/editIcon.png" />
                      </image>
-                  </ImageView>
-               </children>
-            </AnchorPane>
-            <AnchorPane layoutX="217.0" layoutY="3.0">
-               <children>
-                  <Button mnemonicParsing="false" onMouseClicked="#Report" prefHeight="40.0" prefWidth="40.0" style="-fx-text-fill: #ffffff; -fx-padding: 0 0 10 0; -fx-background-radius: 40;" textFill="#c6151500">
-                     <font>
-                        <Font size="18.0" />
-                     </font>
-                  </Button>
-               </children>
-            </AnchorPane>
-            <AnchorPane disable="true" layoutX="134.0" layoutY="49.0" visible="false">
-               <children>
-                  <Button alignment="CENTER_RIGHT" contentDisplay="RIGHT" mnemonicParsing="false" onMouseClicked="#Chat" prefHeight="40.0" prefWidth="85.0" style="-fx-text-fill: #ffffff; -fx-background-color: #0E1113; -fx-background-radius: 20;" text="Chat" textFill="#c6151500" />
-                  <ImageView fitHeight="40.0" fitWidth="37.0" layoutX="6.0" layoutY="2.0" mouseTransparent="true" pickOnBounds="true" preserveRatio="true" rotate="180.0">
-                     <image>
-                        <Image url="@assets/comment.png" />
-                     </image>
-                     <rotationAxis>
-                        <Point3D y="1.0" />
-                     </rotationAxis>
                   </ImageView>
                </children>
             </AnchorPane>

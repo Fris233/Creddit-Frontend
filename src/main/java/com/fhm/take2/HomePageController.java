@@ -298,7 +298,22 @@ public class HomePageController {
             return;
         }
         System.out.println("My Profile Button Pressed");
-        //Clean();
+        Clean();
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("my-profile-page.fxml"));
+            Parent root = loader.load();
+
+            MyProfilePageController myProfilePageController = loader.getController();
+            myProfilePageController.initData(this.currentUser, "", true, false, false, false, false, false);
+
+            // Get the current stage
+            Stage stage = (Stage) postsContainer.getScene().getWindow();
+            // Set the new scene
+            stage.setScene(new Scene(root));
+        }
+        catch (Exception ex) {
+            System.out.println(ex.getMessage());
+        }
         event.consume();
     }
 

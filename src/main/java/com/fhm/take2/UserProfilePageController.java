@@ -74,7 +74,7 @@ public class UserProfilePageController {
 
         usernameLabel.setText(this.profileUser.getUsername());
         usernameLabel1.setText("u/" + this.profileUser.getUsername());
-        registerDateLabel.setText(this.profileUser.getLastSeen().toLocalDateTime().toLocalDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+        registerDateLabel.setText(this.profileUser.getTimeCreated().toLocalDateTime().toLocalDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
         if(this.profileUser.getLastSeen().toInstant().isAfter(Instant.now().minusSeconds(60)))
             lastOnlineLabel.setText("now");
         else
@@ -288,6 +288,7 @@ public class UserProfilePageController {
     void CheckRules(MouseEvent event) {
         System.out.println("Rules Button Pressed");
         event.consume();
+        //TODO
     }
 
     @FXML
@@ -324,19 +325,50 @@ public class UserProfilePageController {
         }
         System.out.println("Create Subcreddit Button Pressed");
         Clean();
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("create-subcreddit-page.fxml"));
+            Parent root = loader.load();
+
+            // Get the login controller
+            CreateSubcredditPageController createSubcredditPageController = loader.getController();
+            createSubcredditPageController.InitData(this.currentUser);
+
+            // Create a new stage for login (dialog)
+            Stage createSubcredditStage = new Stage();
+            createSubcredditStage.setTitle("Create Subcreddit");
+            createSubcredditStage.setScene(new Scene(root, 600, 400));
+            createSubcredditStage.setResizable(false);
+
+            // Set modality so it blocks interaction with homepage
+            createSubcredditStage.initModality(Modality.WINDOW_MODAL);
+            createSubcredditStage.initOwner(postsContainer.getScene().getWindow());
+
+            // Set up callback for successful login
+            createSubcredditPageController.setOnCreationSuccess(sub -> {
+                createSubcredditStage.close();
+                //TODO: Open Subcreddit Page here
+            });
+
+            createSubcredditStage.showAndWait();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        event.consume();
         event.consume();
     }
 
     @FXML
     void FilterComments(MouseEvent event) {
         Clean();
+        //TODO this.filterPosts = false
         System.out.println("Filter Comments pressed");
         event.consume();
     }
 
     @FXML
     void FilterPosts(MouseEvent event) {
-        Clean();
+        this.filterPosts = true;
         Refresh();
         event.consume();
     }

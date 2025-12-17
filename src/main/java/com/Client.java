@@ -87,10 +87,6 @@ public abstract class Client {
         return json;
     }
 
-    /*public static String GetJSON(Object obj) {
-        return gson.toJson(obj);
-    }*/
-
     public static String UploadFile(File file) throws Exception {
         String boundary = "----Boundary" + System.currentTimeMillis();
         URL url = new URL(BASE_URL + "/upload");
