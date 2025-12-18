@@ -1,17 +1,13 @@
 package com.fhm.take2;
 
 import com.Client;
-import com.crdt.Media;
-import com.crdt.MediaType;
-import com.crdt.User;
+import com.crdt.*;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
@@ -70,11 +66,15 @@ public class EditProfilePageController {
     @FXML
     void ApplyEdits(MouseEvent event) throws Exception {
         //todo check data validity
-        user.setPFP(new Media(MediaType.IMAGE, Client.UploadFile(this.pfp)));
+        //user.setPFP(new Media(MediaType.IMAGE, Client.UploadFile(this.pfp)));
         user.setUsername(this.usernameTextField.getText());
         user.setPassword(this.passwordTextField.getText());
         user.setBio(this.bioTextArea.getText());
-        Client.editUser(this.user);
+        if(Client.editUser(this.user)){
+            showAlert("Edits Applied", "Edits Applied Successfully");
+        }
+        else
+            showAlert("Edits Not Applied", "Edits Were not Applied");
     }
 
     @FXML
@@ -272,4 +272,18 @@ public class EditProfilePageController {
         //todo
     }
 
+    private void showAlert(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        DialogPane dialogPane = alert.getDialogPane();
+        dialogPane.setStyle("-fx-background-color: #0E1113;");
+        dialogPane.lookup(".content.label").setStyle("-fx-text-fill: white;");
+        ButtonType okButton = alert.getButtonTypes().get(0);
+        Node okButtonNode = dialogPane.lookupButton(okButton);
+        okButtonNode.setStyle("-fx-background-color: #0E1113; -fx-text-fill: white; -fx-background-radius: 10;");
+
+        alert.showAndWait();
+    }
 }

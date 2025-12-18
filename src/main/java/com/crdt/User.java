@@ -460,22 +460,14 @@ public class User implements Reportable {
         return conn.getResponseCode() == 200;
     }
 
-    public void addReport(Report report) {
-    }
-
-    public void vote(Voteable voteable, int voteValue) { // voteValue -> {1: upvote, -1: downvote, 0: remove vote}
-        if(!this.active || voteable == null || (voteValue != -1 && voteValue != 1 && voteValue != 0))
-            return;
-    }
-
     public void setUsername(String username) {
-        if (username == null || username.isEmpty() || username.length() > 32)
+        if (username == null || username.isBlank() || username.length() > 32)
             return;
         this.username = username;
     }
 
     public void setPassword(String password) {
-        if (password == null || password.length() < 8 || password.length() > 16)
+        if (password == null || password.length() < 8 || password.isBlank() || password.length() > 16)
             return;
         this.password = password;
     }
