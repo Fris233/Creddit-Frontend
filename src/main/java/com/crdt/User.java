@@ -471,19 +471,23 @@ public class User implements Reportable {
     public void setUsername(String username) {
         if (username == null || username.isEmpty() || username.length() > 32)
             return;
+        this.username = username;
     }
 
     public void setPassword(String password) {
         if (password == null || password.length() < 8 || password.length() > 16)
             return;
+        this.password = password;
     }
 
     public void setBio(String bio) {
         if (bio == null)
             return;
+        this.bio = bio;
     }
 
     public void setPFP(Media pfp) {
+        this.pfp = pfp;
     }
 
     public int getId() {return this.id;}

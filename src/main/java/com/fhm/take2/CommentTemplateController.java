@@ -115,7 +115,7 @@ public class CommentTemplateController {
                     if(ind < 0)
                         ind = this.parentPage.replyControllers.indexOf(this);
                     this.parentPage.replyControllers.add(ind + 1, commentTemplateController);
-                    this.parentPage.postsContainer.getChildren().add(ind + 1, node);
+                    this.parentPage.postsContainer.getChildren().add(ind + 3, node);
                     this.reply = null;
                     this.addedReply.set(false);
                 }
@@ -185,7 +185,7 @@ public class CommentTemplateController {
                 ind = this.parentPage.parentCommentControllers.indexOf(this);
                 if(ind < 0)
                     ind = this.parentPage.replyControllers.indexOf(this);
-                this.parentPage.postsContainer.getChildren().add(ind + 1, node);
+                this.parentPage.postsContainer.getChildren().add(ind + 3, node);
                 System.out.println("Added small reply box after comment at index : " + ind);
             }
             catch (Exception e) {
@@ -193,7 +193,7 @@ public class CommentTemplateController {
             }
         }
         else {
-            this.parentPage.postsContainer.getChildren().remove(ind + 1);
+            this.parentPage.postsContainer.getChildren().remove(ind + 3);
             addCommentPaneController.Clean();
             addCommentPaneController = null;
         }
