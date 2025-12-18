@@ -243,7 +243,7 @@
                         <Insets bottom="5.0" />
                      </padding>
                   </AnchorPane>
-                  <AnchorPane prefHeight="116.0" prefWidth="893.0">
+                  <AnchorPane fx:id="commentAnchor" prefHeight="116.0" prefWidth="893.0">
                      <children>
                         <VBox layoutX="17.0" spacing="5.0">
                            <children>

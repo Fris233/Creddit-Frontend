@@ -3,8 +3,11 @@ package com.fhm.take2;
 import com.Client;
 import com.crdt.Comment;
 import com.crdt.User;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -42,15 +45,21 @@ public class CommentTemplateController {
     private int myVote;
     private boolean modAuthor = false;
 
+    BooleanProperty addedReply = new SimpleBooleanProperty(false);
+    Comment reply;
     MediaViewController mediaViewController;
+    private ActualPostTemplateController parentPage;
 
-    public void Init(Comment newComment, User user, int userVote) {
+    public void Init(Comment newComment, User user, int userVote, ActualPostTemplateController parent) {
         this.comment = newComment;
         this.currentUser = user;
+        this.parentPage = parent;
         this.mediaViewController = null;
         myOGVote = 0;
         if(user != null)
             myOGVote = userVote;
+        if(this.currentUser == null)
+            replyButton.setDisable(true);
         myVote = myOGVote;
         ColorVote();
         usernameLabel.setText("u/" + comment.getAuthor().getUsername());
@@ -86,6 +95,21 @@ public class CommentTemplateController {
                 e.printStackTrace();
             }
         }
+        addedReply.addListener((obs, oldV, newV) -> {
+            if(newV) {
+                /*FXMLLoader loader = new FXMLLoader(getClass().getResource("Comment_Template.fxml"));
+                Node node = loader.load();
+
+                CommentTemplateController commentTemplateController = loader.getController();
+                commentTemplateController.Init(comment, currentUser, votes.get(comment.getID()), this);
+
+                // Get the current stage
+                AnchorPane anchorPane = new AnchorPane(node);
+                anchorPane.setPadding(new Insets(0, 0, 0, 0));
+                postsContainer.getChildren().add(anchorPane);
+                parentCommentControllers.add(commentTemplateController);*/
+            }
+        });
     }
 
     private void ColorVote() {
