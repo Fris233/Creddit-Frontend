@@ -59,7 +59,7 @@ public class CreatePostPageController {
 
     private ObservableList<String> suggestions;
 
-    public void InitData(User user) {
+    public void InitData(User user, Post post) {
         this.currentUser = user;
         try {
             allCategories = new ArrayList<>(Arrays.asList(Client.GetAllCategories()));
@@ -155,6 +155,18 @@ public class CreatePostPageController {
             event.setDropCompleted(success);
             event.consume();
         });
+
+        if(post != null){
+            timeLabel.setText("Edit Post");
+            subcredditComboBox.hide();
+            titleField.setText(post.GetTitle());
+            for(String category : post.GetCategories()){
+                AddCategory(category);
+            }
+            for (Media media : post.GetMedia()) {
+                //AddFile(new File());
+            }
+        }
     }
     public void InitData(User user, Subcreddit subcreddit) {
         this.currentUser = user;
