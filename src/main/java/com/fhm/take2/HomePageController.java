@@ -123,7 +123,10 @@ public class HomePageController {
             return;
         }
         try {
-            Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("message.fxml")));
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("message.fxml"));
+            Parent root = fxmlLoader.load();
+            MessageController messageController = fxmlLoader.getController();
+            messageController.Init(this.currentUser);
             Stage stage = new Stage();
             stage.setTitle("Chats");
             stage.setScene(new Scene(root, 800, 600));

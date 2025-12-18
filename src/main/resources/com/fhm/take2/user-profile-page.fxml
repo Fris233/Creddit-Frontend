@@ -17,7 +17,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="900.0" prefWidth="1600.0" style="-fx-background-color: #0E1113;" stylesheets="@CredditCSS.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.fhm.take2.UserProfilePageController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="900.0" prefWidth="1600.0" style="-fx-background-color: #0E1113;" stylesheets="@CredditCSS.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.fhm.take2.UserProfilePageController">
     <children>
         <ScrollPane fx:id="postsScrollPane" layoutX="307.0" layoutY="84.0" prefHeight="817.0" prefWidth="908.0" style="-fx-background-color: #0E1113; -fx-background: #0E1113;" stylesheets="@CredditCSS.css">
             <content>
@@ -310,7 +310,7 @@
                   </ImageView>
                </children>
             </AnchorPane>
-            <AnchorPane disable="true" layoutX="134.0" layoutY="49.0" visible="false">
+            <AnchorPane fx:id="chatAnchor" disable="true" layoutX="134.0" layoutY="49.0" visible="false">
                <children>
                   <Button alignment="CENTER_RIGHT" contentDisplay="RIGHT" mnemonicParsing="false" onMouseClicked="#Chat" prefHeight="40.0" prefWidth="85.0" style="-fx-text-fill: #ffffff; -fx-background-color: #0E1113; -fx-background-radius: 20;" text="Chat" textFill="#c6151500" />
                   <ImageView fitHeight="40.0" fitWidth="37.0" layoutX="6.0" layoutY="2.0" mouseTransparent="true" pickOnBounds="true" preserveRatio="true" rotate="180.0">

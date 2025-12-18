@@ -48,6 +48,7 @@ public class UserProfilePageController {
     @FXML private TextField searchField;
     @FXML private Label subcredditCountLabel;
     @FXML private AnchorPane unfriendButtonAnchor;
+    @FXML private AnchorPane chatAnchor;
     @FXML private ImageView userPFP;
     @FXML private Label usernameLabel;
     @FXML private Label usernameLabel1;
@@ -85,20 +86,22 @@ public class UserProfilePageController {
         else
             filterCommentsButton.setStyle("-fx-background-color: #404040; -fx-text-fill: #ffffff; -fx-background-radius: 20;");
 
-        try {
-            profileSubs = Client.GetUserSubcreddits(this.profileUser);
+        if(currentUser != null) {
+            chatAnchor.setVisible(true);
+            try {
+                profileSubs = Client.GetUserSubcreddits(this.profileUser);
 
-            if(Client.GetFriends(this.currentUser).contains(this.profileUser))
-                unfriendButtonAnchor.setVisible(true);
-            else if(Client.GetReceivedFriendRequests(this.currentUser).contains(this.profileUser))
-                friendRequestAnchor.setVisible(true);
-            else if(Client.GetSentFriendRequests(this.currentUser).contains(this.profileUser))
-                pendingFriendButton.setVisible(true);
-            else
-                friendButtonAnchor.setVisible(true);
-        }
-        catch (Exception e) {
-            e.printStackTrace();
+                if (Client.GetFriends(this.currentUser).contains(this.profileUser))
+                    unfriendButtonAnchor.setVisible(true);
+                else if (Client.GetReceivedFriendRequests(this.currentUser).contains(this.profileUser))
+                    friendRequestAnchor.setVisible(true);
+                else if (Client.GetSentFriendRequests(this.currentUser).contains(this.profileUser))
+                    pendingFriendButton.setVisible(true);
+                else
+                    friendButtonAnchor.setVisible(true);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
         subcredditCountLabel.setText(String.valueOf(profileSubs.size()));
         bioTextArea.setText(this.profileUser.getBio());

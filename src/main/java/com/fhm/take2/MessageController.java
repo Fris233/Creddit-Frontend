@@ -22,7 +22,7 @@ import java.util.*;
 
 import javafx.scene.shape.Circle;
 
-public class MessageController implements Initializable {
+public class MessageController {
 
     @FXML private VBox messagesContainer;
     @FXML private ScrollPane scrollPane;
@@ -31,15 +31,17 @@ public class MessageController implements Initializable {
     @FXML private VBox friendsListContainer;
     @FXML private Label friendName;
     @FXML private Label friendStatus;
-    private User currentUser;
+    private User currentFriend;
     private List<User> friends = new ArrayList<>();
     private Map<User, ArrayList<Message>> unreadMessages = new HashMap<>();
     private Map<User, ArrayList<Message>> allMessages = new HashMap<>();
     private boolean isLoadingOlderMessages = false;
     private int currentLoadedCount = 0;
 
-    @Override
-    public void initialize(URL location, ResourceBundle resources) {
+    private User currentUser;
+
+    public void Init(User user) {
+        this.currentUser = user;
         setupEventHandlers();
         setupScrollPane();
         applyInlineStyles();
@@ -59,19 +61,19 @@ public class MessageController implements Initializable {
     private void setupScrollListener() {
         scrollPane.vvalueProperty().addListener((obs, oldValue, newValue) -> {
             // When scrolled to top (or near top), load older messages
-            if (newValue.doubleValue() < 0.1 && !isLoadingOlderMessages && currentUser != null) {
+            if (newValue.doubleValue() < 0.1 && !isLoadingOlderMessages && currentFriend != null) {
                 loadOlderMessages();
             }
         });
     }
 
     private void loadOlderMessages() {
-        if (currentUser == null) return;
+        if (currentFriend == null) return;
 
         isLoadingOlderMessages = true;
 
         // Get older messages (simulating database fetch)
-        List<Message> olderMessages = fetchOlderMessages(currentUser, currentLoadedCount);
+        List<Message> olderMessages = fetchOlderMessages(currentFriend, currentLoadedCount);
 
         if (!olderMessages.isEmpty()) {
             // Add older messages to the TOP of the container
@@ -112,7 +114,7 @@ public class MessageController implements Initializable {
     }
 
     private HBox createMessageBubbleFromMessage(Message message) {
-        boolean isSentByMe = message.GetSender().equals(currentUser); // Need to compare properly
+        boolean isSentByMe = message.GetSender().equals(currentFriend); // Need to compare properly
         return createMessageBubble(message.GetText(), isSentByMe);
     }
 
@@ -249,12 +251,12 @@ public class MessageController implements Initializable {
 
     private void sendMessage() {
         String text = messageInput.getText().trim();
-        if (!text.isEmpty() && currentUser != null) {
+        if (!text.isEmpty() && currentFriend != null) {
             // Create message
             Message newMessage = new Message(
                     -1, // will be set by database
                     null, // sender (would be current loggedin user)
-                    currentUser, // receiver
+                    currentFriend, // receiver
                     text,
                     null, // media
                     new java.sql.Timestamp(System.currentTimeMillis()), // create time
@@ -401,12 +403,12 @@ public class MessageController implements Initializable {
 
 
         container.setOnMouseEntered(_ -> {
-            if (currentUser != user) {
+            if (currentFriend != user) {
                 container.setStyle("-fx-background-color: #272729; -fx-background-radius: 4; -fx-cursor: hand;");
             }
         });
         container.setOnMouseExited(_ -> {
-            if (currentUser != user) {
+            if (currentFriend != user) {
                 container.setStyle("-fx-background-color: transparent; -fx-background-radius: 4; -fx-cursor: hand;");
             }
         });
@@ -418,7 +420,7 @@ public class MessageController implements Initializable {
     }
 
     private void selectUser(User user) {
-        currentUser = user;
+        currentFriend = user;
         currentLoadedCount = 0;
 
         // Update chat header
