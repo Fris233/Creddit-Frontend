@@ -465,6 +465,18 @@ public class MediaViewController {
         DisplayMedia();
     }
 
+    void AddMedia(Media media) {
+        if(mode == 1 || media == null)
+            return;
+        for(Media md : mediaArrayList)
+            if(extractUrl(md).equals(extractUrl(media)))
+                return;
+        mediaArrayList.add(media);
+        currentMediaIndex = mediaArrayList.size() - 1;
+        PrevNextButtons();
+        DisplayMedia();
+    }
+
     ArrayList<File> GetFileArrayList() {
         if(mp != null && mp.getTotalDuration() != null && !mp.getTotalDuration().isUnknown() && !mp.getTotalDuration().isIndefinite())
             RemoveMedia();
