@@ -266,7 +266,7 @@ public class PostPreviewTemplateController {
         else {
             // Navigate to Subcreddit Page
             try {
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("subcreddit-page.fxml"));
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("subcreddit.fxml"));
                 Parent root = loader.load();
 
                 SubcredditController controller = loader.getController();
