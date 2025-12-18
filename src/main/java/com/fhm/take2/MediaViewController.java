@@ -49,7 +49,7 @@ public class MediaViewController {
     private boolean isSeeking = false;
     private BooleanProperty paused = new SimpleBooleanProperty(true);
     private boolean isAudio = false;
-    private boolean creating = false;
+    private int mode = 0; //0 for normal viewing, 1 for normal creating, 2 for editing
     BooleanProperty done = new SimpleBooleanProperty(false);
 
     private final int prevOrigX = 0;
@@ -61,14 +61,14 @@ public class MediaViewController {
     Map<Integer, Image> images;
     Map<Integer, MediaPlayer> mediaPlayers;
 
-    public void init(ArrayList<Media> mediaArrayList, boolean creating, ArrayList<File> fileArrayList) {
-        if(!creating)
+    public void init(ArrayList<Media> mediaArrayList, int mode, ArrayList<File> fileArrayList) {
+        if(mode != 1)
             this.mediaArrayList = mediaArrayList;
         images = new HashMap<>();
         mediaPlayers = new HashMap<>();
         this.currentMediaIndex = 0;
-        this.creating = creating;
-        if(creating)
+        this.mode = mode;
+        if(mode != 0)
             this.fileArrayList = fileArrayList;
         else
             removeButton.setVisible(false);
@@ -157,7 +157,12 @@ public class MediaViewController {
     }
 
     private void UpdateIndexLabel() {
-        mediaIndexLabel.setText((currentMediaIndex + 1) + "/" + (creating? fileArrayList.size() : mediaArrayList.size()));
+        int sz = mediaArrayList.size();
+        if(mode == 1)
+            sz = fileArrayList.size();
+        if(mode == 2)
+            sz = mediaArrayList.size() + fileArrayList.size();
+        mediaIndexLabel.setText((currentMediaIndex + 1) + "/" + sz);
     }
 
     @FXML
@@ -246,13 +251,20 @@ public class MediaViewController {
 
         // Handle media display
         Object item;
-        if(!creating) {
-            if(mediaArrayList == null || mediaArrayList.isEmpty()) return;
+        if(mode == 0) {
+            //if(mediaArrayList == null || mediaArrayList.isEmpty()) return;
             item = mediaArrayList.get(currentMediaIndex);  // Media
         }
-        else {
-            if(fileArrayList == null || fileArrayList.isEmpty()) return;
+        else if(mode == 1) {
+            //if(fileArrayList == null || fileArrayList.isEmpty()) return;
             item = fileArrayList.get(currentMediaIndex);   // File
+        }
+        else {
+            //if((mediaArrayList == null && fileArrayList == null) || (mediaArrayList.isEmpty() && fileArrayList.isEmpty())) return;
+            if(currentMediaIndex < mediaArrayList.size())
+                item = mediaArrayList.get(currentMediaIndex);
+            else
+                item = fileArrayList.get(currentMediaIndex - mediaArrayList.size());
         }
 
         String url = extractUrl(item);
@@ -399,7 +411,7 @@ public class MediaViewController {
 
     @FXML
     void OpenUnknownMedia(MouseEvent event) {
-        if(creating) return;
+        if(mode != 0) return;
 
         String url = unknownMediaLabel.getText();
         try {
@@ -418,7 +430,12 @@ public class MediaViewController {
 
     @FXML
     void NextMedia(MouseEvent event) {
-        if(currentMediaIndex == (creating? fileArrayList.size() : mediaArrayList.size()) - 1)
+        int limit = mediaArrayList.size();
+        if(mode == 1)
+            limit = fileArrayList.size();
+        if(limit == 2)
+            limit = mediaArrayList.size() + fileArrayList.size();
+        if(currentMediaIndex == limit)
             return;
         currentMediaIndex++;
         PrevNextButtons();
@@ -437,13 +454,13 @@ public class MediaViewController {
     }
 
     void AddMedia(File file) {
-        if(!creating || file == null)
+        if(mode == 0 || file == null)
             return;
         for(File f : fileArrayList)
             if(extractUrl(f).equals(extractUrl(file)))
                 return;
         fileArrayList.add(file);
-        currentMediaIndex = fileArrayList.size() - 1;
+        currentMediaIndex = fileArrayList.size() - 1 + (mode == 2? mediaArrayList.size() : 0);
         PrevNextButtons();
         DisplayMedia();
     }
@@ -456,12 +473,12 @@ public class MediaViewController {
 
     @FXML
     void RemoveMedia() {
-        if(!creating)
+        if(mode == 0)
             return;
         fileArrayList.remove(currentMediaIndex);
         if(fileArrayList.isEmpty())
             done.set(true);
-        if(currentMediaIndex > 0 && currentMediaIndex == fileArrayList.size())
+        if(currentMediaIndex > 0 && currentMediaIndex == (fileArrayList.size() - (mode == 2? mediaArrayList.size() : 0)))
             currentMediaIndex--;
         PrevNextButtons();
         DisplayMedia();
@@ -471,7 +488,11 @@ public class MediaViewController {
         if(mp != null && (mp.getTotalDuration() == null || mp.getTotalDuration().isUnknown() || mp.getTotalDuration().isIndefinite()))
             RemoveMedia();
         UpdateIndexLabel();
-        int sz = creating? fileArrayList.size() : mediaArrayList.size();
+        int sz = mediaArrayList.size();
+        if(mode == 1)
+            sz = fileArrayList.size();
+        if(mode == 2)
+            sz = mediaArrayList.size() + fileArrayList.size();
 
         prevButton.setVisible(currentMediaIndex != 0);
         nextButton.setVisible(currentMediaIndex != sz - 1);

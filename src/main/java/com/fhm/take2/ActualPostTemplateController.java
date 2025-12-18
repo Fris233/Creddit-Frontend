@@ -112,7 +112,7 @@ public class ActualPostTemplateController {
                 Node mediaNode = loader.load();
 
                 mediaViewController = loader.getController();
-                mediaViewController.init(post.GetMedia(), false, null);
+                mediaViewController.init(post.GetMedia(), 0, null);
 
                 mediaAnchor.getChildren().add(mediaNode);
             }
@@ -494,7 +494,7 @@ public class ActualPostTemplateController {
             Parent root = loader.load();
 
             CreatePostPageController createPostPageController = loader.getController();
-            createPostPageController.InitData(currentUser);
+            createPostPageController.InitData(currentUser, null);
 
             // Get the current stage
             Stage stage = (Stage) postsContainer.getScene().getWindow();

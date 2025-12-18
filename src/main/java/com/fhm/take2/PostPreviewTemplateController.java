@@ -66,7 +66,7 @@ public class PostPreviewTemplateController {
                 Node mediaNode = loader.load();
 
                 mediaViewController = loader.getController();
-                mediaViewController.init(post.GetMedia(), false, null);
+                mediaViewController.init(post.GetMedia(), 0, null);
 
                 mediaAnchor.getChildren().add(mediaNode);
             }

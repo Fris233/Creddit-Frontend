@@ -126,7 +126,7 @@ public class AddCommentPaneController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("media-view.fxml"));
             Node mediaNode = loader.load();
             commentMediaViewController = loader.getController();
-            commentMediaViewController.init(null, true, new ArrayList<>());
+            commentMediaViewController.init(null, 1, new ArrayList<>());
             commentMediaPane.getChildren().add(mediaNode);
             commentMediaViewController.done.addListener((obs, oldVal, newVal) -> {
                 if (newVal)

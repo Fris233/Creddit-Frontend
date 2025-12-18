@@ -178,7 +178,7 @@ public class HomePageController {
                     }
 
                     CreatePostPageController createPostPageController = loader.getController();
-                    createPostPageController.InitData(currentUser);
+                    createPostPageController.InitData(currentUser, null);
 
                     Stage stage = (Stage) error404Controller.refreshButton.getScene().getWindow();
 
@@ -193,7 +193,7 @@ public class HomePageController {
                 Parent root = loader.load();
 
                 CreatePostPageController createPostPageController = loader.getController();
-                createPostPageController.InitData(currentUser);
+                createPostPageController.InitData(currentUser, null);
 
                 Stage stage = (Stage) postsContainer.getScene().getWindow();
                 stage.setScene(new Scene(root));

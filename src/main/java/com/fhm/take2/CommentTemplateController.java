@@ -18,6 +18,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.util.ArrayList;
@@ -37,7 +38,7 @@ public class CommentTemplateController {
     @FXML private ImageView userPFP;
     @FXML private Label usernameLabel;
     @FXML private AnchorPane voteAnchor;
-    @FXML private AnchorPane anchor;
+    @FXML private VBox anchor;
     @FXML private Label votesLabel;
 
     private User currentUser;
@@ -80,7 +81,7 @@ public class CommentTemplateController {
                 Node mediaNode = loader.load();
 
                 mediaViewController = loader.getController();
-                mediaViewController.init(new ArrayList<>(Arrays.asList(comment.getMedia())), false, null);
+                mediaViewController.init(new ArrayList<>(Arrays.asList(comment.getMedia())), 0, null);
 
                 mediaAnchor.getChildren().add(mediaNode);
             }
@@ -115,7 +116,7 @@ public class CommentTemplateController {
                     if(ind < 0)
                         ind = this.parentPage.replyControllers.indexOf(this);
                     this.parentPage.replyControllers.add(ind + 1, commentTemplateController);
-                    this.parentPage.postsContainer.getChildren().add(ind + 3, node);
+                    this.parentPage.postsContainer.getChildren().add(ind + this.level + 3, node);
                     this.reply = null;
                     this.addedReply.set(false);
                 }
@@ -185,7 +186,7 @@ public class CommentTemplateController {
                 ind = this.parentPage.parentCommentControllers.indexOf(this);
                 if(ind < 0)
                     ind = this.parentPage.replyControllers.indexOf(this);
-                this.parentPage.postsContainer.getChildren().add(ind + 3, node);
+                this.parentPage.postsContainer.getChildren().add(ind + this.level + 3, node);
                 System.out.println("Added small reply box after comment at index : " + ind);
             }
             catch (Exception e) {
@@ -193,7 +194,7 @@ public class CommentTemplateController {
             }
         }
         else {
-            this.parentPage.postsContainer.getChildren().remove(ind + 3);
+            this.parentPage.postsContainer.getChildren().remove(ind + this.level + 3);
             addCommentPaneController.Clean();
             addCommentPaneController = null;
         }
