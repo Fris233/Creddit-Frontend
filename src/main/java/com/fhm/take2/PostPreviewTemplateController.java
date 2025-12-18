@@ -281,5 +281,11 @@ public class PostPreviewTemplateController {
         return this.post.GetID();
     }
 
+    public void Clean() {
+        if(mediaViewController != null) {
+            mediaViewController.Clean();
+        }
+    }
+
 }
 

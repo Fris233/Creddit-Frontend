@@ -494,8 +494,8 @@ public abstract class Client {
 
     //BOOKMARK: Comment
 
-    public static Map<Comment, Map<Comment, PriorityQueue<Comment>>> GetPostCommentFeed(User user, Post post, int lastID, Map<Integer, Integer> votes) throws Exception {
-        return post.GetCommentFeed(user, lastID, votes, BASE_URL, gson);
+    public static CommentFeed GetPostCommentFeed(User user, Post post, int lastID) throws Exception {
+        return post.GetCommentFeed(user, lastID, BASE_URL, gson);
     }
 
     public static int CreateComment(Comment comment) throws Exception {

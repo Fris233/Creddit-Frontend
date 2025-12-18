@@ -160,17 +160,11 @@ public class CreateSubcredditPageController {
     }
 
     private void AddFile(File file) {
-        try {
-            String mime = Files.probeContentType(file.toPath());
-            if (mime != null) {
-                if (mime.startsWith("image/")) {
-                    this.subIcon = file;
-                    String[] str = file.toURI().toString().split("/");
-                    mediaLabel.setText(str[str.length-1]);
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
+        String name = file.getName().toLowerCase();
+        if (name.endsWith(".png") || name.endsWith(".jpg") || name.endsWith(".jpeg") || name.endsWith(".gif")) {
+            this.subIcon = file;
+            String[] str = file.toURI().toString().split("/");
+            mediaLabel.setText(str[str.length - 1]);
         }
     }
 
@@ -320,7 +314,9 @@ public class CreateSubcredditPageController {
 
     @FXML
     void Cancel(MouseEvent event) {
-
+        System.out.println("Cancel Button Pressed");
+        onCreationSuccess.accept(null);
+        event.consume();
     }
 
     @FXML

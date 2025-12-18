@@ -186,4 +186,12 @@ public class CommentTemplateController {
         System.out.println("More Options Pressed!");
         event.consume();
     }
+
+    public void Clean() {
+        if(mediaViewController != null) {
+            mediaViewController.Clean();
+        }
+    }
+
+    int GetCommentID() {return this.comment.getID();}
 }

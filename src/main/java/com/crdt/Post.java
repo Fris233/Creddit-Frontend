@@ -30,7 +30,7 @@ public class Post implements Voteable, Reportable {
     private int votes;
     private int comments;
 
-    private static Type commentMapType = new TypeToken<Map<Comment, Map<Comment, PriorityQueue<Comment>>>>() {}.getType();
+    private static Type commentMapType = new TypeToken<Map<Integer, Comment[]>>() {}.getType();
     private static Type id_vote_type = new TypeToken<Map<Integer, Integer>>() {}.getType();
 
     public Post(int id, User author, Subcreddit subcreddit, String title, String content, ArrayList<Media> media, ArrayList<String> categories, Timestamp timeCreated, Timestamp timeEdited, int votes, int comments) {
@@ -109,7 +109,7 @@ public class Post implements Voteable, Reportable {
         return conn.getResponseCode() == 200;
     }
 
-    public Map<Comment, Map<Comment, PriorityQueue<Comment>>> GetCommentFeed(User user, int lastID, Map<Integer, Integer> votes, String BASE_URL, Gson gson) throws Exception {
+    public CommentFeed GetCommentFeed(User user, int lastID, String BASE_URL, Gson gson) throws Exception {
         JsonObject json = new JsonObject();
         json.add("user", gson.toJsonTree(user, User.class));
         json.add("post", gson.toJsonTree(this, Post.class));
@@ -134,10 +134,12 @@ public class Post implements Voteable, Reportable {
         reader.close();
 
         JsonObject jsonObj = gson.fromJson(sb.toString(), JsonObject.class);
-        Map<Comment, Map<Comment, PriorityQueue<Comment>>> comments = gson.fromJson(jsonObj.get("comments"), commentMapType);
-        votes = gson.fromJson(jsonObj.get("votes"), id_vote_type);
+        Comment[] parents = gson.fromJson(jsonObj.get("parents"), Comment[].class);
+        Map<Integer, Comment[]> lv2 = gson.fromJson(jsonObj.get("lv2"), commentMapType);
+        Map<Integer, Comment[]> lv3 = gson.fromJson(jsonObj.get("lv3"), commentMapType);
+        Map<Integer, Integer> votes = gson.fromJson(jsonObj.get("votes"), id_vote_type);
 
-        return comments;
+        return new CommentFeed(parents, lv2, lv3, votes);
     }
 
     public int GetID() {

@@ -459,12 +459,14 @@ public class MyProfilePageController {
     }
 
     private void Clean() {
-        if (postPreviewControllers != null) {
-            for(PostPreviewTemplateController controller : postPreviewControllers) {
-                if(controller != null && controller.mediaViewController != null) {
-                    controller.mediaViewController.Clean();
+        Client.THREAD_POOL.submit(() -> {
+            if (postPreviewControllers != null) {
+                for(PostPreviewTemplateController controller : postPreviewControllers) {
+                    if(controller != null && controller.mediaViewController != null) {
+                        controller.mediaViewController.Clean();
+                    }
                 }
             }
-        }
+        });
     }
 }

@@ -2,10 +2,12 @@ package com.fhm.take2;
 
 import com.Client;
 import com.crdt.*;
+import javafx.animation.PauseTransition;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -15,6 +17,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
+import javafx.scene.input.TransferMode;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
@@ -22,17 +25,14 @@ import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.Window;
+import javafx.util.Duration;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.sql.Timestamp;
-import java.time.Duration;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 public class ActualPostTemplateController {
 
@@ -73,11 +73,13 @@ public class ActualPostTemplateController {
 
     MediaViewController mediaViewController;
 
-    MediaViewController commentMediaViewController;
-    private ArrayList<CommentTemplateController> commentTemplateControllers;
+    ArrayList<CommentTemplateController> parentCommentControllers = new ArrayList<>();
+    ArrayList<CommentTemplateController> replyControllers = new ArrayList<>();
 
-    private MediaViewController commentmediaViewController;
+    private MediaViewController commentMediaViewController;
     private BooleanProperty validCommentInfo = new SimpleBooleanProperty(false);
+    private boolean updating = false;
+    private boolean scrollCooldown = false;
 
     public void InitData(Post post, User user, int userVote) {
         try {
@@ -137,7 +139,7 @@ public class ActualPostTemplateController {
         }
         UpdateJoinButton();
 
-        commentTextArea.setPrefHeight(commentTextArea.getMinHeight());
+        //commentTextArea.setPrefHeight(commentTextArea.getMinHeight());
         int[] lastLineCount = { 1 };
         commentTextArea.textProperty().addListener((obs, oldText, newText) -> {
             int lines = newText.split("\n", -1).length;
@@ -150,7 +152,7 @@ public class ActualPostTemplateController {
 
                 var content = commentTextArea.lookup(".content");
                 if (content != null) {
-                    double height = 52 + (32 * (Math.min(lines, 14)));
+                    double height = 47 + (32 * (Math.min(lines, 4)));
                     commentTextArea.setPrefHeight(height);
                 }
             }
@@ -173,7 +175,7 @@ public class ActualPostTemplateController {
 
         commentTextArea.setOnDragOver(event -> {
             if (event.getGestureSource() != commentTextArea && event.getDragboard().hasFiles()) {
-                event.acceptTransferModes(javafx.scene.input.TransferMode.COPY_OR_MOVE);
+                event.acceptTransferModes(TransferMode.COPY_OR_MOVE);
             }
             event.consume();
         });
@@ -189,6 +191,120 @@ public class ActualPostTemplateController {
             }
             event.setDropCompleted(success);
             event.consume();
+        });
+
+        try {
+            CommentFeed commentFeed = Client.GetPostCommentFeed(currentUser, this.post, 0);
+            Map<Integer, Integer> votes = commentFeed.votes();
+            for (Comment comment : commentFeed.parents()) {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("Comment_Template.fxml"));
+                Node node = loader.load();
+
+                CommentTemplateController commentTemplateController = loader.getController();
+                commentTemplateController.Init(comment, currentUser, votes.get(comment.getID()));
+
+                // Get the current stage
+                AnchorPane anchorPane = new AnchorPane(node);
+                anchorPane.setPadding(new Insets(0, 0, 0, 0));
+                postsContainer.getChildren().add(anchorPane);
+                parentCommentControllers.add(commentTemplateController);
+                // Set the new scene
+                Comment[] lv2 = commentFeed.lv2().get(comment.getID());
+                for(Comment lv2_reply : lv2) {
+
+                    FXMLLoader loader2 = new FXMLLoader(getClass().getResource("Comment_Template.fxml"));
+                    Node node2 = loader2.load();
+
+                    CommentTemplateController commentTemplateController2 = loader2.getController();
+                    commentTemplateController2.Init(lv2_reply, currentUser, votes.get(comment.getID()));
+
+                    // Get the current stage
+                    AnchorPane anchorPane2 = new AnchorPane(node2);
+                    anchorPane2.setPadding(new Insets(0, 0, 0, 40));
+                    postsContainer.getChildren().add(anchorPane2);
+                    replyControllers.add(commentTemplateController2);
+
+                    Comment[] lv3 = commentFeed.lv3().get(lv2_reply.getID());
+                    for(Comment lv3_reply : lv3) {
+                        FXMLLoader loader3 = new FXMLLoader(getClass().getResource("Comment_Template.fxml"));
+                        Node node3 = loader3.load();
+
+                        CommentTemplateController commentTemplateController3 = loader3.getController();
+                        commentTemplateController3.Init(lv3_reply, currentUser, votes.get(comment.getID()));
+
+                        // Get the current stage
+                        AnchorPane anchorPane3 = new AnchorPane(node3);
+                        anchorPane3.setPadding(new Insets(0, 0, 0, 80));
+                        postsContainer.getChildren().add(anchorPane3);
+                        replyControllers.add(commentTemplateController3);
+                    }
+                }
+            }
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        postsScrollPane.vvalueProperty().addListener((obs, oldVal, newVal) -> {
+            if(!updating && !scrollCooldown && newVal.doubleValue() >= postsScrollPane.getVmax()) {
+                updating = true;
+                scrollCooldown = true;
+                try {
+                    Map<Integer, Integer> votes = new HashMap<>();
+                    CommentFeed commentFeed = Client.GetPostCommentFeed(currentUser, this.post, parentCommentControllers.getLast().GetCommentID());
+                    for (Comment comment : commentFeed.parents()) {
+                        FXMLLoader loader = new FXMLLoader(getClass().getResource("Comment_Template.fxml"));
+                        Node node = loader.load();
+
+                        CommentTemplateController commentTemplateController = loader.getController();
+                        commentTemplateController.Init(comment, currentUser, votes.get(comment.getID()));
+
+                        // Get the current stage
+                        AnchorPane anchorPane = new AnchorPane(node);
+                        anchorPane.setPadding(new Insets(0, 0, 0, 0));
+                        postsContainer.getChildren().add(anchorPane);
+                        parentCommentControllers.add(commentTemplateController);
+                        // Set the new scene
+                        Comment[] lv2 = commentFeed.lv2().get(comment.getID());
+                        for(Comment lv2_reply : lv2) {
+
+                            FXMLLoader loader2 = new FXMLLoader(getClass().getResource("Comment_Template.fxml"));
+                            Node node2 = loader2.load();
+
+                            CommentTemplateController commentTemplateController2 = loader2.getController();
+                            commentTemplateController2.Init(lv2_reply, currentUser, votes.get(comment.getID()));
+
+                            // Get the current stage
+                            AnchorPane anchorPane2 = new AnchorPane(node2);
+                            anchorPane2.setPadding(new Insets(0, 0, 0, 40));
+                            postsContainer.getChildren().add(anchorPane2);
+                            replyControllers.add(commentTemplateController2);
+
+                            Comment[] lv3 = commentFeed.lv3().get(lv2_reply.getID());
+                            for(Comment lv3_reply : lv3) {
+                                FXMLLoader loader3 = new FXMLLoader(getClass().getResource("Comment_Template.fxml"));
+                                Node node3 = loader3.load();
+
+                                CommentTemplateController commentTemplateController3 = loader3.getController();
+                                commentTemplateController3.Init(lv3_reply, currentUser, votes.get(comment.getID()));
+
+                                // Get the current stage
+                                AnchorPane anchorPane3 = new AnchorPane(node3);
+                                anchorPane3.setPadding(new Insets(0, 0, 0, 80));
+                                postsContainer.getChildren().add(anchorPane3);
+                                replyControllers.add(commentTemplateController3);
+                            }
+                        }
+                    }
+                }
+                catch (Exception e) {
+                    e.printStackTrace();
+                }
+                updating = false;
+                PauseTransition pause = new PauseTransition(Duration.seconds(5));
+                pause.setOnFinished(e -> scrollCooldown = false);
+                pause.play();
+            }
         });
 
         postsScrollPane.addEventFilter(ScrollEvent.SCROLL, e -> {
@@ -434,8 +550,8 @@ public class ActualPostTemplateController {
             MediaType mediaType = MediaType.NONE;
 
             Media media = null;
-            if(mediaViewController != null) {
-                File selectedFile = mediaViewController.GetFileArrayList().getFirst();
+            if(commentMediaViewController != null) {
+                File selectedFile = commentMediaViewController.GetFileArrayList().getFirst();
                 String uploadResponse = Client.UploadFile(selectedFile);
                 if (uploadResponse.isBlank()) {
                     new Alert(Alert.AlertType.ERROR, "Server unreachable! Check your connection and try again!").showAndWait();
@@ -455,14 +571,14 @@ public class ActualPostTemplateController {
             }
 
             // Now send post JSON
-            Comment comment = new Comment(0, this.post, this.currentUser, content, media, 0, 0, 0, null, null, false);
+            Comment comment = new Comment(0, this.post, this.currentUser, content, media, 0, 0, 0, Timestamp.from(Instant.now()), Timestamp.from(Instant.now()), false);
             int id = Client.CreateComment(comment);
             if (id > 0) {
                 comment.setId(id);
                 Alert alert = new Alert(Alert.AlertType.INFORMATION, "Comment uploaded successfully!");
                 alert.showAndWait();
-                if(mediaViewController != null) {
-                    mediaViewController.Clean();
+                if(commentMediaViewController != null) {
+                    commentMediaViewController.Clean();
                     RemoveMediaPane();
                 }
                 try {
@@ -473,9 +589,9 @@ public class ActualPostTemplateController {
                     commentTemplateController.Init(comment, currentUser, 0);
 
                     // Get the current stage
-                    postsContainer.getChildren().add(node);
-                    // Set the new scene
-                    commentTemplateControllers.add(commentTemplateController);
+                    AnchorPane anchorPane = new AnchorPane(node);
+                    anchorPane.setPadding(new Insets(0, 0, 0, 0));
+                    postsContainer.getChildren().add(anchorPane);
                 }
                 catch (Exception ex) {
                     System.out.println(ex.getMessage());
@@ -496,7 +612,7 @@ public class ActualPostTemplateController {
 
     @FXML
     void AttachMedia(MouseEvent event) {
-        Window window = ((javafx.scene.Node) event.getSource()).getScene().getWindow();
+        Window window = ((Node) event.getSource()).getScene().getWindow();
 
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Open File");
@@ -594,6 +710,7 @@ public class ActualPostTemplateController {
 
     @FXML
     void GoHome(MouseEvent event) {
+
         Clean();
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("home-page.fxml"));
@@ -617,6 +734,7 @@ public class ActualPostTemplateController {
 
     @FXML
     void Refresh(MouseEvent event) {
+        Clean();
         if(mediaViewController != null)
             mediaViewController.Clean();
         try {
@@ -645,13 +763,13 @@ public class ActualPostTemplateController {
     }
 
     private void showAlert(String title, String message) {
-        javafx.scene.control.Alert alert = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.INFORMATION);
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle(title);
         alert.setHeaderText(null);
         alert.setContentText(message);
 
         // Style the alert to match our dark theme
-        javafx.scene.control.DialogPane dialogPane = alert.getDialogPane();
+        DialogPane dialogPane = alert.getDialogPane();
         dialogPane.setStyle("-fx-background-color: #0E1113;");
         dialogPane.lookup(".content.label").setStyle("-fx-text-fill: white;");
 
@@ -659,9 +777,18 @@ public class ActualPostTemplateController {
     }
 
     private void Clean() {
-        if(mediaViewController != null) {
-           mediaViewController.Clean();
-        }
+        Client.THREAD_POOL.submit(() -> {
+            if(mediaViewController != null)
+                mediaViewController.Clean();
+            if(commentMediaViewController != null)
+                commentMediaViewController.Clean();
+            if(parentCommentControllers != null && !parentCommentControllers.isEmpty())
+                for(CommentTemplateController controller : parentCommentControllers)
+                    controller.Clean();
+            if(replyControllers != null && !replyControllers.isEmpty())
+                for(CommentTemplateController controller : replyControllers)
+                    controller.Clean();
+        });
     }
 }
 

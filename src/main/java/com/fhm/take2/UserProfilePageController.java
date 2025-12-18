@@ -145,11 +145,11 @@ public class UserProfilePageController {
                         postsContainer.getChildren().add(postNode);
                         postPreviewControllers.add(controller);
                     }
-                    updating = false;
                 }
                 catch (Exception e) {
                     e.printStackTrace();
                 }
+                updating = false;
                 PauseTransition pause = new PauseTransition(Duration.seconds(5));
                 pause.setOnFinished(e -> scrollCooldown = false);
                 pause.play();
@@ -524,12 +524,14 @@ public class UserProfilePageController {
     }
 
     private void Clean() {
-        if (postPreviewControllers != null) {
-            for(PostPreviewTemplateController controller : postPreviewControllers) {
-                if(controller != null && controller.mediaViewController != null) {
-                    controller.mediaViewController.Clean();
+        Client.THREAD_POOL.submit(() -> {
+            if (postPreviewControllers != null) {
+                for(PostPreviewTemplateController controller : postPreviewControllers) {
+                    if(controller != null && controller.mediaViewController != null) {
+                        controller.mediaViewController.Clean();
+                    }
                 }
             }
-        }
+        });
     }
 }
