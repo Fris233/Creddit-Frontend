@@ -35,7 +35,6 @@ import java.util.*;
 
 public class SubcredditController implements Initializable {
 
-    // Top bar elements
     @FXML private AnchorPane loggedInPane;
     @FXML private AnchorPane loggedOutPane;
     @FXML private VBox postsContainer;
@@ -43,7 +42,6 @@ public class SubcredditController implements Initializable {
     @FXML private TextField searchField;
     @FXML private ImageView userPFP;
 
-    // Subcreddit details elements
     @FXML private Text subcredditName;
     @FXML private Button joinButton;
     @FXML private TextArea descriptionText;
@@ -69,13 +67,10 @@ public class SubcredditController implements Initializable {
         this.currentUser = user;
         this.postPreviewControllers = new ArrayList<>();
 
-        // Update UI based on login status
         updateLoginUI();
 
-        // Load subcreddit data
         loadSubcredditData(subcredditName);
 
-        // Setup scroll behavior
         setupScrollBehavior();
     }
 
@@ -84,28 +79,21 @@ public class SubcredditController implements Initializable {
         this.currentSubcreddit = subcreddit;
         this.postPreviewControllers = new ArrayList<>();
 
-        // Update UI based on login status
         updateLoginUI();
 
-        // Update UI with subcreddit info
         updateSubcredditUI();
 
-        // Check if user is a member
         checkMemberStatus();
 
-        // Load moderators
         loadModerators();
 
-        // Load posts
         loadPosts();
 
-        // Setup scroll behavior
         setupScrollBehavior();
     }
 
     private void loadSubcredditData(String subcredditName) {
         try {
-            // Try to get subcreddit from server
             Subcreddit[] allSubs = Client.GetAllSubcreddits();
             Subcreddit foundSub = null;
             for (Subcreddit sub : allSubs) {
@@ -117,22 +105,18 @@ public class SubcredditController implements Initializable {
 
             if (foundSub == null) {
                 showAlert("Error", "Subcreddit not found: " + subcredditName);
-                goToHome();  // Call parameterless version
+                goToHome();
                 return;
             }
 
             this.currentSubcreddit = foundSub;
 
-            // Update UI with subcreddit info
             updateSubcredditUI();
 
-            // Check if user is a member
             checkMemberStatus();
 
-            // Load moderators
             loadModerators();
 
-            // Load posts
             loadPosts();
 
         } catch (Exception e) {
@@ -145,31 +129,22 @@ public class SubcredditController implements Initializable {
     private void updateSubcredditUI() {
         if (currentSubcreddit == null) return;
 
-        // Set subcreddit name
         subcredditName.setText("c/" + currentSubcreddit.GetSubName());
 
-        // Set description
         descriptionText.setText(currentSubcreddit.GetDescription());
 
-        // Format and set creation date
         Timestamp created = currentSubcreddit.GetTimecreated();
         if (created != null) {
             SimpleDateFormat sdf = new SimpleDateFormat("MMM dd, yyyy");
             createdDate.setText("Created: " + sdf.format(created));
         }
 
-        // Set privacy status
         privacyStatus.setText("Privacy: " + (currentSubcreddit.GetPrivate() ? "Private" : "Public"));
 
-        // Update join button
         updateJoinButton();
 
-        // Update sort buttons
-        updateSortButtons();
-
-        // Mock member count (in real app, get from server)
-        memberCount.setText("1234"); // Mock value
-        onlineCount.setText("125"); // Mock value
+        memberCount.setText("1234"); //dummy
+        onlineCount.setText("125"); //dummy
     }
 
     private void checkMemberStatus() {
@@ -179,7 +154,6 @@ public class SubcredditController implements Initializable {
         }
 
         try {
-            // Check if user is a member of this subcreddit
             isMember = Client.IsSubMember(currentUser, currentSubcreddit);
         } catch (Exception e) {
             System.err.println("Error checking member status: " + e.getMessage());
@@ -221,11 +195,10 @@ public class SubcredditController implements Initializable {
         if (currentSubcreddit == null) return;
 
         try {
-            // Get posts for this subcreddit using Client.GetPostFeedFilterSub
             Map<Post, Integer> postFeed = Client.GetPostFeedFilterSub(
                     currentUser,
                     currentSubcreddit,
-                    "", // search prompt
+                    "",
                     lastPostId
             );
 
@@ -242,13 +215,11 @@ public class SubcredditController implements Initializable {
                 postsContainer.getChildren().add(postNode);
                 postPreviewControllers.add(controller);
 
-                // Update lastPostId for pagination
                 if (post.GetID() > lastPostId) {
                     lastPostId = post.GetID();
                 }
             }
 
-            // If no posts found, show message
             if (postFeed.isEmpty()) {
                 Text noPostsText = new Text("No posts found in c/" + currentSubcreddit.GetSubName());
                 noPostsText.setFill(Color.WHITE);
@@ -270,11 +241,10 @@ public class SubcredditController implements Initializable {
         if (currentSubcreddit == null || updating) return;
 
         try {
-            // Get more posts for this subcreddit
             Map<Post, Integer> postFeed = Client.GetPostFeedFilterSub(
                     currentUser,
                     currentSubcreddit,
-                    "", // search prompt
+                    "",
                     lastPostId
             );
 
@@ -291,7 +261,6 @@ public class SubcredditController implements Initializable {
                 postsContainer.getChildren().add(postNode);
                 postPreviewControllers.add(controller);
 
-                // Update lastPostId for pagination
                 if (post.GetID() > lastPostId) {
                     lastPostId = post.GetID();
                 }
@@ -302,7 +271,6 @@ public class SubcredditController implements Initializable {
     }
 
     private void setupScrollBehavior() {
-        // Same scroll behavior as HomePageController
         postsScrollPane.addEventFilter(ScrollEvent.SCROLL, e -> {
             double delta = e.getDeltaY() * 2;
             postsScrollPane.setVvalue(postsScrollPane.getVvalue() - delta / postsScrollPane.getContent().getBoundsInLocal().getHeight());
@@ -349,13 +317,12 @@ public class SubcredditController implements Initializable {
         }
     }
 
-    private void updateSortButtons() {
-        hotButton.setStyle("-fx-background-color: " + ("hot".equals(currentSort) ? "#0079d3" : "#2C3539") + "; -fx-text-fill: white;");
-        newButton.setStyle("-fx-background-color: " + ("new".equals(currentSort) ? "#0079d3" : "#2C3539") + "; -fx-text-fill: white;");
-        topButton.setStyle("-fx-background-color: " + ("top".equals(currentSort) ? "#0079d3" : "#2C3539") + "; -fx-text-fill: white;");
-    }
+//    private void updateSortButtons() {
+//        hotButton.setStyle("-fx-background-color: " + ("hot".equals(currentSort) ? "#0079d3" : "#2C3539") + "; -fx-text-fill: white;");
+//        newButton.setStyle("-fx-background-color: " + ("new".equals(currentSort) ? "#0079d3" : "#2C3539") + "; -fx-text-fill: white;");
+//        topButton.setStyle("-fx-background-color: " + ("top".equals(currentSort) ? "#0079d3" : "#2C3539") + "; -fx-text-fill: white;");
+//    }
 
-    // Navigation methods
     @FXML
     void goToHome(MouseEvent event) {
         goToHome();
@@ -402,7 +369,6 @@ public class SubcredditController implements Initializable {
 
             controller.setOnCreationSuccess(sub -> {
                 createSubcredditStage.close();
-                // Navigate to the new subcreddit
                 goToSubcreddit(sub);
             });
 
@@ -439,7 +405,6 @@ public class SubcredditController implements Initializable {
         clean();
         try {
             showAlert("Search", "Searching in c/" + currentSubcreddit.GetSubName() + " for: " + searchTerm);
-            // You would need to implement actual search functionality here
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -598,7 +563,6 @@ public class SubcredditController implements Initializable {
         event.consume();
     }
 
-    // Subcreddit-specific methods
     @FXML
     void toggleJoinSubcreddit(MouseEvent event) {
         if (currentUser == null) {
@@ -638,32 +602,32 @@ public class SubcredditController implements Initializable {
         event.consume();
     }
 
-    @FXML
-    void sortByHot(MouseEvent event) {
-        currentSort = "hot";
-        updateSortButtons();
-        // Reload posts with hot sorting
-        loadPosts();
-        event.consume();
-    }
-
-    @FXML
-    void sortByNew(MouseEvent event) {
-        currentSort = "new";
-        updateSortButtons();
-        // Reload posts with new sorting
-        loadPosts();
-        event.consume();
-    }
-
-    @FXML
-    void sortByTop(MouseEvent event) {
-        currentSort = "top";
-        updateSortButtons();
-        // Reload posts with top sorting
-        loadPosts();
-        event.consume();
-    }
+//    @FXML
+//    void sortByHot(MouseEvent event) {
+//        currentSort = "hot";
+//        updateSortButtons();
+//        // Reload posts with hot sorting
+//        loadPosts();
+//        event.consume();
+//    }
+//
+//    @FXML
+//    void sortByNew(MouseEvent event) {
+//        currentSort = "new";
+//        updateSortButtons();
+//        // Reload posts with new sorting
+//        loadPosts();
+//        event.consume();
+//    }
+//
+//    @FXML
+//    void sortByTop(MouseEvent event) {
+//        currentSort = "top";
+//        updateSortButtons();
+//        // Reload posts with top sorting
+//        loadPosts();
+//        event.consume();
+//    }
 
     @FXML
     void showSubcredditRules(MouseEvent event) {
@@ -672,8 +636,6 @@ public class SubcredditController implements Initializable {
         Alert rulesAlert = new Alert(Alert.AlertType.INFORMATION);
         rulesAlert.setTitle("c/" + currentSubcreddit.GetSubName() + " Rules");
         rulesAlert.setHeaderText("Subcreddit Rules");
-
-        // Default rules - in a real app, you'd fetch these from the server
         String defaultRules = "1. Be respectful and civil\n" +
                 "2. No spam or self-promotion\n" +
                 "3. Stay on topic\n" +
@@ -729,6 +691,5 @@ public class SubcredditController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        // Initialization happens in InitData
     }
 }

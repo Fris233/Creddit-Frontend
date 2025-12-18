@@ -48,7 +48,6 @@ public class CreatePostPageController {
     @FXML private TextField titleField;
     @FXML private ImageView userPFP;
 
-    //private ArrayList<File> selectedFiles;
     private MediaViewController mediaViewController;
     private User currentUser;
     private BooleanProperty validPostInfo = new SimpleBooleanProperty(false);
@@ -138,7 +137,6 @@ public class CreatePostPageController {
             scrollPane.setVvalue(scrollPane.getVvalue() - delta / scrollPane.getContent().getBoundsInLocal().getHeight());
         });
 
-        // Handle dragging over the pane
         scrollPane.setOnDragOver(event -> {
             if (event.getGestureSource() != scrollPane && event.getDragboard().hasFiles()) {
                 event.acceptTransferModes(javafx.scene.input.TransferMode.COPY_OR_MOVE);
@@ -146,7 +144,6 @@ public class CreatePostPageController {
             event.consume();
         });
 
-        // Handle dropping files
         scrollPane.setOnDragDropped(event -> {
             var db = event.getDragboard();
             boolean success = false;
@@ -250,7 +247,6 @@ public class CreatePostPageController {
             scrollPane.setVvalue(scrollPane.getVvalue() - delta / scrollPane.getContent().getBoundsInLocal().getHeight());
         });
 
-        // Handle dragging over the pane
         scrollPane.setOnDragOver(event -> {
             if (event.getGestureSource() != scrollPane && event.getDragboard().hasFiles()) {
                 event.acceptTransferModes(javafx.scene.input.TransferMode.COPY_OR_MOVE);
@@ -258,7 +254,6 @@ public class CreatePostPageController {
             event.consume();
         });
 
-        // Handle dropping files
         scrollPane.setOnDragDropped(event -> {
             var db = event.getDragboard();
             boolean success = false;
@@ -362,10 +357,8 @@ public class CreatePostPageController {
 
         String lower = input.toLowerCase();
 
-        // filter
         suggestions.setAll(allCategories.stream().filter(c -> c.toLowerCase().contains(lower)).toList());
 
-        // remove selection when typing
         lvSuggestions.getSelectionModel().clearSelection();
 
         if (suggestions.isEmpty()) {
@@ -373,7 +366,6 @@ public class CreatePostPageController {
         } else {
             lvSuggestions.setVisible(true);
 
-            // auto shrink / expand
             int maxVisible = Math.min(suggestions.size(), 6);
             lvSuggestions.setPrefHeight(maxVisible * lvSuggestions.getFixedCellSize());
         }
@@ -461,7 +453,6 @@ public class CreatePostPageController {
             String mediaUrl = null;
             MediaType mediaType = null;
 
-            // If file selected, upload first
             ArrayList<Media> media = new ArrayList<>();
             if(mediaViewController != null) {
                 ArrayList<File> fileArrayList = mediaViewController.GetFileArrayList();
@@ -474,7 +465,6 @@ public class CreatePostPageController {
                     Map<?, ?> json = Client.GetResponse(uploadResponse);
                     mediaUrl = (String) json.get("url");
 
-                    // Detect media type
                     String mime = Files.probeContentType(selectedFile.toPath());
                     if (mime != null) {
                         if (mime.startsWith("image/")) mediaType = MediaType.IMAGE;
@@ -486,7 +476,6 @@ public class CreatePostPageController {
                 }
             }
 
-            // Now send post JSON
             Post post = new Post(1, currentUser, subcredditComboBox.getSelectionModel().getSelectedItem(), title, content, media, selectedCategories, null, null, 0, 0);
             int id = Client.CreatePost(post);
             if (id > 0) {
@@ -504,9 +493,7 @@ public class CreatePostPageController {
                     ActualPostTemplateController actualPostTemplateController = loader.getController();
                     actualPostTemplateController.InitData(post, currentUser, 0);
 
-                    // Get the current stage
                     Stage stage = (Stage) postButton.getScene().getWindow();
-                    // Set the new scene
                     stage.setScene(new Scene(root));
                 }
                 catch (Exception ex) {

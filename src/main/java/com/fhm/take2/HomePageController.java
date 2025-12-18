@@ -51,7 +51,6 @@ public class HomePageController {
         this.searchField.setText(searchPrompt);
         postPreviewControllers = new ArrayList<>();
 
-        // Update UI based on login status
         updateLoginUI();
 
         try {
@@ -71,7 +70,6 @@ public class HomePageController {
             e.printStackTrace();
         }
 
-        // Setup scroll behavior
         postsScrollPane.addEventFilter(ScrollEvent.SCROLL, e -> {
             double delta = e.getDeltaY() * 2;
             postsScrollPane.setVvalue(postsScrollPane.getVvalue() - delta / postsScrollPane.getContent().getBoundsInLocal().getHeight());
@@ -109,12 +107,9 @@ public class HomePageController {
 
     private void updateLoginUI() {
         if(currentUser != null) {
-            // User is logged in
             loggedOutPane.setVisible(false);
             loggedInPane.setVisible(true);
-            //userPFP.setImage(currentUser.getPfp());
         } else {
-            // User is logged out
             loggedOutPane.setVisible(true);
             loggedInPane.setVisible(false);
             recentScrollPane.setVisible(false);
@@ -182,16 +177,12 @@ public class HomePageController {
                     CreatePostPageController createPostPageController = loader.getController();
                     createPostPageController.InitData(currentUser);
 
-                    // Get the current stage
                     Stage stage = (Stage) error404Controller.refreshButton.getScene().getWindow();
 
-                    // Set the new scene
                     stage.setScene(new Scene(root2));
                 });
 
-                // Get the current stage
                 Stage stage = (Stage) postsContainer.getScene().getWindow();
-                // Set the new scene
                 stage.setScene(new Scene(root));
             }
             else {
@@ -201,9 +192,7 @@ public class HomePageController {
                 CreatePostPageController createPostPageController = loader.getController();
                 createPostPageController.InitData(currentUser);
 
-                // Get the current stage
                 Stage stage = (Stage) postsContainer.getScene().getWindow();
-                // Set the new scene
                 stage.setScene(new Scene(root));
             }
         }
@@ -235,7 +224,6 @@ public class HomePageController {
 
             createSubcredditPageController.setOnCreationSuccess(sub -> {
                 createSubcredditStage.close();
-                // Navigate to the new subcreddit page
                 goToSubcreddit(sub);
             });
 
@@ -252,32 +240,26 @@ public class HomePageController {
         navigateToLoginDialog();
     }
 
-    // In the navigateToLoginDialog method, update the stage title:
     private void navigateToLoginDialog() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("login.fxml"));
             Parent root = loader.load();
 
-            // Get the login controller
             LoginController loginController = loader.getController();
 
-            // Create a new stage for login (dialog)
             Stage loginStage = new Stage();
             loginStage.setTitle("Login"); // Changed to Creddit
             loginStage.setScene(new Scene(root, 400, 500));
             loginStage.setResizable(false);
 
-            // Set modality so it blocks interaction with homepage
             loginStage.initModality(Modality.WINDOW_MODAL);
             loginStage.initOwner(postsContainer.getScene().getWindow());
 
-            // Set up callback for successful login
             loginController.setOnLoginSuccess(user -> {
                 this.currentUser = user;
                 updateLoginUI();
                 loginStage.close();
                 HelloApplication.startSession(currentUser);
-                // Refresh the page to show user-specific content
                 Refresh();
             });
 
@@ -303,9 +285,7 @@ public class HomePageController {
             MyProfilePageController myProfilePageController = loader.getController();
             myProfilePageController.initData(this.currentUser, "", true, false, false, false, false, false);
 
-            // Get the current stage
             Stage stage = (Stage) postsContainer.getScene().getWindow();
-            // Set the new scene
             stage.setScene(new Scene(root));
         }
         catch (Exception ex) {
@@ -324,9 +304,7 @@ public class HomePageController {
             HomePageController homePageController = loader.getController();
             homePageController.InitData(currentUser, searchField.getText(), filter);
 
-            // Get the current stage
             Stage stage = (Stage) postsContainer.getScene().getWindow();
-            // Set the new scene
             stage.setScene(new Scene(root));
         }
         catch (Exception e) {
@@ -344,11 +322,8 @@ public class HomePageController {
             HomePageController homePageController = loader.getController();
             homePageController.InitData(currentUser, null, 0);
 
-            // Create the second scene
             Scene scene2 = new Scene(root);
-            // Get the current stage
             Stage stage = (Stage)postsContainer.getScene().getWindow();
-            // Set the new scene
             stage.setScene(scene2);
         }
         catch (Exception ex) {
@@ -371,7 +346,6 @@ public class HomePageController {
         alert.setHeaderText(null);
         alert.setContentText(message);
 
-        // Style the alert to match our dark theme
         javafx.scene.control.DialogPane dialogPane = alert.getDialogPane();
         dialogPane.setStyle("-fx-background-color: #0E1113;");
         dialogPane.lookup(".content.label").setStyle("-fx-text-fill: white;");

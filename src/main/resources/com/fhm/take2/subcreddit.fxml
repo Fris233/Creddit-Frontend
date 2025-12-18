@@ -27,7 +27,6 @@
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="com.fhm.take2.SubcredditController">
     <children>
-        <!-- Center Content: Posts from this subcreddit -->
         <ScrollPane fx:id="postsScrollPane" layoutX="307.0" layoutY="84.0" prefHeight="817.0"
                     prefWidth="908.0" style="-fx-background-color: #0E1113; -fx-background: #0E1113;"
                     stylesheets="@CredditCSS.css">
@@ -40,8 +39,6 @@
                 </VBox>
             </content>
         </ScrollPane>
-
-        <!-- Left Sidebar (same as homepage) -->
         <AnchorPane layoutY="83.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
                     minWidth="-Infinity" prefHeight="818.0" prefWidth="276.0"
                     style="-fx-background-color: #0E1113; -fx-border-color: gray;"
@@ -244,34 +241,23 @@
                 </AnchorPane>
             </children>
         </GridPane>
-
-        <!-- Right Sidebar: Subcreddit Details -->
         <AnchorPane layoutX="1248.0" layoutY="83.0" maxHeight="-Infinity" maxWidth="-Infinity"
                     minHeight="-Infinity" minWidth="-Infinity" prefHeight="818.0" prefWidth="352.0"
                     style="-fx-background-color: black; -fx-border-color: gray;">
             <children>
-                <!-- Subcreddit Header -->
                 <VBox layoutX="10.0" layoutY="10.0" spacing="15.0" prefWidth="330.0">
                     <children>
-                        <!-- Subcreddit Name -->
                         <Text fx:id="subcredditName" fill="WHITE"
                               style="-fx-font-weight: bold; -fx-font-size: 24px;"
                               text="c/Subcreddit" />
-
-                        <!-- Join Button -->
                         <Button fx:id="joinButton" mnemonicParsing="false" onMouseClicked="#toggleJoinSubcreddit"
                                 prefHeight="40.0" prefWidth="330.0"
                                 style="-fx-background-color: #0079d3; -fx-text-fill: white; -fx-font-weight: bold;"
                                 text="Join" />
-
-                        <!-- Subcreddit Info -->
                         <VBox spacing="10.0">
-                            <!-- Description -->
                             <TextArea fx:id="descriptionText" editable="false" prefHeight="80.0"
                                       prefWidth="330.0" wrapText="true"
                                       style="-fx-background-color: transparent; -fx-text-fill: #d7dadc; -fx-border-color: gray; -fx-border-radius: 5;" />
-
-                            <!-- Stats -->
                             <HBox spacing="20.0">
                                 <VBox alignment="CENTER">
                                     <Text fx:id="memberCount" fill="WHITE" style="-fx-font-weight: bold; -fx-font-size: 16px;" text="0" />
@@ -282,41 +268,17 @@
                                     <Text fill="#818384" text="Online" />
                                 </VBox>
                             </HBox>
-
-                            <!-- Created Date -->
                             <Text fx:id="createdDate" fill="#818384" style="-fx-font-size: 12px;"
                                   text="Created: N/A" />
-
-                            <!-- Privacy Status -->
                             <HBox>
                                 <Text fx:id="privacyStatus" fill="#818384" style="-fx-font-size: 12px;"
                                       text="Privacy: Public" />
                             </HBox>
                         </VBox>
-
-                        <!-- Rules Button -->
                         <Button mnemonicParsing="false" onMouseClicked="#showSubcredditRules"
                                 prefHeight="40.0" prefWidth="330.0"
                                 style="-fx-background-color: #2C3539; -fx-text-fill: white; -fx-font-weight: bold;"
                                 text="See Rules" />
-
-                        <!-- Sort Options -->
-                        <VBox spacing="10.0">
-                            <Text fill="#818384" style="-fx-font-weight: bold;" text="SORT POSTS BY" />
-                            <HBox spacing="10.0">
-                                <Button fx:id="hotButton" mnemonicParsing="false" onMouseClicked="#sortByHot"
-                                        prefHeight="35.0" prefWidth="105.0"
-                                        style="-fx-background-color: #0079d3; -fx-text-fill: white;" text="Hot" />
-                                <Button fx:id="newButton" mnemonicParsing="false" onMouseClicked="#sortByNew"
-                                        prefHeight="35.0" prefWidth="105.0"
-                                        style="-fx-background-color: #2C3539; -fx-text-fill: white;" text="New" />
-                                <Button fx:id="topButton" mnemonicParsing="false" onMouseClicked="#sortByTop"
-                                        prefHeight="35.0" prefWidth="105.0"
-                                        style="-fx-background-color: #2C3539; -fx-text-fill: white;" text="Top" />
-                            </HBox>
-                        </VBox>
-
-                        <!-- Moderators Section -->
                         <VBox spacing="10.0">
                             <Text fill="#818384" style="-fx-font-weight: bold;" text="MODERATORS" />
                             <VBox fx:id="moderatorsList" spacing="5.0" />

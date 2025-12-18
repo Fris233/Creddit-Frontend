@@ -231,9 +231,7 @@ public class PostPreviewTemplateController {
             ActualPostTemplateController actualPostTemplateController = loader.getController();
             actualPostTemplateController.InitData(post, currentUser, myVote);
 
-            // Get the current stage
             Stage stage = (Stage) JoinButton.getScene().getWindow();
-            // Set the new scene
             stage.setScene(new Scene(root));
         }
         catch (Exception ex) {
@@ -254,9 +252,7 @@ public class PostPreviewTemplateController {
                 UserProfilePageController userProfilePageController = loader.getController();
                 userProfilePageController.InitData(post.GetAuthor().getId(), currentUser, "", true);
 
-                // Get the current stage
                 Stage stage = (Stage) JoinButton.getScene().getWindow();
-                // Set the new scene
                 stage.setScene(new Scene(root));
             }
             catch (Exception ex) {
@@ -264,7 +260,6 @@ public class PostPreviewTemplateController {
             }
         }
         else {
-            // Navigate to Subcreddit Page
             try {
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("subcreddit.fxml"));
                 Parent root = loader.load();
@@ -282,7 +277,9 @@ public class PostPreviewTemplateController {
         event.consume();
     }
 
-    int GetPostID() {return this.post.GetID();}
+    int GetPostID() {
+        return this.post.GetID();
+    }
 
 }
 
