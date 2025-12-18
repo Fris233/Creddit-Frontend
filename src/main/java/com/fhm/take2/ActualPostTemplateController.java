@@ -204,14 +204,10 @@ public class ActualPostTemplateController {
                 Node node = loader.load();
 
                 CommentTemplateController commentTemplateController = loader.getController();
-                commentTemplateController.Init(comment, currentUser, votes.get(comment.getID()), this);
+                commentTemplateController.Init(comment, currentUser, votes.get(comment.getID()), 0, this);
 
-                // Get the current stage
-                AnchorPane anchorPane = new AnchorPane(node);
-                anchorPane.setPadding(new Insets(0, 0, 0, 0));
-                postsContainer.getChildren().add(anchorPane);
+                postsContainer.getChildren().add(node);
                 parentCommentControllers.add(commentTemplateController);
-                // Set the new scene
                 Comment[] lv2 = commentFeed.lv2().get(comment.getID());
                 for(Comment lv2_reply : lv2) {
 
@@ -219,12 +215,9 @@ public class ActualPostTemplateController {
                     Node node2 = loader2.load();
 
                     CommentTemplateController commentTemplateController2 = loader2.getController();
-                    commentTemplateController2.Init(lv2_reply, currentUser, votes.get(comment.getID()), this);
+                    commentTemplateController2.Init(lv2_reply, currentUser, votes.get(comment.getID()), 1, this);
 
-                    // Get the current stage
-                    AnchorPane anchorPane2 = new AnchorPane(node2);
-                    anchorPane2.setPadding(new Insets(0, 0, 0, 30));
-                    postsContainer.getChildren().add(anchorPane2);
+                    postsContainer.getChildren().add(node2);
                     replyControllers.add(commentTemplateController2);
 
                     Comment[] lv3 = commentFeed.lv3().get(lv2_reply.getID());
@@ -233,12 +226,9 @@ public class ActualPostTemplateController {
                         Node node3 = loader3.load();
 
                         CommentTemplateController commentTemplateController3 = loader3.getController();
-                        commentTemplateController3.Init(lv3_reply, currentUser, votes.get(comment.getID()), this);
+                        commentTemplateController3.Init(lv3_reply, currentUser, votes.get(comment.getID()), 2, this);
 
-                        // Get the current stage
-                        AnchorPane anchorPane3 = new AnchorPane(node3);
-                        anchorPane3.setPadding(new Insets(0, 0, 0, 60));
-                        postsContainer.getChildren().add(anchorPane3);
+                        postsContainer.getChildren().add(node3);
                         replyControllers.add(commentTemplateController3);
                     }
                 }
@@ -260,12 +250,9 @@ public class ActualPostTemplateController {
                         Node node = loader.load();
 
                         CommentTemplateController commentTemplateController = loader.getController();
-                        commentTemplateController.Init(comment, currentUser, votes.get(comment.getID()), this);
+                        commentTemplateController.Init(comment, currentUser, votes.get(comment.getID()), 0, this);
 
-                        // Get the current stage
-                        AnchorPane anchorPane = new AnchorPane(node);
-                        anchorPane.setPadding(new Insets(0, 0, 0, 0));
-                        postsContainer.getChildren().add(anchorPane);
+                        postsContainer.getChildren().add(node);
                         parentCommentControllers.add(commentTemplateController);
                         // Set the new scene
                         Comment[] lv2 = commentFeed.lv2().get(comment.getID());
@@ -275,12 +262,9 @@ public class ActualPostTemplateController {
                             Node node2 = loader2.load();
 
                             CommentTemplateController commentTemplateController2 = loader2.getController();
-                            commentTemplateController2.Init(lv2_reply, currentUser, votes.get(comment.getID()), this);
+                            commentTemplateController2.Init(lv2_reply, currentUser, votes.get(comment.getID()), 1, this);
 
-                            // Get the current stage
-                            AnchorPane anchorPane2 = new AnchorPane(node2);
-                            anchorPane2.setPadding(new Insets(0, 0, 0, 30));
-                            postsContainer.getChildren().add(anchorPane2);
+                            postsContainer.getChildren().add(node2);
                             replyControllers.add(commentTemplateController2);
 
                             Comment[] lv3 = commentFeed.lv3().get(lv2_reply.getID());
@@ -289,12 +273,9 @@ public class ActualPostTemplateController {
                                 Node node3 = loader3.load();
 
                                 CommentTemplateController commentTemplateController3 = loader3.getController();
-                                commentTemplateController3.Init(lv3_reply, currentUser, votes.get(comment.getID()), this);
+                                commentTemplateController3.Init(lv3_reply, currentUser, votes.get(comment.getID()), 2, this);
 
-                                // Get the current stage
-                                AnchorPane anchorPane3 = new AnchorPane(node3);
-                                anchorPane3.setPadding(new Insets(0, 0, 0, 60));
-                                postsContainer.getChildren().add(anchorPane3);
+                                postsContainer.getChildren().add(node3);
                                 replyControllers.add(commentTemplateController3);
                             }
                         }
@@ -589,12 +570,11 @@ public class ActualPostTemplateController {
                     Node node = loader.load();
 
                     CommentTemplateController commentTemplateController = loader.getController();
-                    commentTemplateController.Init(comment, currentUser, 0, this);
+                    commentTemplateController.Init(comment, currentUser, 0, 0, this);
 
                     // Get the current stage
-                    AnchorPane anchorPane = new AnchorPane(node);
-                    anchorPane.setPadding(new Insets(0, 0, 0, 0));
-                    postsContainer.getChildren().add(anchorPane);
+                    parentCommentControllers.addFirst(commentTemplateController);
+                    postsContainer.getChildren().addFirst(node);
                 }
                 catch (Exception ex) {
                     System.out.println(ex.getMessage());

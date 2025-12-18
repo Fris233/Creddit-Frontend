@@ -9,7 +9,6 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
@@ -35,6 +34,7 @@ public class AddCommentPaneController {
     @FXML private Button commentButton;
     @FXML private StackPane commentMediaPane;
     @FXML private TextArea commentTextArea;
+    @FXML Button cancelButton;
 
     private MediaViewController commentMediaViewController;
     private BooleanProperty validCommentInfo = new SimpleBooleanProperty(false);
@@ -209,7 +209,7 @@ public class AddCommentPaneController {
         event.consume();
     }
 
-    private void Clean() {
+    void Clean() {
         Client.THREAD_POOL.submit(() -> {
             if(commentMediaViewController != null)
                 commentMediaViewController.Clean();

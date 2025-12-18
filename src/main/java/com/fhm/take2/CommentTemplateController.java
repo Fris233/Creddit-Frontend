@@ -37,6 +37,7 @@ public class CommentTemplateController {
     @FXML private ImageView userPFP;
     @FXML private Label usernameLabel;
     @FXML private AnchorPane voteAnchor;
+    @FXML private AnchorPane anchor;
     @FXML private Label votesLabel;
 
     private User currentUser;
@@ -44,16 +45,21 @@ public class CommentTemplateController {
     private int myOGVote;
     private int myVote;
     private boolean modAuthor = false;
+    private boolean replying = false;
 
     BooleanProperty addedReply = new SimpleBooleanProperty(false);
     Comment reply;
     MediaViewController mediaViewController;
     private ActualPostTemplateController parentPage;
+    private int level;
+    private int ind;
+    private AddCommentPaneController addCommentPaneController = null;
 
-    public void Init(Comment newComment, User user, int userVote, ActualPostTemplateController parent) {
+    public void Init(Comment newComment, User user, int userVote, int replyLevel, ActualPostTemplateController parent) {
         this.comment = newComment;
         this.currentUser = user;
         this.parentPage = parent;
+        this.level = replyLevel;
         this.mediaViewController = null;
         myOGVote = 0;
         if(user != null)
@@ -62,6 +68,7 @@ public class CommentTemplateController {
             replyButton.setDisable(true);
         myVote = myOGVote;
         ColorVote();
+        this.anchor.setPadding(new Insets(0, 0, 5, level * 30));
         usernameLabel.setText("u/" + comment.getAuthor().getUsername());
         timeLabel.setText(PostPreviewTemplateController.timeAgo(comment.getTimeCreated()));
         contentLabel.setText(comment.getContent());
@@ -97,17 +104,24 @@ public class CommentTemplateController {
         }
         addedReply.addListener((obs, oldV, newV) -> {
             if(newV) {
-                /*FXMLLoader loader = new FXMLLoader(getClass().getResource("Comment_Template.fxml"));
-                Node node = loader.load();
+                try {
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource("Comment_Template.fxml"));
+                    Node node = loader.load();
 
-                CommentTemplateController commentTemplateController = loader.getController();
-                commentTemplateController.Init(comment, currentUser, votes.get(comment.getID()), this);
+                    CommentTemplateController commentTemplateController = loader.getController();
+                    commentTemplateController.Init(this.reply, currentUser, 0, this.level + 1, this.parentPage);
 
-                // Get the current stage
-                AnchorPane anchorPane = new AnchorPane(node);
-                anchorPane.setPadding(new Insets(0, 0, 0, 0));
-                postsContainer.getChildren().add(anchorPane);
-                parentCommentControllers.add(commentTemplateController);*/
+                    ind = this.parentPage.parentCommentControllers.indexOf(this);
+                    if(ind < 0)
+                        ind = this.parentPage.replyControllers.indexOf(this);
+                    this.parentPage.replyControllers.add(ind + 1, commentTemplateController);
+                    this.parentPage.postsContainer.getChildren().add(ind + 1, node);
+                    this.reply = null;
+                    this.addedReply.set(false);
+                }
+                catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         });
     }
@@ -134,7 +148,7 @@ public class CommentTemplateController {
 
     @FXML
     void OpenComment(MouseEvent event) {
-        System.out.println("Open Comment Pressed");
+        System.out.println("Open Comment Pressed!");
         event.consume();
     }
 
@@ -160,7 +174,30 @@ public class CommentTemplateController {
 
     @FXML
     void Reply(MouseEvent event) {
-        System.out.println("Reply to Comment Pressed");
+        if(!replying) {
+            try {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("add-comment-pane.fxml"));
+                Node node = loader.load();
+
+                addCommentPaneController = loader.getController();
+                addCommentPaneController.Init(currentUser, this.comment, this);
+
+                ind = this.parentPage.parentCommentControllers.indexOf(this);
+                if(ind < 0)
+                    ind = this.parentPage.replyControllers.indexOf(this);
+                this.parentPage.postsContainer.getChildren().add(ind + 1, node);
+                System.out.println("Added small reply box after comment at index : " + ind);
+            }
+            catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        else {
+            this.parentPage.postsContainer.getChildren().remove(ind + 1);
+            addCommentPaneController.Clean();
+            addCommentPaneController = null;
+        }
+        replying = !replying;
         event.consume();
     }
 

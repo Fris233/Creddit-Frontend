@@ -7,7 +7,6 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-
 <AnchorPane fx:id="commentAnchor" minHeight="110.0" prefWidth="560.0" style="-fx-background-color: #0e1113;" stylesheets="@CredditCSS.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.fhm.take2.AddCommentPaneController">
    <children>
       <VBox layoutX="5.0" prefWidth="553.0" spacing="5.0">
@@ -25,7 +24,12 @@
                         <Font size="18.0" />
                      </font>
                   </Button>
-                  <Button layoutX="348.0" mnemonicParsing="false" onMouseClicked="#AttachMedia" prefHeight="40.0" prefWidth="77.0" style="-fx-text-fill: #ffffff; -fx-background-color: #115bca; -fx-background-radius: 30;" text="Attach" textFill="#c6151500">
+                  <Button layoutX="270.0" mnemonicParsing="false" onMouseClicked="#AttachMedia" prefHeight="40.0" prefWidth="77.0" style="-fx-text-fill: #ffffff; -fx-background-color: #115bca; -fx-background-radius: 30;" text="Attach" textFill="#c6151500">
+                     <font>
+                        <Font size="18.0" />
+                     </font>
+                  </Button>
+                  <Button fx:id="cancelButton" layoutX="355.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="77.0" style="-fx-text-fill: #ffffff; -fx-background-radius: 20;" text="Cancel" textFill="#c6151500">
                      <font>
                         <Font size="18.0" />
                      </font>
