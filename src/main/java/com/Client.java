@@ -483,7 +483,7 @@ public abstract class Client {
     public static ArrayList<Report> GetPostReportFeed(User user, Subcreddit sub, int lastID) throws Exception {
         JsonObject json = new JsonObject();
         json.add("user", gson.toJsonTree(user, User.class));
-        json.add("sub", gson.toJsonTree(sub, User.class));
+        json.add("sub", gson.toJsonTree(sub, Subcreddit.class));
         json.addProperty("lastID", lastID);
 
         String jsonBody = gson.toJson(json);
@@ -510,7 +510,7 @@ public abstract class Client {
     public static ArrayList<Report> GetCommentReportFeed(User user, Subcreddit sub, int lastID) throws Exception {
         JsonObject json = new JsonObject();
         json.add("user", gson.toJsonTree(user, User.class));
-        json.add("sub", gson.toJsonTree(sub, User.class));
+        json.add("sub", gson.toJsonTree(sub, Subcreddit.class));
         json.addProperty("lastID", lastID);
 
         String jsonBody = gson.toJson(json);

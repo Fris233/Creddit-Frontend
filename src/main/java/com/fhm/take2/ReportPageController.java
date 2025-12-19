@@ -139,10 +139,10 @@ public class ReportPageController {
         //Clean();
         event.consume();
     }
-/*
+
     @FXML
     void Refresh() {
-        Clean();
+/*        Clean();
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("home-page.fxml"));
             Parent root = loader.load();
@@ -157,8 +157,27 @@ public class ReportPageController {
         }
         catch (Exception e) {
             e.printStackTrace();
-        }
-    }*/
+        }*/
+    }
+    @FXML
+    void Login(MouseEvent event) {
+
+    }
+    @FXML
+    void CreatePost(MouseEvent event) {
+
+    }
+
+    @FXML
+    void SearchPressed(KeyEvent event) {
+        // Your logic here
+        System.out.println("Key pressed: " + event.getCode());
+    }
+    @FXML
+    void searchPressed(KeyEvent event) {
+        // Your logic here
+        System.out.println("Key pressed: " + event.getCode());
+    }
 
     @FXML
     void GoHome(MouseEvent event) {

@@ -65,8 +65,8 @@ public class SubcredditController {
         this.searchField.setText(searchPrompt);
 
         try {
-            ModCheck();
             this.currentSubcreddit = Client.GetSubcreddit(subID);
+            ModCheck();
         }
         catch (Exception e) {
             e.printStackTrace();
@@ -336,6 +336,17 @@ public class SubcredditController {
 
     @FXML
     void searchPressed(KeyEvent event) {
+        if (event.getCode() == KeyCode.ENTER) {
+            // Search within this subcreddit
+            String searchTerm = searchField.getText();
+            if (!searchTerm.isEmpty()) {
+                searchInSubcreddit(searchTerm);
+            }
+        }
+    }
+
+    @FXML
+    void SearchPressed(KeyEvent event) {
         if (event.getCode() == KeyCode.ENTER) {
             // Search within this subcreddit
             String searchTerm = searchField.getText();
