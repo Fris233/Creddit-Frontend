@@ -34,7 +34,7 @@ import java.text.SimpleDateFormat;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
-public class SubcredditController implements Initializable {
+public class SubcredditController {
 
     @FXML private AnchorPane loggedInPane;
     @FXML private AnchorPane loggedOutPane;
@@ -62,9 +62,11 @@ public class SubcredditController implements Initializable {
     private boolean scrollCooldown = false;
     private boolean isMember = false;
     private int lastPostId = 0;
+    private boolean subMember = false;
 
-    public void InitData(int subID, User user) {
+    public void InitData(int subID, String searchPrompt, User user) {
         this.currentUser = user;
+        this.searchField.setText(searchPrompt);
         try {
             this.currentSubcreddit = Client.GetSubcreddit(subID);
         }
@@ -72,6 +74,15 @@ public class SubcredditController implements Initializable {
             e.printStackTrace();
         }
         this.postPreviewControllers = new ArrayList<>();
+
+        try {
+            if (user != null)
+                //subMember = Client.IsSubMember(this.currentUser, currentSubcreddit);
+            UpdateJoinButton();
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
 
         updateLoginUI();
 
@@ -96,11 +107,6 @@ public class SubcredditController implements Initializable {
         createdDate.setText("Created: " + currentSubcreddit.GetTimecreated().toLocalDateTime().toLocalDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
 
         privacyStatus.setText("Privacy: " + (currentSubcreddit.GetPrivate() ? "Private" : "Public"));
-
-        updateJoinButton();
-
-        memberCount.setText("1234"); //dummy
-        onlineCount.setText("125"); //dummy
     }
 
     private void checkMemberStatus() {
@@ -256,22 +262,6 @@ public class SubcredditController implements Initializable {
         }
     }
 
-    private void updateJoinButton() {
-        if (isMember) {
-            joinButton.setText("Joined");
-            joinButton.setStyle("-fx-background-color: #2C3539; -fx-text-fill: white; -fx-font-weight: bold;");
-        } else {
-            joinButton.setText("Join");
-            joinButton.setStyle("-fx-background-color: #0079d3; -fx-text-fill: white; -fx-font-weight: bold;");
-        }
-    }
-
-//    private void updateSortButtons() {
-//        hotButton.setStyle("-fx-background-color: " + ("hot".equals(currentSort) ? "#0079d3" : "#2C3539") + "; -fx-text-fill: white;");
-//        newButton.setStyle("-fx-background-color: " + ("new".equals(currentSort) ? "#0079d3" : "#2C3539") + "; -fx-text-fill: white;");
-//        topButton.setStyle("-fx-background-color: " + ("top".equals(currentSort) ? "#0079d3" : "#2C3539") + "; -fx-text-fill: white;");
-//    }
-
     @FXML
     void GoHome(MouseEvent event) {
         Clean();
@@ -280,7 +270,7 @@ public class SubcredditController implements Initializable {
             Parent root = loader.load();
 
             HomePageController homePageController = loader.getController();
-            homePageController.InitData(currentUser, null, 0);
+            homePageController.InitData(currentUser, "", 0);
 
             // Create the second scene
             Scene scene2 = new Scene(root);
@@ -298,7 +288,7 @@ public class SubcredditController implements Initializable {
     @FXML
     void createSubcreddit(MouseEvent event) {
         if (currentUser == null) {
-            login();
+            Login();
             return;
         }
 
@@ -351,40 +341,29 @@ public class SubcredditController implements Initializable {
     }
 
     private void searchInSubcreddit(String searchTerm) {
-        clean();
+        Clean();
         try {
-            showAlert("Search", "Searching in c/" + currentSubcreddit.GetSubName() + " for: " + searchTerm);
+            showAlert("Search", "Searching in cr/" + currentSubcreddit.GetSubName() + " for: " + searchTerm);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     @FXML
-    void refresh() {
-        clean();
+    void Refresh() {
+        Clean();
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("subcreddit-page.fxml"));
             Parent root = loader.load();
 
             SubcredditController controller = loader.getController();
-            controller.InitData(currentSubcreddit.GetSubId(), currentUser);
+            controller.InitData(currentSubcreddit.GetSubId(), this.searchField.getText(), currentUser);
 
             Stage stage = (Stage) postsContainer.getScene().getWindow();
             stage.setScene(new Scene(root));
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    @FXML
-    void refresh(MouseEvent event) {
-        refresh();
-        event.consume();
-    }
-
-    @FXML
-    void login() {
-        navigateToLoginDialog();
     }
 
     private void navigateToLoginDialog() {
@@ -405,7 +384,7 @@ public class SubcredditController implements Initializable {
                 this.currentUser = user;
                 updateLoginUI();
                 loginStage.close();
-                refresh();
+                Refresh();
             });
 
             loginStage.showAndWait();
@@ -415,19 +394,18 @@ public class SubcredditController implements Initializable {
     }
 
     @FXML
-    void login(MouseEvent event) {
-        login();
-        event.consume();
+    void Login() {
+        navigateToLoginDialog();
     }
 
     @FXML
     void createPost(MouseEvent event) {
         if (currentUser == null) {
-            login();
+            Login();
             return;
         }
 
-        clean();
+        Clean();
         try {
             if (!Client.isServerReachable()) {
                 FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("error_404.fxml"));
@@ -470,11 +448,11 @@ public class SubcredditController implements Initializable {
     @FXML
     void profilePressed(MouseEvent event) {
         if (currentUser == null) {
-            login();
+            Login();
             return;
         }
 
-        clean();
+        Clean();
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("my-profile-page.fxml"));
             Parent root = loader.load();
@@ -493,19 +471,22 @@ public class SubcredditController implements Initializable {
     @FXML
     void chat(MouseEvent event) {
         if (currentUser == null) {
-            login();
+            Login();
             return;
         }
-
         try {
-            Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("message.fxml")));
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("message.fxml"));
+            Parent root = fxmlLoader.load();
+            MessageController messageController = fxmlLoader.getController();
+            messageController.Init(this.currentUser);
             Stage stage = new Stage();
             stage.setTitle("Chats");
             stage.setScene(new Scene(root, 800, 600));
             stage.setMinWidth(600);
             stage.setMinHeight(400);
             stage.initOwner(postsContainer.getScene().getWindow());
-            stage.show();
+            stage.showAndWait();
+            messageController.Clean();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -515,68 +496,35 @@ public class SubcredditController implements Initializable {
     @FXML
     void toggleJoinSubcreddit(MouseEvent event) {
         if (currentUser == null) {
-            login();
+            Login();
             return;
         }
-
-        try {
-            if (isMember) {
-                // Leave subcreddit
-                boolean success = Client.LeaveSubcreddit(currentUser, currentSubcreddit);
-
-                if (success) {
-                    isMember = false;
-                    showAlert("Left", "You've left c/" + currentSubcreddit.GetSubName());
-                    updateJoinButton();
-                } else {
-                    showAlert("Error", "Failed to leave subcreddit. Please try again.");
-                }
-            } else {
-                // Join subcreddit
-                boolean success = Client.JoinSubcreddit(currentUser, currentSubcreddit);
-
-                if (success) {
-                    isMember = true;
-                    showAlert("Joined", "You've joined c/" + currentSubcreddit.GetSubName() + "!");
-                    updateJoinButton();
-                } else {
-                    showAlert("Error", "Failed to join subcreddit. Please try again.");
-                }
-            }
-
-        } catch (Exception e) {
-            System.err.println("Error toggling join status: " + e.getMessage());
-            showAlert("Error", "Failed to update join status. Please try again.");
+        if(subMember) {
+            if (Client.LeaveSubcreddit(this.currentUser, currentSubcreddit))
+                subMember = false;
         }
+        else {
+            if (Client.JoinSubcreddit(this.currentUser, currentSubcreddit))
+                subMember = true;
+        }
+        for(PostPreviewTemplateController postPreviewTemplateController : postPreviewControllers) {
+            postPreviewTemplateController.subMember = subMember;
+            postPreviewTemplateController.UpdateJoinButton();
+        }
+        UpdateJoinButton();
         event.consume();
     }
 
-//    @FXML
-//    void sortByHot(MouseEvent event) {
-//        currentSort = "hot";
-//        updateSortButtons();
-//        // Reload posts with hot sorting
-//        loadPosts();
-//        event.consume();
-//    }
-//
-//    @FXML
-//    void sortByNew(MouseEvent event) {
-//        currentSort = "new";
-//        updateSortButtons();
-//        // Reload posts with new sorting
-//        loadPosts();
-//        event.consume();
-//    }
-//
-//    @FXML
-//    void sortByTop(MouseEvent event) {
-//        currentSort = "top";
-//        updateSortButtons();
-//        // Reload posts with top sorting
-//        loadPosts();
-//        event.consume();
-//    }
+    private void UpdateJoinButton() {
+        if(subMember) {
+            joinButton.setText("Joined");
+            joinButton.setStyle("-fx-text-fill: #ffffff; -fx-border-color: gray; -fx-border-radius: 20; -fx-background-radius: 20");
+        }
+        else {
+            joinButton.setText("Join");
+            joinButton.setStyle("-fx-background-color: #115bca; -fx-text-fill: #ffffff; -fx-border-radius: 20; -fx-background-radius: 20");
+        }
+    }
 
     @FXML
     void showSubcredditRules(MouseEvent event) {
@@ -598,13 +546,13 @@ public class SubcredditController implements Initializable {
     }
 
     private void goToSubcreddit(Subcreddit subcreddit) {
-        clean();
+        Clean();
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("subcreddit-page.fxml"));
             Parent root = loader.load();
 
             SubcredditController controller = loader.getController();
-            controller.InitData(subcreddit.GetSubId(), currentUser);
+            controller.InitData(subcreddit.GetSubId(), "", currentUser);
 
             Stage stage = (Stage) postsContainer.getScene().getWindow();
             stage.setScene(new Scene(root));
@@ -628,7 +576,7 @@ public class SubcredditController implements Initializable {
         dialogPane.lookup(".content.label").setStyle("-fx-text-fill: white;");
     }
 
-    private void clean() {
+    private void Clean() {
         if (postPreviewControllers != null) {
             for (PostPreviewTemplateController controller : postPreviewControllers) {
                 if (controller != null && controller.mediaViewController != null) {
@@ -636,9 +584,5 @@ public class SubcredditController implements Initializable {
                 }
             }
         }
-    }
-
-    @Override
-    public void initialize(URL location, ResourceBundle resources) {
     }
 }

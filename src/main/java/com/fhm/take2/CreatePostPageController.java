@@ -179,12 +179,12 @@ public class CreatePostPageController {
             }
             contentArea.setText(post.GetContent());
             validPostInfo.set(true);
-            postButton.setText("Apply");//todo SEX
+            postButton.setText("Apply");
         }
 
-        if (subcreddit != null){
+        if (subcreddit != null && mySubcreddits != null){
             for (Subcreddit s : mySubcreddits){
-                if (s.equals(subcreddit)){
+                if (s != null && s.equals(subcreddit)){
                     subcredditComboBox.getSelectionModel().select(s);
                     subcredditComboBox.setDisable(true);
                     break;
@@ -236,7 +236,7 @@ public class CreatePostPageController {
             Parent root = loader.load();
 
             HomePageController homePageController = loader.getController();
-            homePageController.InitData(currentUser, null, 0);
+            homePageController.InitData(currentUser, "", 0);
 
             // Create the second scene
             Scene scene2 = new Scene(root);

@@ -108,7 +108,7 @@
             </VBox>
                 <AnchorPane layoutX="14.0" layoutY="736.0">
                     <children>
-                        <Button layoutX="-7.0" mnemonicParsing="false" onMouseClicked="#CheckRules" prefHeight="52.0" prefWidth="262.0" style="-fx-text-fill: #ffffff;" text="Creddit Rules" textFill="#c6151500">
+                        <Button layoutX="-7.0" mnemonicParsing="false" onMouseClicked="#CheckRules" prefHeight="52.0" prefWidth="262.0" style="-fx-text-fill: #ffffff;" text="Analytics" textFill="#c6151500">
                             <font>
                                 <Font size="18.0" />
                             </font>
@@ -134,6 +134,7 @@
                   </ImageView>
                </children>
             </AnchorPane>
+            <AnchorPane layoutX="14.0" layoutY="573.0" />
             </children>
         </AnchorPane>
         <GridPane prefHeight="84.0" prefWidth="1600.0" style="-fx-border-color: gray;" stylesheets="@CredditCSS.css">

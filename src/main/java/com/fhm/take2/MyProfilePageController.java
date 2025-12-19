@@ -386,7 +386,7 @@ public class MyProfilePageController {
             Parent root = loader.load();
 
             HomePageController homePageController = loader.getController();
-            homePageController.InitData(currentUser, null, 0);
+            homePageController.InitData(currentUser, "", 0);
 
             // Create the second scene
             Scene scene2 = new Scene(root);

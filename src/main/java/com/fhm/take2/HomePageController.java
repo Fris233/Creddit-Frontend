@@ -13,6 +13,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -57,6 +58,8 @@ public class HomePageController {
         currentUser = user;
         this.filter = filter;
         this.searchField.setText(searchPrompt);
+        if(currentUser != null)
+            userPFP.setImage(new Image(currentUser.getPfp().GetURL(), true));
         postPreviewControllers = new ArrayList<>();
 
         updateLoginUI();
@@ -406,7 +409,7 @@ public class HomePageController {
                 Parent root = loader.load();
 
                 SubcredditController controller = loader.getController();
-                controller.InitData(id, currentUser);
+                controller.InitData(id, searchPrompt, currentUser);
 
                 Stage stage = (Stage) postsContainer.getScene().getWindow();
                 stage.setScene(new Scene(root));
@@ -491,7 +494,7 @@ public class HomePageController {
             Parent root = loader.load();
 
             SubcredditController controller = loader.getController();
-            controller.InitData(subcreddit.GetSubId(), currentUser);
+            controller.InitData(subcreddit.GetSubId(), "", currentUser);
 
             Stage stage = (Stage) postsContainer.getScene().getWindow();
             stage.setScene(new Scene(root));

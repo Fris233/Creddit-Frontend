@@ -41,7 +41,7 @@ public class PostPreviewTemplateController {
     private User currentUser;
     private int myOGVote;
     private int myVote;
-    private boolean subMember = false;
+    boolean subMember = false;
     private boolean modAuthor = false;
 
     MediaViewController mediaViewController;
@@ -90,6 +90,10 @@ public class PostPreviewTemplateController {
             catch (Exception e) {
                 e.printStackTrace();
             }
+            //subPFP.setImage(new Image(post.GetSubcreddit().GetLogo().GetURL(), true));
+        }
+        else {
+            //subPFP.setImage(new Image(post.GetAuthor().getPfp().GetURL(), true));
         }
         UpdateJoinButton();
     }
@@ -143,7 +147,7 @@ public class PostPreviewTemplateController {
         }
     }
 
-    private void UpdateJoinButton() {
+    void UpdateJoinButton() {
         if(subMember) {
             JoinButton.setText("Joined");
             JoinButton.setStyle("-fx-text-fill: #ffffff; -fx-border-color: gray; -fx-border-radius: 20; -fx-background-radius: 20");
@@ -265,7 +269,7 @@ public class PostPreviewTemplateController {
                 Parent root = loader.load();
 
                 SubcredditController controller = loader.getController();
-                controller.InitData(post.GetSubcreddit().GetSubId(), currentUser);
+                controller.InitData(post.GetSubcreddit().GetSubId(), "", currentUser);
 
                 Stage stage = (Stage) JoinButton.getScene().getWindow();
                 stage.setScene(new Scene(root));
