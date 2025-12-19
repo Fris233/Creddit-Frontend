@@ -442,7 +442,7 @@ public class HomePageController {
             Parent root = loader.load();
 
             HomePageController homePageController = loader.getController();
-            homePageController.InitData(currentUser, null, 0);
+            homePageController.InitData(currentUser, "", 0);
 
             Scene scene2 = new Scene(root);
             Stage stage = (Stage)postsContainer.getScene().getWindow();
