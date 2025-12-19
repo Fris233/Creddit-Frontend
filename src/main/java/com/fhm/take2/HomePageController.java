@@ -131,7 +131,8 @@ public class HomePageController {
             stage.setMinWidth(600);
             stage.setMinHeight(400);
             stage.initOwner(postsContainer.getScene().getWindow());
-            stage.show();
+            stage.showAndWait();
+            messageController.Clean();
         } catch (IOException e) {
             e.printStackTrace();
         }
