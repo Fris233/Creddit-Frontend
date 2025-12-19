@@ -643,8 +643,47 @@ public class ActualPostTemplateController {
             return;
         }
         System.out.println("Create Subcreddit Button Pressed");
-        Clean();
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("create-subcreddit-page.fxml"));
+            Parent root = loader.load();
+
+            CreateSubcredditPageController createSubcredditPageController = loader.getController();
+            createSubcredditPageController.InitData(this.currentUser);
+
+            Stage createSubcredditStage = new Stage();
+            createSubcredditStage.setTitle("Create Subcreddit");
+            createSubcredditStage.setScene(new Scene(root, 600, 400));
+            createSubcredditStage.setResizable(false);
+            createSubcredditStage.initModality(Modality.WINDOW_MODAL);
+            createSubcredditStage.initOwner(postsContainer.getScene().getWindow());
+
+            createSubcredditPageController.setOnCreationSuccess(sub -> {
+                createSubcredditStage.close();
+                goToSubcreddit(sub);
+            });
+
+            createSubcredditStage.showAndWait();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         event.consume();
+    }
+
+    public void goToSubcreddit(Subcreddit subcreddit) {
+        Clean();
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("subcreddit-page.fxml"));
+            Parent root = loader.load();
+
+            SubcredditController controller = loader.getController();
+            controller.InitData(subcreddit.GetSubId(), "", currentUser);
+
+            Stage stage = (Stage) postsContainer.getScene().getWindow();
+            stage.setScene(new Scene(root));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @FXML
