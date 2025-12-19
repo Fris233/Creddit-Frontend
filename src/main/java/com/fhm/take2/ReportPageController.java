@@ -1,7 +1,5 @@
 package com.fhm.take2;
 
-import com.Client;
-import com.crdt.Post;
 import com.crdt.Report;
 import com.crdt.User;
 import javafx.animation.PauseTransition;
@@ -19,13 +17,11 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Map;
 import java.util.Objects;
 
 public class ReportPageController {
@@ -46,21 +42,18 @@ public class ReportPageController {
     private boolean scrollCooldown = false;
     private int filter; // 0 for posts, 1 for subcreddits, 2 for comments, 3 for users
 
-    public void InitData(User user, String searchPrompt, int filter) {
+    public void InitData(User user, ArrayList<Report> reportsarr) {
         currentUser = user;
-        this.filter = filter;
-        this.searchField.setText(searchPrompt);
         reportPreviewControllers = new ArrayList<>();
-
+        this.reportsarr = reportsarr;
 
         try {
-            ArrayList<Report> report = reportsarr;//TODO: REPORT ARRAYLIST
-            for (Report report1 : report) {
+            for (Report report : reportsarr) {
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("Report_Preview_Template.fxml"));
                 Node postNode = loader.load();
 
                 ReportPreviewTemplateController controller = loader.getController();
-                controller.init(report1, user);
+                controller.init(report, user);
 
                 reportContainer.getChildren().add(postNode);
                 reportPreviewControllers.add(controller);
@@ -81,12 +74,11 @@ public class ReportPageController {
                 updating = true;
                 scrollCooldown = true;
                 try {
-                    ArrayList<Report> report = reportsarr; //TODO: REPORT ARRAYLIST
-                    for (Report report1 : report) {
+                    for (Report report : reportsarr) {
                         FXMLLoader loader = new FXMLLoader(getClass().getResource("Report_Preview_Template.fxml"));
                         Node postNode = loader.load();
                         ReportPreviewTemplateController controller = loader.getController();
-                        controller.init(report1, user);
+                        controller.init(report, user);
                         reportContainer.getChildren().add(postNode);
                         reportPreviewControllers.add(controller);
                     }
@@ -147,7 +139,7 @@ public class ReportPageController {
         //Clean();
         event.consume();
     }
-
+/*
     @FXML
     void Refresh() {
         Clean();
@@ -155,7 +147,7 @@ public class ReportPageController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("home-page.fxml"));
             Parent root = loader.load();
 
-            ReportPageController homePageController = loader.getController();
+            HomePageController homePageController = loader.getController();
             homePageController.InitData(currentUser, searchField.getText(), filter);
 
             // Get the current stage
@@ -166,7 +158,7 @@ public class ReportPageController {
         catch (Exception e) {
             e.printStackTrace();
         }
-    }
+    }*/
 
     @FXML
     void GoHome(MouseEvent event) {
@@ -175,7 +167,7 @@ public class ReportPageController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("home-page.fxml"));
             Parent root = loader.load();
 
-            ReportPageController homePageController = loader.getController();
+            HomePageController homePageController = loader.getController();
             homePageController.InitData(currentUser, null, 0);
 
             // Create the second scene
@@ -189,14 +181,6 @@ public class ReportPageController {
             System.out.println(ex.getMessage());
         }
         event.consume();
-    }
-
-    @FXML
-    void SearchPressed(KeyEvent event) {
-        if(event.getCode() == KeyCode.ENTER) {
-            Refresh();
-            event.consume();
-        }
     }
 
     private void showAlert(String title, String message) {
@@ -213,7 +197,7 @@ public class ReportPageController {
         alert.showAndWait();
     }
 
-    private void Clean() {
+    private void Clean() { //TODO: what does this do?
         if (reportPreviewControllers != null) {
             for(ReportPreviewTemplateController controller : reportPreviewControllers) {
                 if(controller != null && controller.mediaViewController != null) {
