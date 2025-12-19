@@ -143,7 +143,7 @@
                     <children>
                         <AnchorPane fx:id="loggedOutPane" layoutY="3.0" prefHeight="78.0" prefWidth="352.0">
                             <children>
-                                <Button layoutX="134.0" layoutY="19.0" mnemonicParsing="false" onMouseClicked="#login" prefHeight="40.0" prefWidth="85.0" style="-fx-text-fill: #ffffff; -fx-background-color: green; -fx-background-radius: 30;" text="Log In" textFill="#c6151500">
+                                <Button layoutX="134.0" layoutY="19.0" mnemonicParsing="false" onMouseClicked="#Login" prefHeight="40.0" prefWidth="85.0" style="-fx-text-fill: #ffffff; -fx-background-color: green; -fx-background-radius: 30;" text="Log In" textFill="#c6151500">
                                     <font>
                                         <Font size="18.0" />
                                     </font>
