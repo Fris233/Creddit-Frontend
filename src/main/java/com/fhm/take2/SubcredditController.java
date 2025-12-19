@@ -62,6 +62,7 @@ public class SubcredditController {
     private boolean scrollCooldown = false;
     private boolean isMember = false;
     private int lastPostId = 0;
+    private boolean subMember = false;
 
     public void InitData(int subID, String searchPrompt, User user) {
         this.currentUser = user;
@@ -73,6 +74,14 @@ public class SubcredditController {
             e.printStackTrace();
         }
         this.postPreviewControllers = new ArrayList<>();
+
+        try {
+            if (user != null)
+                subMember = Client.IsSubMember(this.currentUser, currentSubcreddit);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
 
         updateLoginUI();
 
@@ -510,37 +519,27 @@ public class SubcredditController {
             Login();
             return;
         }
-
-        try {
-            if (isMember) {
-                // Leave subcreddit
-                boolean success = Client.LeaveSubcreddit(currentUser, currentSubcreddit);
-
-                if (success) {
-                    isMember = false;
-                    showAlert("Left", "You've left c/" + currentSubcreddit.GetSubName());
-                    updateJoinButton();
-                } else {
-                    showAlert("Error", "Failed to leave subcreddit. Please try again.");
-                }
-            } else {
-                // Join subcreddit
-                boolean success = Client.JoinSubcreddit(currentUser, currentSubcreddit);
-
-                if (success) {
-                    isMember = true;
-                    showAlert("Joined", "You've joined c/" + currentSubcreddit.GetSubName() + "!");
-                    updateJoinButton();
-                } else {
-                    showAlert("Error", "Failed to join subcreddit. Please try again.");
-                }
-            }
-
-        } catch (Exception e) {
-            System.err.println("Error toggling join status: " + e.getMessage());
-            showAlert("Error", "Failed to update join status. Please try again.");
+        if(subMember) {
+            if (Client.LeaveSubcreddit(this.currentUser, currentSubcreddit))
+                subMember = false;
         }
+        else {
+            if (Client.JoinSubcreddit(this.currentUser, currentSubcreddit))
+                subMember = true;
+        }
+        UpdateJoinButton();
         event.consume();
+    }
+
+    private void UpdateJoinButton() {
+        if(subMember) {
+            joinButton.setText("Joined");
+            joinButton.setStyle("-fx-text-fill: #ffffff; -fx-border-color: gray; -fx-border-radius: 20; -fx-background-radius: 20");
+        }
+        else {
+            joinButton.setText("Join");
+            joinButton.setStyle("-fx-background-color: #115bca; -fx-text-fill: #ffffff; -fx-border-radius: 20; -fx-background-radius: 20");
+        }
     }
 
     @FXML
