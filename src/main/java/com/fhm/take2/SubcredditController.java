@@ -34,7 +34,7 @@ import java.text.SimpleDateFormat;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
-public class SubcredditController implements Initializable {
+public class SubcredditController {
 
     @FXML private AnchorPane loggedInPane;
     @FXML private AnchorPane loggedOutPane;
@@ -63,8 +63,9 @@ public class SubcredditController implements Initializable {
     private boolean isMember = false;
     private int lastPostId = 0;
 
-    public void InitData(int subID, User user) {
+    public void InitData(int subID, String searchPrompt, User user) {
         this.currentUser = user;
+        this.searchField.setText(searchPrompt);
         try {
             this.currentSubcreddit = Client.GetSubcreddit(subID);
         }
@@ -298,7 +299,7 @@ public class SubcredditController implements Initializable {
     @FXML
     void createSubcreddit(MouseEvent event) {
         if (currentUser == null) {
-            login();
+            Login();
             return;
         }
 
@@ -351,40 +352,29 @@ public class SubcredditController implements Initializable {
     }
 
     private void searchInSubcreddit(String searchTerm) {
-        clean();
+        Clean();
         try {
-            showAlert("Search", "Searching in c/" + currentSubcreddit.GetSubName() + " for: " + searchTerm);
+            showAlert("Search", "Searching in cr/" + currentSubcreddit.GetSubName() + " for: " + searchTerm);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     @FXML
-    void refresh() {
-        clean();
+    void Refresh() {
+        Clean();
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("subcreddit-page.fxml"));
             Parent root = loader.load();
 
             SubcredditController controller = loader.getController();
-            controller.InitData(currentSubcreddit.GetSubId(), currentUser);
+            controller.InitData(currentSubcreddit.GetSubId(), this.searchField.getText(), currentUser);
 
             Stage stage = (Stage) postsContainer.getScene().getWindow();
             stage.setScene(new Scene(root));
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    @FXML
-    void refresh(MouseEvent event) {
-        refresh();
-        event.consume();
-    }
-
-    @FXML
-    void login() {
-        navigateToLoginDialog();
     }
 
     private void navigateToLoginDialog() {
@@ -405,7 +395,7 @@ public class SubcredditController implements Initializable {
                 this.currentUser = user;
                 updateLoginUI();
                 loginStage.close();
-                refresh();
+                Refresh();
             });
 
             loginStage.showAndWait();
@@ -415,19 +405,18 @@ public class SubcredditController implements Initializable {
     }
 
     @FXML
-    void login(MouseEvent event) {
-        login();
-        event.consume();
+    void Login() {
+        navigateToLoginDialog();
     }
 
     @FXML
     void createPost(MouseEvent event) {
         if (currentUser == null) {
-            login();
+            Login();
             return;
         }
 
-        clean();
+        Clean();
         try {
             if (!Client.isServerReachable()) {
                 FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("error_404.fxml"));
@@ -470,11 +459,11 @@ public class SubcredditController implements Initializable {
     @FXML
     void profilePressed(MouseEvent event) {
         if (currentUser == null) {
-            login();
+            Login();
             return;
         }
 
-        clean();
+        Clean();
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("my-profile-page.fxml"));
             Parent root = loader.load();
@@ -493,19 +482,22 @@ public class SubcredditController implements Initializable {
     @FXML
     void chat(MouseEvent event) {
         if (currentUser == null) {
-            login();
+            Login();
             return;
         }
-
         try {
-            Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("message.fxml")));
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("message.fxml"));
+            Parent root = fxmlLoader.load();
+            MessageController messageController = fxmlLoader.getController();
+            messageController.Init(this.currentUser);
             Stage stage = new Stage();
             stage.setTitle("Chats");
             stage.setScene(new Scene(root, 800, 600));
             stage.setMinWidth(600);
             stage.setMinHeight(400);
             stage.initOwner(postsContainer.getScene().getWindow());
-            stage.show();
+            stage.showAndWait();
+            messageController.Clean();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -515,7 +507,7 @@ public class SubcredditController implements Initializable {
     @FXML
     void toggleJoinSubcreddit(MouseEvent event) {
         if (currentUser == null) {
-            login();
+            Login();
             return;
         }
 
@@ -551,33 +543,6 @@ public class SubcredditController implements Initializable {
         event.consume();
     }
 
-//    @FXML
-//    void sortByHot(MouseEvent event) {
-//        currentSort = "hot";
-//        updateSortButtons();
-//        // Reload posts with hot sorting
-//        loadPosts();
-//        event.consume();
-//    }
-//
-//    @FXML
-//    void sortByNew(MouseEvent event) {
-//        currentSort = "new";
-//        updateSortButtons();
-//        // Reload posts with new sorting
-//        loadPosts();
-//        event.consume();
-//    }
-//
-//    @FXML
-//    void sortByTop(MouseEvent event) {
-//        currentSort = "top";
-//        updateSortButtons();
-//        // Reload posts with top sorting
-//        loadPosts();
-//        event.consume();
-//    }
-
     @FXML
     void showSubcredditRules(MouseEvent event) {
         if (currentSubcreddit == null) return;
@@ -598,13 +563,13 @@ public class SubcredditController implements Initializable {
     }
 
     private void goToSubcreddit(Subcreddit subcreddit) {
-        clean();
+        Clean();
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("subcreddit-page.fxml"));
             Parent root = loader.load();
 
             SubcredditController controller = loader.getController();
-            controller.InitData(subcreddit.GetSubId(), currentUser);
+            controller.InitData(subcreddit.GetSubId(), "", currentUser);
 
             Stage stage = (Stage) postsContainer.getScene().getWindow();
             stage.setScene(new Scene(root));
@@ -628,7 +593,7 @@ public class SubcredditController implements Initializable {
         dialogPane.lookup(".content.label").setStyle("-fx-text-fill: white;");
     }
 
-    private void clean() {
+    private void Clean() {
         if (postPreviewControllers != null) {
             for (PostPreviewTemplateController controller : postPreviewControllers) {
                 if (controller != null && controller.mediaViewController != null) {
@@ -636,9 +601,5 @@ public class SubcredditController implements Initializable {
                 }
             }
         }
-    }
-
-    @Override
-    public void initialize(URL location, ResourceBundle resources) {
     }
 }
