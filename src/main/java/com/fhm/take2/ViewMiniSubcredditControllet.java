@@ -11,7 +11,6 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
 
-import java.io.IOException;
 
 public class ViewMiniSubcredditControllet {
 
@@ -43,7 +42,7 @@ public class ViewMiniSubcredditControllet {
            Parent root = loader.load();
 
            SubcredditController subcredditController = loader.getController();
-           subcredditController.InitData(subcreddit.GetSubId(), currentUser);
+           subcredditController.InitData(subcreddit.GetSubId(), "",currentUser);
 
            Stage stage = (Stage) subName.getScene().getWindow();
            stage.setScene(new Scene(root));
