@@ -106,9 +106,9 @@
                       </ScrollPane>
                </children>
             </VBox>
-                <AnchorPane layoutX="14.0" layoutY="736.0">
+                <AnchorPane fx:id="analyticsAnchor" layoutX="14.0" layoutY="736.0">
                     <children>
-                        <Button layoutX="-7.0" mnemonicParsing="false" onMouseClicked="#CheckRules" prefHeight="52.0" prefWidth="262.0" style="-fx-text-fill: #ffffff;" text="Analytics" textFill="#c6151500">
+                        <Button layoutX="-7.0" mnemonicParsing="false" onMouseClicked="#CheckAnalytics" prefHeight="52.0" prefWidth="262.0" style="-fx-text-fill: #ffffff;" text="Analytics" textFill="#c6151500">
                             <font>
                                 <Font size="18.0" />
                             </font>
@@ -120,9 +120,9 @@
                         </ImageView>
                     </children>
                 </AnchorPane>
-            <AnchorPane layoutX="14.0" layoutY="646.0">
+            <AnchorPane fx:id="reportsAnchor" layoutX="14.0" layoutY="646.0">
                <children>
-                  <Button layoutX="-7.0" mnemonicParsing="false" onMouseClicked="#CheckRules" prefHeight="52.0" prefWidth="262.0" style="-fx-text-fill: #ffffff;" text="Reports" textFill="#c6151500">
+                  <Button layoutX="-7.0" mnemonicParsing="false" onMouseClicked="#CheckReports" prefHeight="52.0" prefWidth="262.0" style="-fx-text-fill: #ffffff;" text="Reports" textFill="#c6151500">
                      <font>
                         <Font size="18.0" />
                      </font>
