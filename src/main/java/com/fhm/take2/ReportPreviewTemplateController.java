@@ -66,14 +66,14 @@ public class ReportPreviewTemplateController {
             status.setTextFill(Color.ORANGE);
         }
 
-        if(report.getTarget() instanceof Post){ //TODO report target
-
+        if(report.getTarget() instanceof Post){
+            target.setText("Post Title: " + ((Post) report.getTarget()).GetTitle());
         }
         else if(report.getTarget() instanceof Comment){
-
+            target.setText("Comment Author: " + ((Comment) report.getTarget()).getAuthor().getUsername());
         }
         else if(report.getTarget() instanceof User){
-
+            target.setText("Target User: " + ((User) report.getTarget()).getUsername());
         }
     }
 
@@ -113,63 +113,63 @@ public class ReportPreviewTemplateController {
     }
 
     @FXML
-    void Resolve(MouseEvent event) throws SQLException {
+    void Resolve(MouseEvent event) throws Exception {
         System.out.println("Approve Pressed!");
         status.setTextFill(Color.LIMEGREEN);
+        Client.ResolveReport(report);
     }
-    //TODO RESOLVE DISMISS
+
     @FXML
-    void Dismiss(MouseEvent event) throws SQLException {
+    void Dismiss(MouseEvent event) throws Exception {
         System.out.println("Dismiss Pressed!");
         status.setTextFill(Color.ORANGE);
+        Client.DismissReport(report);
     }
 
     @FXML
-    void OpenPost(MouseEvent event) {
-        if(mediaViewController != null)
-            mediaViewController.Clean();
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("ActualPost_Template.fxml"));
-            Parent root = loader.load();
+    void OpenTarget(MouseEvent event) {
+        if(report.getTarget() instanceof Post){
+            target.setText("Post Title: " + ((Post) report.getTarget()).GetTitle());
+            if(mediaViewController != null)
+                mediaViewController.Clean();
+            try {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("ActualPost_Template.fxml"));
+                Parent root = loader.load();
 
-            ActualPostTemplateController actualPostTemplateController = loader.getController();
-          //  actualPostTemplateController.InitData(post, currentUser, myVote);
+                ActualPostTemplateController actualPostTemplateController = loader.getController();
+                actualPostTemplateController.InitData(((Post) report.getTarget()).GetID(), currentUser);
 
-            // Get the current stage
-            Stage stage = (Stage) JoinButton.getScene().getWindow();
-            // Set the new scene
-            stage.setScene(new Scene(root));
+                Stage stage = (Stage) JoinButton.getScene().getWindow();
+                stage.setScene(new Scene(root));
+            }
+            catch (Exception ex) {
+                System.out.println(ex.getMessage());
+            }
+            event.consume();
         }
-        catch (Exception ex) {
-            System.out.println(ex.getMessage());
+        else if(report.getTarget() instanceof Comment){
+            //TODO: COMMENT TARGET
         }
-        event.consume();
-    }
-
-    @FXML
-    void OpenSubcreddit(MouseEvent event) {
-       /* if(mediaViewController != null)
-            mediaViewController.Clean();
-        if(post.GetSubcreddit() == null) {
+        else if(report.getTarget() instanceof User){
+            if(mediaViewController != null)
+                mediaViewController.Clean();
             try {
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("user-profile-page.fxml"));
                 Parent root = loader.load();
 
                 UserProfilePageController userProfilePageController = loader.getController();
-                userProfilePageController.InitData(post.GetAuthor().getId(), currentUser, "", true);
+                userProfilePageController.InitData(((User) report.getTarget()).getId(), currentUser, "", true);
 
                 // Get the current stage
-                Stage stage = (Stage) JoinButton.getScene().getWindow();
+                Stage stage = (Stage) target.getScene().getWindow();
                 // Set the new scene
                 stage.setScene(new Scene(root));
             }
             catch (Exception ex) {
                 System.out.println(ex.getMessage());
             }
+            event.consume();
         }
-        else {
-            System.out.println("Open Subcreddit Pressed!");
-        }
-        event.consume();*/
-    }}
+    }
+    }
 
