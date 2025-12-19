@@ -2,6 +2,7 @@ package com.fhm.take2;
 
 import com.Client;
 import com.crdt.Post;
+import com.crdt.Report;
 import com.crdt.User;
 import javafx.animation.PauseTransition;
 import javafx.fxml.FXML;
@@ -40,6 +41,7 @@ public class ReportPageController {
 
     private User currentUser;
     private ArrayList<ReportPreviewTemplateController> reportPreviewControllers;
+    private ArrayList<Report> reportsarr;
     private boolean updating = false;
     private boolean scrollCooldown = false;
     private int filter; // 0 for posts, 1 for subcreddits, 2 for comments, 3 for users
@@ -50,15 +52,15 @@ public class ReportPageController {
         this.searchField.setText(searchPrompt);
         reportPreviewControllers = new ArrayList<>();
 
-/*
+
         try {
-            Map<Post, Integer> postFeed = Client.GetPostFeed(currentUser, searchPrompt, 0);
-            for (Post post : postFeed.keySet()) {
+            ArrayList<Report> report = reportsarr;//TODO: REPORT ARRAYLIST
+            for (Report report1 : report) {
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("Report_Preview_Template.fxml"));
                 Node postNode = loader.load();
 
                 ReportPreviewTemplateController controller = loader.getController();
-                controller.init(report, user,);
+                controller.init(report1, user);
 
                 reportContainer.getChildren().add(postNode);
                 reportPreviewControllers.add(controller);
@@ -79,12 +81,12 @@ public class ReportPageController {
                 updating = true;
                 scrollCooldown = true;
                 try {
-                    Map<Post, Integer> postFeed = Client.GetPostFeed(currentUser, searchPrompt, reportPreviewControllers.getLast().GetPostID());
-                    for (Post post : postFeed.keySet()) {
-                        FXMLLoader loader = new FXMLLoader(getClass().getResource("Post_Preview_Template.fxml"));
+                    ArrayList<Report> report = reportsarr; //TODO: REPORT ARRAYLIST
+                    for (Report report1 : report) {
+                        FXMLLoader loader = new FXMLLoader(getClass().getResource("Report_Preview_Template.fxml"));
                         Node postNode = loader.load();
                         ReportPreviewTemplateController controller = loader.getController();
-                        controller.init(post, user, postFeed.get(post));
+                        controller.init(report1, user);
                         reportContainer.getChildren().add(postNode);
                         reportPreviewControllers.add(controller);
                     }
@@ -107,7 +109,6 @@ public class ReportPageController {
     @FXML
     void Chat(MouseEvent event) {
         if (currentUser == null) {
-            Login();
             return;
         }
         try {
@@ -138,75 +139,8 @@ public class ReportPageController {
     }
 
     @FXML
-    void CreatePost(MouseEvent event) {
-        if (currentUser == null) {
-            Login();
-            return;
-        }
-        System.out.println("Create Post Button Pressed");
-        Clean();
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("create-post-page.fxml"));
-            Parent root = loader.load();
-
-            CreatePostPageController createPostPageController = loader.getController();
-            createPostPageController.InitData(currentUser);
-
-            // Get the current stage
-            Stage stage = (Stage) reportContainer.getScene().getWindow();
-            // Set the new scene
-            stage.setScene(new Scene(root));
-        }
-        catch (Exception ex) {
-            System.out.println(ex.getMessage());
-        }
-        event.consume();
-    }
-
-    @FXML
-    void CreateSubcreddit(MouseEvent event) {
-        if (currentUser == null) {
-            Login();
-            return;
-        }
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("create-subcreddit-page.fxml"));
-            Parent root = loader.load();
-
-            // Get the login controller
-            CreateSubcredditPageController createSubcredditPageController = loader.getController();
-            createSubcredditPageController.InitData(this.currentUser);
-
-            // Create a new stage for login (dialog)
-            Stage createSubcredditStage = new Stage();
-            createSubcredditStage.setTitle("Create Subcreddit");
-            createSubcredditStage.setScene(new Scene(root, 600, 400));
-            createSubcredditStage.setResizable(false);
-
-            // Set modality so it blocks interaction with homepage
-            createSubcredditStage.initModality(Modality.WINDOW_MODAL);
-            createSubcredditStage.initOwner(reportContainer.getScene().getWindow());
-
-            // Set up callback for successful login
-            createSubcredditPageController.setOnCreationSuccess(sub -> {
-                createSubcredditStage.close();
-                //TODO: Open Subcreddit Page here
-            });
-
-            createSubcredditStage.showAndWait();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        event.consume();
-    }
-
-
-
-    @FXML
     void ProfilePressed(MouseEvent event) {
         if (currentUser == null) {
-            Login();
             return;
         }
         System.out.println("My Profile Button Pressed");
@@ -286,6 +220,6 @@ public class ReportPageController {
                     controller.mediaViewController.Clean();
                 }
             }
-        }*/
+        }
     }
 }
