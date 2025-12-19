@@ -158,18 +158,22 @@ public class Post implements Voteable, Reportable {
     public String GetTitle() {
         return title;
     }
+    public void setTitle(String title) {this.title = title;}
 
     public String GetContent() {
         return content;
     }
+    public void setContent(String content) {this.content = content;}
 
     public ArrayList<Media> GetMedia() {
         return media;
     }
+    public void setMedia(ArrayList<Media> media) {this.media = media;}
 
     public ArrayList<String> GetCategories() {
         return categories;
     }
+    public void setCategories(ArrayList<String> categories) {this.categories = categories;}
 
     public Timestamp GetTimeCreated() {
         return timeCreated;

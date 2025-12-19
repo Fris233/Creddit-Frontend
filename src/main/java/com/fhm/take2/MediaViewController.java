@@ -433,7 +433,7 @@ public class MediaViewController {
         int limit = mediaArrayList.size();
         if(mode == 1)
             limit = fileArrayList.size();
-        if(limit == 2)
+        if(mode == 2) //sex
             limit = mediaArrayList.size() + fileArrayList.size();
         if(currentMediaIndex == limit)
             return;
@@ -481,6 +481,12 @@ public class MediaViewController {
         if(mp != null && mp.getTotalDuration() != null && !mp.getTotalDuration().isUnknown() && !mp.getTotalDuration().isIndefinite())
             RemoveMedia();
         return this.fileArrayList;
+    }
+
+    ArrayList<Media> getMediaArrayList() {
+        if(mp != null && mp.getTotalDuration() != null && !mp.getTotalDuration().isUnknown() && !mp.getTotalDuration().isIndefinite())
+            RemoveMedia();
+        return this.mediaArrayList;
     }
 
     @FXML

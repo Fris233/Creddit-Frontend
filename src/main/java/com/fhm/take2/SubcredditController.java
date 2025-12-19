@@ -509,7 +509,7 @@ public class SubcredditController implements Initializable {
             Parent root = loader.load();
 
             CreatePostPageController createPostPageController = loader.getController();
-            createPostPageController.InitData(currentUser, currentSubcreddit);
+            createPostPageController.InitData(currentUser, null, currentSubcreddit);
 
             Stage stage = (Stage) postsContainer.getScene().getWindow();
             stage.setScene(new Scene(root));

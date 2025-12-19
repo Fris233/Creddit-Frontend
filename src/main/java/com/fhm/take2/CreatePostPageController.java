@@ -51,16 +51,15 @@ public class CreatePostPageController {
     private MediaViewController mediaViewController;
     private User currentUser;
     private BooleanProperty validPostInfo = new SimpleBooleanProperty(false);
-
     private ArrayList<String> allCategories;
     private ArrayList<String> selectedCategories;
-
     private ArrayList<Subcreddit> mySubcreddits;
-
     private ObservableList<String> suggestions;
+    private Post post;
 
-    public void InitData(User user, Post post) {
+    public void InitData(User user, Post post, Subcreddit subcreddit) {
         this.currentUser = user;
+        this.post = post;
         try {
             allCategories = new ArrayList<>(Arrays.asList(Client.GetAllCategories()));
             mySubcreddits = Client.GetUserSubcreddits(this.currentUser);
@@ -164,119 +163,22 @@ public class CreatePostPageController {
                 AddCategory(category);
             }
             for (Media media : post.GetMedia()) {
-                //AddFile(new File());
+                addMedia(media);
             }
-        }
-    }
-    public void InitData(User user, Subcreddit subcreddit) {
-        this.currentUser = user;
-
-        try {
-            allCategories = new ArrayList<>(Arrays.asList(Client.GetAllCategories()));
-            mySubcreddits = Client.GetUserSubcreddits(this.currentUser);
-            mySubcreddits.addFirst(null);
-            subcredditComboBox.setItems(FXCollections.observableArrayList(mySubcreddits));
-
-            // If a subcreddit is specified, pre-select it
-            if (subcreddit != null) {
-                for (int i = 0; i < mySubcreddits.size(); i++) {
-                    if (mySubcreddits.get(i) != null &&
-                            mySubcreddits.get(i).GetSubId() == subcreddit.GetSubId()) {
-                        subcredditComboBox.getSelectionModel().select(i);
-                        break;
-                    }
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
+            contentArea.setText(post.GetContent());
+            validPostInfo.set(true);
+            postButton.setText("Apply");//todo SEX
         }
 
-        selectedCategories = new ArrayList<>();
-        mediaViewController = null;
-
-        contentArea.setWrapText(true);
-
-        suggestions = FXCollections.observableArrayList();
-        lvSuggestions.setItems(suggestions);
-        lvSuggestions.setVisible(false);
-        lvSuggestions.setFocusTraversable(false);
-        lvSuggestions.setFixedCellSize(24);
-        categorySearchField.textProperty().addListener((obs, old, text) -> {
-            UpdateSuggestions(text);
-        });
-
-        lvSuggestions.setOnMouseClicked(e -> {
-            if(e.getClickCount() == 1)
-                HandleSelect();
-        });
-
-        int[] lastLineCount = { 1 };
-
-        contentArea.setPrefHeight(contentArea.getMinHeight());
-
-        contentArea.textProperty().addListener((obs, oldText, newText) -> {
-            int lines = newText.split("\n", -1).length;
-
-            if (lines != lastLineCount[0]) {
-                lastLineCount[0] = lines;
-
-                contentArea.applyCss();
-                contentArea.layout();
-
-                var content = contentArea.lookup(".content");
-                if (content != null) {
-                    double height = 52 + (32 * (Math.min(lines, 14)));
-                    contentArea.setPrefHeight(height);
+        if (subcreddit != null){
+            for (Subcreddit s : mySubcreddits){
+                if (s.equals(subcreddit)){
+                    subcredditComboBox.getSelectionModel().select(s);
+                    subcredditComboBox.setDisable(true);
+                    break;
                 }
             }
-        });
-
-        titleField.textProperty().addListener((obs, oldText, newText) -> {
-            if(newText.length() > 255)
-                titleField.setText(oldText);
-            validPostInfo.set(!newText.isBlank());
-        });
-
-        categorySearchField.textProperty().addListener((obs, oldText, newText) -> {
-            if(newText.length() > 50)
-                categorySearchField.setText(oldText);
-        });
-
-        validPostInfo.addListener((obs, oldVal, newVal) -> {
-            if(newVal) {
-                postButton.setStyle("-fx-background-color: #115bca; -fx-text-fill: #ffffff; -fx-background-radius: 30;");
-                postButton.setDisable(false);
-            }
-            else {
-                postButton.setStyle("-fx-background-color: #191c1e; -fx-text-fill: #525454; -fx-background-radius: 30;");
-                postButton.setDisable(true);
-            }
-        });
-
-        // Setup scroll behavior
-        scrollPane.addEventFilter(ScrollEvent.SCROLL, e -> {
-            double delta = e.getDeltaY() * 2;
-            scrollPane.setVvalue(scrollPane.getVvalue() - delta / scrollPane.getContent().getBoundsInLocal().getHeight());
-        });
-
-        scrollPane.setOnDragOver(event -> {
-            if (event.getGestureSource() != scrollPane && event.getDragboard().hasFiles()) {
-                event.acceptTransferModes(javafx.scene.input.TransferMode.COPY_OR_MOVE);
-            }
-            event.consume();
-        });
-
-        scrollPane.setOnDragDropped(event -> {
-            var db = event.getDragboard();
-            boolean success = false;
-            if (db.hasFiles()) {
-                success = true;
-                List<File> files = db.getFiles();
-                files.forEach(this::AddFile);
-            }
-            event.setDropCompleted(success);
-            event.consume();
-        });
+        }
     }
 
     @FXML
@@ -458,70 +360,104 @@ public class CreatePostPageController {
             return;
         }
 
-        try {
-            String title = titleField.getText();
-            String content = contentArea.getText();
+        if(this.post == null){
+            try {
+                String title = titleField.getText();
+                String content = contentArea.getText();
 
+                String mediaUrl = null;
+                MediaType mediaType = null;
+
+                ArrayList<Media> media = new ArrayList<>();
+                if(mediaViewController != null) {
+                    ArrayList<File> fileArrayList = mediaViewController.GetFileArrayList();
+                    for (File selectedFile : fileArrayList) {
+                        String uploadResponse = Client.UploadFile(selectedFile);
+                        if (uploadResponse == null) {
+                            new Alert(Alert.AlertType.ERROR, "Server unreachable! Check your connection and try again!").showAndWait();
+                            return;
+                        }
+                        Map<?, ?> json = Client.GetResponse(uploadResponse);
+                        mediaUrl = (String) json.get("url");
+
+                        String mime = Files.probeContentType(selectedFile.toPath());
+                        if (mime != null) {
+                            if (mime.startsWith("image/")) mediaType = MediaType.IMAGE;
+                            else if (mime.startsWith("video/")) mediaType = MediaType.VIDEO;
+                            else if (mime.startsWith("audio/")) mediaType = MediaType.AUDIO;
+                            else mediaType = MediaType.OTHER;
+                        }
+                        media.add(new Media(mediaType, mediaUrl));
+                    }
+                }
+
+                Post post = new Post(1, currentUser, subcredditComboBox.getSelectionModel().getSelectedItem(), title, content, media, selectedCategories, null, null, 0, 0);
+                int id = Client.CreatePost(post);
+                if (id > 0) {
+                    post.SetID(id);
+                    Alert alert = new Alert(Alert.AlertType.INFORMATION, "Post uploaded successfully!");
+                    alert.showAndWait();
+                    if(mediaViewController != null) {
+                        mediaViewController.Clean();
+                        RemoveMediaPane();
+                    }
+                    try {
+                        FXMLLoader loader = new FXMLLoader(getClass().getResource("ActualPost_Template.fxml"));
+                        Parent root = loader.load();
+
+                        ActualPostTemplateController actualPostTemplateController = loader.getController();
+                        actualPostTemplateController.InitData(post, currentUser, 0);
+
+                        Stage stage = (Stage) postButton.getScene().getWindow();
+                        stage.setScene(new Scene(root));
+                    }
+                    catch (Exception ex) {
+                        System.out.println(ex.getMessage());
+                    }
+                }
+                else {
+                    Alert alert = new Alert(Alert.AlertType.ERROR, "Failed to send post!");
+                    alert.showAndWait();
+                }
+            }
+            catch (Exception ex) {
+                ex.printStackTrace();
+                new Alert(Alert.AlertType.ERROR, "Error: " + ex.getMessage()).showAndWait();
+            }
+        }else{
+            post.setTitle(titleField.getText());
+            post.setContent(contentArea.getText());
+            post.setCategories(selectedCategories);
             String mediaUrl = null;
             MediaType mediaType = null;
-
-            ArrayList<Media> media = new ArrayList<>();
-            if(mediaViewController != null) {
-                ArrayList<File> fileArrayList = mediaViewController.GetFileArrayList();
-                for (File selectedFile : fileArrayList) {
-                    String uploadResponse = Client.UploadFile(selectedFile);
-                    if (uploadResponse == null) {
-                        new Alert(Alert.AlertType.ERROR, "Server unreachable! Check your connection and try again!").showAndWait();
-                        return;
-                    }
-                    Map<?, ?> json = Client.GetResponse(uploadResponse);
-                    mediaUrl = (String) json.get("url");
-
-                    String mime = Files.probeContentType(selectedFile.toPath());
-                    if (mime != null) {
-                        if (mime.startsWith("image/")) mediaType = MediaType.IMAGE;
-                        else if (mime.startsWith("video/")) mediaType = MediaType.VIDEO;
-                        else if (mime.startsWith("audio/")) mediaType = MediaType.AUDIO;
-                        else mediaType = MediaType.OTHER;
-                    }
-                    media.add(new Media(mediaType, mediaUrl));
-                }
-            }
-
-            Post post = new Post(1, currentUser, subcredditComboBox.getSelectionModel().getSelectedItem(), title, content, media, selectedCategories, null, null, 0, 0);
-            int id = Client.CreatePost(post);
-            if (id > 0) {
-                post.SetID(id);
-                Alert alert = new Alert(Alert.AlertType.INFORMATION, "Post uploaded successfully!");
-                alert.showAndWait();
+            try{
+                ArrayList<Media> media = mediaViewController.getMediaArrayList();
                 if(mediaViewController != null) {
-                    mediaViewController.Clean();
-                    RemoveMediaPane();
-                }
-                try {
-                    FXMLLoader loader = new FXMLLoader(getClass().getResource("ActualPost_Template.fxml"));
-                    Parent root = loader.load();
+                    ArrayList<File> fileArrayList = mediaViewController.GetFileArrayList();
+                    for (File selectedFile : fileArrayList) {
+                        String uploadResponse = Client.UploadFile(selectedFile);
+                        if (uploadResponse == null) {
+                            new Alert(Alert.AlertType.ERROR, "Server unreachable! Check your connection and try again!").showAndWait();
+                            return;
+                        }//todo fuck miho
+                        Map<?, ?> json = Client.GetResponse(uploadResponse);
+                        mediaUrl = (String) json.get("url");
 
-                    ActualPostTemplateController actualPostTemplateController = loader.getController();
-                    actualPostTemplateController.InitData(post, currentUser, 0);
-
-                    Stage stage = (Stage) postButton.getScene().getWindow();
-                    stage.setScene(new Scene(root));
+                        String mime = Files.probeContentType(selectedFile.toPath());
+                        if (mime != null) {
+                            if (mime.startsWith("image/")) mediaType = MediaType.IMAGE;
+                            else if (mime.startsWith("video/")) mediaType = MediaType.VIDEO;
+                            else if (mime.startsWith("audio/")) mediaType = MediaType.AUDIO;
+                            else mediaType = MediaType.OTHER;
+                        }
+                        media.add(new Media(mediaType, mediaUrl));
+                    }
+                    Client.EditPost(post);
                 }
-                catch (Exception ex) {
-                    System.out.println(ex.getMessage());
-                }
-            }
-            else {
-                Alert alert = new Alert(Alert.AlertType.ERROR, "Failed to send post!");
-                alert.showAndWait();
+            }catch(Exception ex){
+                ex.printStackTrace();
             }
         }
-        catch (Exception ex) {
-            ex.printStackTrace();
-            new Alert(Alert.AlertType.ERROR, "Error: " + ex.getMessage()).showAndWait();
-        }
-
         event.consume();
     }
 
@@ -548,7 +484,7 @@ public class CreatePostPageController {
                 Node mediaNode = loader.load();
 
                 mediaViewController = loader.getController();
-                mediaViewController.init(null, true, new ArrayList<>());
+                mediaViewController.init(new ArrayList<>(), (file == null) ? 1 : 2, new ArrayList<>());
 
                 mediaPane.getChildren().add(mediaNode);
 
@@ -562,6 +498,29 @@ public class CreatePostPageController {
             }
         }
         mediaViewController.AddMedia(file);
+    }
+
+    private void addMedia(Media media) {
+        if(mediaViewController == null) {
+            try {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("media-view.fxml"));
+                Node mediaNode = loader.load();
+
+                mediaViewController = loader.getController();
+                mediaViewController.init(new ArrayList<>(), 2, new ArrayList<>());
+
+                mediaPane.getChildren().add(mediaNode);
+
+                mediaViewController.done.addListener((obs, oldVal, newVal) -> {
+                    if (newVal)
+                        RemoveMediaPane();
+                });
+            }
+            catch (Exception ex) {
+                System.out.println(ex.getMessage());
+            }
+        }
+        mediaViewController.AddMedia(media);
     }
 
     private void RemoveMediaPane() {

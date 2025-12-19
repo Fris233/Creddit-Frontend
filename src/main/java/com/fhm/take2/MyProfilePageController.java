@@ -268,7 +268,7 @@ public class MyProfilePageController {
             Parent root = loader.load();
 
             CreatePostPageController createPostPageController = loader.getController();
-            createPostPageController.InitData(currentUser, null);
+            createPostPageController.InitData(currentUser, null, null);
 
             // Get the current stage
             Stage stage = (Stage) postsContainer.getScene().getWindow();

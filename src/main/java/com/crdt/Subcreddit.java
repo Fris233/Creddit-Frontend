@@ -163,9 +163,8 @@ public class Subcreddit {
 
     @Override
     public boolean equals(Object obj) {
-        if(obj instanceof Subcreddit) {
+        if(obj instanceof Subcreddit)
             return this.id == ((Subcreddit) obj).id;
-        }
         return false;
     }
 }

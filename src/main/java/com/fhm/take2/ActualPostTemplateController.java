@@ -96,7 +96,7 @@ public class ActualPostTemplateController {
             myOGVote = userVote;
         myVote = myOGVote;
         ColorVote();
-        subName.setText(post.GetSubcreddit() != null? "cr/" + post.GetSubcreddit().GetSubName() : ""); //TODO: CHANGE TERTIARY OPERATOR
+        subName.setText(post.GetSubcreddit() != null? "cr/" + post.GetSubcreddit().GetSubName() : "");
         timeLabel.setText(PostPreviewTemplateController.timeAgo(post.GetTimeCreated()));
         titleLabel.setText(post.GetTitle());
         votesLabel.setText(String.valueOf(post.GetVotes()));
@@ -104,7 +104,7 @@ public class ActualPostTemplateController {
        /* if(post.GetContent() == null)
             postDesc.setText("sex"); //TODO sex
         else*/
-            postDesc.setText(post.GetContent());
+        postDesc.setText(post.GetContent());
         posterName.setText("u/" + post.GetAuthor().getUsername());
         if(post.GetMedia() != null && !post.GetMedia().isEmpty()) {
             try {
@@ -142,7 +142,6 @@ public class ActualPostTemplateController {
         }
         UpdateJoinButton();
 
-        //commentTextArea.setPrefHeight(commentTextArea.getMinHeight());
         int[] lastLineCount = { 1 };
         commentTextArea.textProperty().addListener((obs, oldText, newText) -> {
             int lines = newText.split("\n", -1).length;
@@ -494,7 +493,7 @@ public class ActualPostTemplateController {
             Parent root = loader.load();
 
             CreatePostPageController createPostPageController = loader.getController();
-            createPostPageController.InitData(currentUser, null);
+            createPostPageController.InitData(currentUser, null, null);
 
             // Get the current stage
             Stage stage = (Stage) postsContainer.getScene().getWindow();
@@ -617,7 +616,7 @@ public class ActualPostTemplateController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("media-view.fxml"));
             Node mediaNode = loader.load();
             commentMediaViewController = loader.getController();
-            commentMediaViewController.init(null, true, new ArrayList<>());
+            commentMediaViewController.init(null, 0, new ArrayList<>());
             commentMediaPane.getChildren().add(mediaNode);
             commentMediaViewController.done.addListener((obs, oldVal, newVal) -> {
                 if (newVal)

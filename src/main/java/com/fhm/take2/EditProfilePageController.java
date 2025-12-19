@@ -149,7 +149,7 @@ public class EditProfilePageController {
             Parent root = loader.load();
 
             CreatePostPageController createPostPageController = loader.getController();
-            createPostPageController.InitData(user, null);
+            createPostPageController.InitData(user, null, null);
 
             // Get the current stage
             Stage stage = (Stage) usernameLabel.getScene().getWindow();
