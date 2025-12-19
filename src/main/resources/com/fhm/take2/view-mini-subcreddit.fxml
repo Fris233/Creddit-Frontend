@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane onMouseClicked="#onSubcredditClick" prefHeight="84.0" prefWidth="600.0" style="-fx-background-color: black;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.fhm.take2.ViewMiniSubcredditControllet">
+   <children>
+      <ImageView fx:id="subPFP" fitHeight="78.0" fitWidth="75.0" layoutX="3.0" layoutY="4.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@assets/creddit_icon_final_nobg.png" />
+         </image>
+      </ImageView>
+      <Label fx:id="subName" layoutX="93.0" layoutY="11.0" text="cr/Name" textFill="WHITE">
+         <font>
+            <Font size="19.0" />
+         </font>
+      </Label>
+      <Label fx:id="subDescription" layoutX="93.0" layoutY="43.0" prefHeight="20.0" prefWidth="480.0" text="Description" textFill="WHITE">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </Label>
+   </children>
+   <cursor>
+      <Cursor fx:constant="HAND" />
+   </cursor>
+</AnchorPane>

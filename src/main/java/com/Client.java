@@ -452,6 +452,36 @@ public abstract class Client {
 
     //BOOKMARK: Subcreddit
 
+    public static ArrayList<Subcreddit> GetSubFeed(User user, String prompt, int lastID) throws Exception {
+        JsonObject json = new JsonObject();
+        json.add("user", gson.toJsonTree(user, User.class));
+        json.addProperty("prompt", prompt);
+        json.addProperty("lastID", lastID);
+
+        String jsonBody = gson.toJson(json);
+
+        URL url = new URL(BASE_URL + "/subcreddit/feed");
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("POST");
+        conn.setDoOutput(true);
+        conn.setRequestProperty("Content-Type", "application/json");
+
+        try (OutputStream os = conn.getOutputStream()) {
+            os.write(jsonBody.getBytes());
+        }
+
+        BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+        StringBuilder sb = new StringBuilder();
+        String line;
+        while ((line = reader.readLine()) != null) sb.append(line);
+        reader.close();
+
+        JsonObject jsonObj = gson.fromJson(sb.toString(), JsonObject.class);
+        ArrayList<Subcreddit> subs = new ArrayList<>(Arrays.asList(gson.fromJson(jsonObj.get("subs"), Subcreddit[].class)));
+
+        return subs;
+    }
+
     public static Subcreddit[] GetAllSubcreddits() throws Exception {
         URL url = new URL(BASE_URL + "/subcreddit/all");
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();

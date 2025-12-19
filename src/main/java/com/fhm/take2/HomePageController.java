@@ -10,6 +10,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
@@ -18,6 +19,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.stage.Modality;
@@ -38,9 +40,15 @@ public class HomePageController {
     @FXML private ScrollPane postsScrollPane;
     @FXML private TextField searchField;
     @FXML private ImageView userPFP;
+    @FXML private HBox filterHBox;
+    @FXML private Button filterComments;
+    @FXML private Button filterPosts;
+    @FXML private Button filterSubcreddits;
+    @FXML private Button filterUsers;
 
     private User currentUser;
     private ArrayList<PostPreviewTemplateController> postPreviewControllers;
+    private ArrayList<ViewMiniSubcredditControllet> viewMiniSubcredditControllets;
     private boolean updating = false;
     private boolean scrollCooldown = false;
     private int filter; // 0 for posts, 1 for subcreddits, 2 for comments, 3 for users
@@ -53,54 +61,103 @@ public class HomePageController {
 
         updateLoginUI();
 
-        try {
-            Map<Post, Integer> postFeed = Client.GetPostFeed(currentUser, searchPrompt, 0);
-            for (Post post : postFeed.keySet()) {
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("Post_Preview_Template.fxml"));
-                Node postNode = loader.load();
-                PostPreviewTemplateController controller = loader.getController();
-                controller.init(post, user, postFeed.get(post));
-                postsContainer.getChildren().add(postNode);
-                postPreviewControllers.add(controller);
-            }
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-        }
-
         postsScrollPane.addEventFilter(ScrollEvent.SCROLL, e -> {
             double delta = e.getDeltaY() * 2;
             postsScrollPane.setVvalue(postsScrollPane.getVvalue() - delta / postsScrollPane.getContent().getBoundsInLocal().getHeight());
         });
 
-        postsScrollPane.vvalueProperty().addListener((obs, oldVal, newVal) -> {
-            if(!updating && !scrollCooldown && newVal.doubleValue() >= postsScrollPane.getVmax()) {
-                updating = true;
-                scrollCooldown = true;
-                try {
-                    Map<Post, Integer> postFeed = Client.GetPostFeed(currentUser, searchPrompt, postPreviewControllers.getLast().GetPostID());
-                    for (Post post : postFeed.keySet()) {
-                        FXMLLoader loader = new FXMLLoader(getClass().getResource("Post_Preview_Template.fxml"));
-                        Node postNode = loader.load();
-                        PostPreviewTemplateController controller = loader.getController();
-                        controller.init(post, user, postFeed.get(post));
-                        postsContainer.getChildren().add(postNode);
-                        postPreviewControllers.add(controller);
-                    }
-                }
-                catch (Exception e) {
-                    e.printStackTrace();
-                }
-                updating = false;
-                PauseTransition pause = new PauseTransition(Duration.seconds(2));
-                pause.setOnFinished(e -> scrollCooldown = false);
-                pause.play();
-            }
-        });
         postsScrollPane.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
             if (event.getCode() == KeyCode.SPACE) event.consume();
             if (event.getCode() == KeyCode.TAB) event.consume();
         });
+
+        if(this.filter == 0){
+            filterHBox.setVisible(!searchPrompt.isBlank());
+
+            try {
+                Map<Post, Integer> postFeed = Client.GetPostFeed(currentUser, searchPrompt, 0);
+                for (Post post : postFeed.keySet()) {
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource("Post_Preview_Template.fxml"));
+                    Node postNode = loader.load();
+                    PostPreviewTemplateController controller = loader.getController();
+                    controller.init(post, user, postFeed.get(post));
+                    postsContainer.getChildren().add(postNode);
+                    postPreviewControllers.add(controller);
+                }
+            }
+            catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            postsScrollPane.vvalueProperty().addListener((obs, oldVal, newVal) -> {
+                if(!updating && !scrollCooldown && newVal.doubleValue() >= postsScrollPane.getVmax()) {
+                    updating = true;
+                    scrollCooldown = true;
+                    try {
+                        Map<Post, Integer> postFeed = Client.GetPostFeed(currentUser, searchPrompt, postPreviewControllers.getLast().GetPostID());
+                        for (Post post : postFeed.keySet()) {
+                            FXMLLoader loader = new FXMLLoader(getClass().getResource("Post_Preview_Template.fxml"));
+                            Node postNode = loader.load();
+                            PostPreviewTemplateController controller = loader.getController();
+                            controller.init(post, user, postFeed.get(post));
+                            postsContainer.getChildren().add(postNode);
+                            postPreviewControllers.add(controller);
+                        }
+                    }
+                    catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    updating = false;
+                    PauseTransition pause = new PauseTransition(Duration.seconds(2));
+                    pause.setOnFinished(e -> scrollCooldown = false);
+                    pause.play();
+                }
+            });
+
+        } else if(this.filter == 1){
+            filterHBox.setVisible(true);
+
+            try {
+                ArrayList<Subcreddit> subFeed = Client.GetSubFeed(currentUser, searchPrompt, 0);
+                for (Subcreddit sub : subFeed) {
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource("view-mini-subcreddit.fxml"));
+                    Node subcredditNode = loader.load();
+                    ViewMiniSubcredditControllet controller = loader.getController();
+                    controller.initData(sub, currentUser);
+                    postsContainer.getChildren().add(subcredditNode);
+                    viewMiniSubcredditControllets.add(controller);
+                }
+            }
+            catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            postsScrollPane.vvalueProperty().addListener((obs, oldVal, newVal) -> {
+                if(!updating && !scrollCooldown && newVal.doubleValue() >= postsScrollPane.getVmax()) {
+                    updating = true;
+                    scrollCooldown = true;
+                    try {
+                        ArrayList<Subcreddit> subFeed = Client.GetSubFeed(currentUser, searchPrompt, viewMiniSubcredditControllets.getLast().getSubID());
+                        for (Subcreddit sub : subFeed) {
+                            FXMLLoader loader = new FXMLLoader(getClass().getResource("view-mini-subcreddit.fxml"));
+                            Node subcredditNode = loader.load();
+                            ViewMiniSubcredditControllet controller = loader.getController();
+                            controller.initData(sub, currentUser);
+                            postsContainer.getChildren().add(subcredditNode);
+                            viewMiniSubcredditControllets.add(controller);
+                        }
+                    }
+                    catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    updating = false;
+                    PauseTransition pause = new PauseTransition(Duration.seconds(2));
+                    pause.setOnFinished(e -> scrollCooldown = false);
+                    pause.play();
+                }
+            });
+        }
+
     }
 
     private void updateLoginUI() {
@@ -441,5 +498,17 @@ public class HomePageController {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    @FXML
+    public void onFilterPostPressed(MouseEvent event) {
+        filter = 0;
+        Refresh();
+    }
+
+    @FXML
+    public void onFilterSubCredditPressed(MouseEvent event) {
+        filter = 1;
+        Refresh();
     }
 }
