@@ -11,7 +11,7 @@
 
 <AnchorPane prefHeight="500.0" prefWidth="430.0" style="-fx-background-color: #0E1113;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.fhm.take2.CreateReportPageController">
    <children>
-      <ImageView fx:id="returnIcon" fitHeight="26.0" fitWidth="28.0" layoutX="18.0" layoutY="24.0" nodeOrientation="RIGHT_TO_LEFT" pickOnBounds="true" preserveRatio="true">
+      <ImageView fx:id="returnIcon" fitHeight="26.0" fitWidth="40.0" layoutX="18.0" layoutY="24.0" nodeOrientation="RIGHT_TO_LEFT" onMouseClicked="#onReturnPressed" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@assets/arrowIcon.png" />
          </image>

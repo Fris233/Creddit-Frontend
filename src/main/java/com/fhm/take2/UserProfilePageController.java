@@ -2,6 +2,7 @@ package com.fhm.take2;
 
 import com.Client;
 import com.crdt.Post;
+import com.crdt.Report;
 import com.crdt.Subcreddit;
 import com.crdt.User;
 import javafx.animation.PauseTransition;
@@ -457,25 +458,25 @@ public class UserProfilePageController {
             Login();
             return;
         }
-        System.out.println("Report User Button Pressed");
-            try {
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("create-report-page.fxml"));
-                Parent root = loader.load();
-
-                CreateReportPageController reportPageController = loader.getController();
-
-                Stage popup = new Stage();
-                popup.setTitle("Report Page");
-                popup.setScene(new Scene(root));
-                popup.initModality(Modality.APPLICATION_MODAL);
-
-                reportPageController.initData(this.currentUser, profileUser, popup);
-                popup.showAndWait();
+        try {
+            if(Client.ReportExists(new Report(0, this.currentUser, this.profileUser, null, null, null, null))) {
+                showAlert("Duplicate Report", "You have already submitted a report on this target!");
+                return;
             }
-            catch (Exception ex) {
-                System.out.println(ex.getMessage());
-            }
-            event.consume();
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("create-report-page.fxml"));
+            Parent root = loader.load();
+            CreateReportPageController reportPageController = loader.getController();
+            Stage popup = new Stage();
+            popup.setTitle("Report Page");
+            popup.setScene(new Scene(root));
+            popup.initModality(Modality.APPLICATION_MODAL);
+            reportPageController.initData(this.currentUser, profileUser, popup);
+            popup.showAndWait();
+        }
+        catch (Exception ex) {
+            System.out.println(ex.getMessage());
+        }
+        event.consume();
     }
 
     @FXML

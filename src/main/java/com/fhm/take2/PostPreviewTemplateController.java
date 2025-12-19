@@ -229,7 +229,7 @@ public class PostPreviewTemplateController {
             Parent root = loader.load();
 
             ActualPostTemplateController actualPostTemplateController = loader.getController();
-            actualPostTemplateController.InitData(post, currentUser, myVote);
+            actualPostTemplateController.InitData(post.GetID(), currentUser);
 
             Stage stage = (Stage) JoinButton.getScene().getWindow();
             stage.setScene(new Scene(root));
@@ -265,7 +265,7 @@ public class PostPreviewTemplateController {
                 Parent root = loader.load();
 
                 SubcredditController controller = loader.getController();
-                controller.InitData(currentUser, post.GetSubcreddit());
+                controller.InitData(post.GetSubcreddit().GetSubId(), currentUser);
 
                 Stage stage = (Stage) JoinButton.getScene().getWindow();
                 stage.setScene(new Scene(root));

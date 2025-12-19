@@ -264,7 +264,7 @@ public abstract class Client {
         json.add("user", gson.toJsonTree(user, User.class));
         json.add("sub", gson.toJsonTree(sub));
         json.addProperty("prompt", prompt);
-        json.addProperty("lastID", gson.toJson(lastID));
+        json.addProperty("lastID", lastID);
 
         String jsonBody = gson.toJson(json);
 
@@ -301,7 +301,7 @@ public abstract class Client {
         json.add("user", gson.toJsonTree(user, User.class));
         json.add("author", gson.toJsonTree(author, User.class));
         json.addProperty("prompt", prompt);
-        json.addProperty("lastID", gson.toJson(lastID));
+        json.addProperty("lastID", lastID);
 
         String jsonBody = gson.toJson(json);
 
@@ -337,7 +337,7 @@ public abstract class Client {
         JsonObject json = new JsonObject();
         json.add("user", gson.toJsonTree(user, User.class));
         json.addProperty("prompt", prompt);
-        json.addProperty("lastID", gson.toJson(lastID));
+        json.addProperty("lastID", lastID);
 
         String jsonBody = gson.toJson(json);
 
@@ -383,10 +383,20 @@ public abstract class Client {
         return post.update(BASE_URL, gson);
     }
 
-    public static Post GetPost(int id) throws Exception {
-        URL url = new URL(BASE_URL + String.format("/post?id=%s", java.net.URLEncoder.encode(String.valueOf(id), "UTF-8")));
+    public static Map<Post, Integer> GetPost(int id, User user) throws Exception {
+        JsonObject json = new JsonObject();
+        json.add("user", gson.toJsonTree(user, User.class));
+        json.addProperty("id", id);
+        String jsonBody = gson.toJson(json);
+        URL url = new URL(BASE_URL + "/post");
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-        conn.setRequestMethod("GET");
+        conn.setRequestMethod("POST");
+        conn.setDoOutput(true);
+        conn.setRequestProperty("Content-Type", "application/json");
+
+        try (OutputStream os = conn.getOutputStream()) {
+            os.write(jsonBody.getBytes());
+        }
 
         BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
         StringBuilder sb = new StringBuilder();
@@ -394,7 +404,13 @@ public abstract class Client {
         while ((line = reader.readLine()) != null) sb.append(line);
         reader.close();
 
-        return gson.fromJson(sb.toString(), Post.class);
+        JsonObject jsonObj = gson.fromJson(sb.toString(), JsonObject.class);
+        Post post = gson.fromJson(jsonObj.get("post"), Post.class);
+        int myVote = gson.fromJson(jsonObj.get("vote"), int.class);
+
+        Map<Post, Integer> postMap = new HashMap<>();
+        postMap.put(post, myVote);
+        return postMap;
     }
 
     public static String[] GetAllCategories() throws Exception {
@@ -419,6 +435,18 @@ public abstract class Client {
 
     public static boolean submitReport(Report report) throws Exception {
         return report.SubmitReport(BASE_URL, gson);
+    }
+
+    public static boolean ReportExists(Report report) throws Exception {
+        return report.Exists(BASE_URL, gson);
+    }
+
+    public static boolean ResolveReport(Report report) throws Exception {
+        return report.Resolve(BASE_URL, gson);
+    }
+
+    public static boolean DismissReport(Report report) throws Exception {
+        return report.Dismiss(BASE_URL, gson);
     }
 
 
@@ -450,6 +478,10 @@ public abstract class Client {
         reader.close();
 
         return gson.fromJson(sb.toString(), Subcreddit.class);
+    }
+
+    public static ArrayList<User> GetSubMembers(Subcreddit sub, int lastID) throws Exception {
+        return new ArrayList<>(Arrays.asList(sub.GetMemberFeed(lastID, BASE_URL, gson)));
     }
 
     public static int CreateSubcreddit(Subcreddit sub) throws Exception {

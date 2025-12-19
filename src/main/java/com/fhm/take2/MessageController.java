@@ -1,4 +1,5 @@
 package com.fhm.take2;
+import com.Client;
 import com.crdt.Gender;
 import com.crdt.Message;
 import com.crdt.User;
@@ -18,6 +19,8 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import java.net.URL;
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.*;
 
 import javafx.scene.shape.Circle;
@@ -196,10 +199,13 @@ public class MessageController {
         // Mark all unread messages as read
         ArrayList<Message> unread = unreadMessages.get(user);
         if (unread != null) {
-            for (Message msg : unread) {
-
+            try {
+                Client.ReadMessage(this.currentUser, user);
+                unread.clear();
             }
-            unread.clear();
+            catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -212,9 +218,6 @@ public class MessageController {
     }
 
     private void setupEventHandlers() {
-        // Send button click handler
-        sendButton.setOnAction(_ -> sendMessage());
-
         // Enter key handler for text field
         messageInput.setOnKeyPressed(event -> {
             if (event.getCode() == KeyCode.ENTER) {
@@ -236,33 +239,27 @@ public class MessageController {
         scrollPane.setFitToWidth(true);
     }
 
-    private void addSampleMessages() {
-
-        messagesContainer.getChildren().clear();
-
-        addReceivedMessage("Hello! How are you doing?");
-        addSentMessage("Hi there! I'm doing great.");
-        addReceivedMessage("I got your earlier message");
-        addSentMessage("Thanks for getting back to me");
-        addReceivedMessage("Let me know when you're available");
-        addSentMessage("I'll be available in 30 minutes");
-
-    }
-
+    @FXML
     private void sendMessage() {
         String text = messageInput.getText().trim();
         if (!text.isEmpty() && currentFriend != null) {
             // Create message
             Message newMessage = new Message(
-                    -1, // will be set by database
-                    null, // sender (would be current loggedin user)
-                    currentFriend, // receiver
+                    0, // will be set by database
+                    this.currentUser, // sender (would be current loggedin user)
+                    this.currentFriend, // receiver
                     text,
                     null, // media
-                    new java.sql.Timestamp(System.currentTimeMillis()), // create time
-                    null, // edit time
+                    Timestamp.from(Instant.now()), // create time
+                    Timestamp.from(Instant.now()), // edit time
                     false // not read yet by receiver
             );
+            try {
+                Client.SendPM(newMessage);
+            }
+            catch (Exception e) {
+                e.printStackTrace();
+            }
             addMessageToBottom(newMessage);
             messageInput.clear();
         }
@@ -309,26 +306,19 @@ public class MessageController {
 
     private void setupFriendlist() {
         try {
-            User friend1 = new User(1, "Hassan", "hassan@gmail.com", "0001", Gender.MALE, "lelelelelelelelelelelelelele", null, null, null, true);
-            friends.add(friend1);
-
-            unreadMessages.put(friend1, new ArrayList<>());
-            allMessages.put(friend1, new ArrayList<>());
-
-            unreadMessages.get(friend1).add(new Message(1, friend1, null, "Hi there!", null, null, null, false));
-            unreadMessages.get(friend1).add(new Message(2, friend1, null, "Are you there?", null, null, null, false));
-
-            User friend2 = new User(2, "Hasan", "hasan@gmail.com", "0010", Gender.MALE, "صلي على محمد", null, null, null, false);
-            friends.add(friend2);
-
-            unreadMessages.put(friend2, new ArrayList<>());
-            allMessages.put(friend2, new ArrayList<>());
+            friends = Client.GetFriends(this.currentUser);
+            for(User friend : friends) {
+                unreadMessages.put(friend, new ArrayList<>());
+            }
+            ArrayList<Message> unread = Client.GetUnreadPM(this.currentUser);
+            for(Message msg : unread) {
+                unreadMessages.get(msg.GetSender()).add(msg);
+            }
 
             displayFriendList();
 
         } catch (Exception e) {
-            System.out.println("Error creating dummy users: " + e.getMessage());
-            friends = new ArrayList<>();
+            e.printStackTrace();
         }
     }
 
@@ -425,7 +415,7 @@ public class MessageController {
 
         // Update chat header
         friendName.setText(user.getUsername());
-        friendStatus.setText(user.getActive() ? "Online" : "Offline");
+        friendStatus.setText(user.getActive() ? "Online" : "Offline"); //todo this is wrong
 
         // Clear current messages
         messagesContainer.getChildren().clear();

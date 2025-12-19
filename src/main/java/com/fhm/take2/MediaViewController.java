@@ -500,8 +500,10 @@ public class MediaViewController {
         if(mode == 0)
             return;
         fileArrayList.remove(currentMediaIndex);
-        if(fileArrayList.isEmpty() && (mediaArrayList == null || mediaArrayList.isEmpty()))
+        if(fileArrayList.isEmpty() && (mediaArrayList == null || mediaArrayList.isEmpty())) {
             done.set(true);
+            return;
+        }
         if(currentMediaIndex > 0 && currentMediaIndex == (fileArrayList.size() - (mode == 2? mediaArrayList.size() : 0)))
             currentMediaIndex--;
         PrevNextButtons();

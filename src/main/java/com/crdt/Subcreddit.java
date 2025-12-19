@@ -85,17 +85,32 @@ public class Subcreddit {
         return conn.getResponseCode() == 200;
     }
 
-    public ArrayList<User> GetMembers() {
-        ArrayList<User> members = new ArrayList<>();
-        return members;
+    public User[] GetMemberFeed(int lastID, String BASE_URL, Gson gson) throws Exception {
+        JsonObject json = new JsonObject();
+        json.add("subcreddit", gson.toJsonTree(this, Subcreddit.class));
+        json.addProperty("lastID", lastID);
+        String jsonBody = gson.toJson(json);
+        URL url = new URL(BASE_URL + "/subcreddit/members");
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("POST");
+        conn.setDoOutput(true);
+        conn.setRequestProperty("Content-Type", "application/json");
+
+        try (OutputStream os = conn.getOutputStream()) {
+            os.write(jsonBody.getBytes());
+        }
+
+        BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+        StringBuilder sb = new StringBuilder();
+        String line;
+        while ((line = reader.readLine()) != null) sb.append(line);
+        reader.close();
+
+        return gson.fromJson(sb.toString(), User[].class);
     }
 
-    public ArrayList<User> GetBannedMembers() {
-        if(this.id <= 0)
-            return null;
-
-        ArrayList<User> bannedMembers = new ArrayList<>();
-        return bannedMembers;
+    public ArrayList<User> GetBannedMembers(String BASE_URL, Gson gson) throws Exception {
+        return new ArrayList<>();
     }
 
     public boolean VerifyModeration(User user, String BASE_URL, Gson gson) throws Exception {

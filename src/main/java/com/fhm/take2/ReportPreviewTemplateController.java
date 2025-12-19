@@ -116,14 +116,12 @@ public class ReportPreviewTemplateController {
     void Resolve(MouseEvent event) throws SQLException {
         System.out.println("Approve Pressed!");
         status.setTextFill(Color.LIMEGREEN);
-        report.Resolve();
     }
     //TODO RESOLVE DISMISS
     @FXML
     void Dismiss(MouseEvent event) throws SQLException {
         System.out.println("Dismiss Pressed!");
         status.setTextFill(Color.ORANGE);
-        report.Dismiss();
     }
 
     @FXML

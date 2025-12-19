@@ -34,13 +34,8 @@ public class Post implements Voteable, Reportable {
     private static Type id_vote_type = new TypeToken<Map<Integer, Integer>>() {}.getType();
 
     public Post(int id, User author, Subcreddit subcreddit, String title, String content, ArrayList<Media> media, ArrayList<String> categories, Timestamp timeCreated, Timestamp timeEdited, int votes, int comments) {
-        if (id <= 0)
+        if (id < 0)
             return;
-
-        if (title == null || title.isEmpty() || title.length() > 255)
-            return;
-        /*if(content == null || content.isEmpty())
-            return;*/
 
         this.id = id;
         this.author = author;

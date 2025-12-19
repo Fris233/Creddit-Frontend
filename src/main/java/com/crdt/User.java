@@ -244,7 +244,13 @@ public class User implements Reportable {
             os.write(jsonBody.getBytes());
         }
 
-        return conn.getResponseCode() == 200;
+        BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+        StringBuilder sb = new StringBuilder();
+        String line;
+        while ((line = reader.readLine()) != null) sb.append(line);
+        reader.close();
+
+        return gson.fromJson(sb.toString(), boolean.class);
     }
 
     public Subcreddit[] GetSubcreddits(String BASE_URL, Gson gson) throws Exception {

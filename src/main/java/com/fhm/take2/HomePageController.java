@@ -58,10 +58,8 @@ public class HomePageController {
             for (Post post : postFeed.keySet()) {
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("Post_Preview_Template.fxml"));
                 Node postNode = loader.load();
-
                 PostPreviewTemplateController controller = loader.getController();
                 controller.init(post, user, postFeed.get(post));
-
                 postsContainer.getChildren().add(postNode);
                 postPreviewControllers.add(controller);
             }
@@ -300,18 +298,78 @@ public class HomePageController {
     @FXML
     void Refresh() {
         Clean();
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("home-page.fxml"));
-            Parent root = loader.load();
+        String searchPrompt = searchField.getText();
+        if (searchPrompt != null && searchPrompt.matches("^creddit/post/\\d+$")) {
+            String[] strings = searchPrompt.split("/");
+            int id = Integer.parseInt(strings[strings.length - 1]);
+            Clean();
+            try {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("ActualPost_Template.fxml"));
+                Parent root = loader.load();
 
-            HomePageController homePageController = loader.getController();
-            homePageController.InitData(currentUser, searchField.getText(), filter);
+                ActualPostTemplateController actualPostTemplateController = loader.getController();
+                actualPostTemplateController.InitData(id, currentUser);
 
-            Stage stage = (Stage) postsContainer.getScene().getWindow();
-            stage.setScene(new Scene(root));
+                Stage stage = (Stage) postsContainer.getScene().getWindow();
+                stage.setScene(new Scene(root));
+            }
+            catch (Exception ex) {
+                System.out.println(ex.getMessage());
+            }
         }
-        catch (Exception e) {
-            e.printStackTrace();
+        else if (searchPrompt != null && searchPrompt.matches("^creddit/comment/\\d+$")) {
+
+        }
+        else if (searchPrompt != null && searchPrompt.matches("^creddit/user/\\d+$")) {
+            String[] strings = searchPrompt.split("/");
+            int id = Integer.parseInt(strings[strings.length - 1]);
+            Clean();
+            try {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("user-profile-page.fxml"));
+                Parent root = loader.load();
+
+                UserProfilePageController userProfilePageController = loader.getController();
+                userProfilePageController.InitData(id, currentUser, searchField.getText(), true);
+
+                // Get the current stage
+                Stage stage = (Stage) postsContainer.getScene().getWindow();
+                // Set the new scene
+                stage.setScene(new Scene(root));
+            }
+            catch (Exception ex) {
+                System.out.println(ex.getMessage());
+            }
+        }
+        else if (searchPrompt != null && searchPrompt.matches("^creddit/subcreddit/\\d+$")) {
+            String[] strings = searchPrompt.split("/");
+            int id = Integer.parseInt(strings[strings.length - 1]);
+            try {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("subcreddit-page.fxml"));
+                Parent root = loader.load();
+
+                SubcredditController controller = loader.getController();
+                controller.InitData(id, currentUser);
+
+                Stage stage = (Stage) postsContainer.getScene().getWindow();
+                stage.setScene(new Scene(root));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        else {
+            try {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("home-page.fxml"));
+                Parent root = loader.load();
+
+                HomePageController homePageController = loader.getController();
+                homePageController.InitData(currentUser, searchPrompt, filter);
+
+                Stage stage = (Stage) postsContainer.getScene().getWindow();
+                stage.setScene(new Scene(root));
+            }
+            catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -367,21 +425,6 @@ public class HomePageController {
             }
         });
     }
-    public void goToSubcreddit(String subcredditName) {
-        Clean();
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("subcreddit-page.fxml"));
-            Parent root = loader.load();
-
-            SubcredditController controller = loader.getController();
-            controller.InitData(currentUser, subcredditName);
-
-            Stage stage = (Stage) postsContainer.getScene().getWindow();
-            stage.setScene(new Scene(root));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 
     public void goToSubcreddit(Subcreddit subcreddit) {
         Clean();
@@ -390,7 +433,7 @@ public class HomePageController {
             Parent root = loader.load();
 
             SubcredditController controller = loader.getController();
-            controller.InitData(currentUser, subcreddit);
+            controller.InitData(subcreddit.GetSubId(), currentUser);
 
             Stage stage = (Stage) postsContainer.getScene().getWindow();
             stage.setScene(new Scene(root));

@@ -50,7 +50,6 @@ public class ActualPostTemplateController {
     @FXML private ImageView upvoteButton;
     @FXML private Label votesLabel;
     @FXML private Label commentsLabel;
-    @FXML private ImageView shareButton;
     @FXML private Label posterName;
     @FXML private Label postDesc;
     @FXML private TextArea commentTextArea;
@@ -64,6 +63,12 @@ public class ActualPostTemplateController {
     @FXML private ScrollPane postsScrollPane;
     @FXML private TextField searchField;
     @FXML private ImageView userPFP;
+    @FXML private VBox moreOptionsVBox;
+    @FXML private Button shareButton;
+    @FXML private Button bookmarkButton;
+    @FXML private Button reportButton;
+    @FXML private Button editButton;
+    @FXML private Button deleteButton;
 
     private Post post;
     private User currentUser;
@@ -81,19 +86,20 @@ public class ActualPostTemplateController {
     private BooleanProperty validCommentInfo = new SimpleBooleanProperty(false);
     private boolean updating = false;
     private boolean scrollCooldown = false;
+    private boolean moreOptioning = false;
 
-    public void InitData(Post post, User user, int userVote) {
+    public void InitData(int postid, User user) {
         try {
-            this.post = Client.GetPost(post.GetID());
+            Map<Post, Integer> postMap = Client.GetPost(postid, this.currentUser);
+            for(Post p : postMap.keySet())
+                this.post = p;
+            myOGVote = postMap.get(this.post);
         } catch (Exception e) {
             e.printStackTrace();
         }
         this.currentUser = user;
         this.mediaViewController = null;
-        myOGVote = 0;
         updateLoginUI();
-        if(user != null)
-            myOGVote = userVote;
         myVote = myOGVote;
         ColorVote();
         subName.setText(post.GetSubcreddit() != null? "cr/" + post.GetSubcreddit().GetSubName() : "");
@@ -294,6 +300,20 @@ public class ActualPostTemplateController {
             double delta = e.getDeltaY() * 2;
             postsScrollPane.setVvalue(postsScrollPane.getVvalue() - delta / postsScrollPane.getContent().getBoundsInLocal().getHeight());
         });
+
+        moreOptionsVBox.setVisible(false);
+        if(this.currentUser == null) {
+            moreOptionsVBox.setDisable(true);
+        }
+        else {
+            if (!this.currentUser.equals(this.post.GetAuthor())) {
+                moreOptionsVBox.getChildren().remove(editButton);
+                moreOptionsVBox.getChildren().remove(deleteButton);
+            } else {
+                moreOptionsVBox.getChildren().remove(reportButton);
+                moreOptionsVBox.getChildren().remove(bookmarkButton);
+            }
+        }
     }
 
     private void ColorVote() {
@@ -334,7 +354,6 @@ public class ActualPostTemplateController {
             event.consume();
             return;
         }
-        System.out.println("Upvote Pressed!");
         try {
             myVote = myVote != 1? 1 : 0;
             if(Client.Vote(currentUser, post, myVote)) {
@@ -345,6 +364,8 @@ public class ActualPostTemplateController {
         catch (Exception e) {
             e.printStackTrace();
         }
+        if(moreOptioning)
+            MoreOptionsButton();
         event.consume();
     }
     @FXML
@@ -364,7 +385,8 @@ public class ActualPostTemplateController {
         catch (Exception e) {
             e.printStackTrace();
         }
-        System.out.println("Downvote Pressed!");
+        if(moreOptioning)
+            MoreOptionsButton();
         event.consume();
     }
 
@@ -388,15 +410,98 @@ public class ActualPostTemplateController {
     }
 
     @FXML
-    void MoreOptionsButton(MouseEvent event) {
-        System.out.println("More Options Pressed!");
-        event.consume();
+    void MoreOptionsButton() {
+        moreOptioning = !moreOptioning;
+        moreOptionsVBox.setVisible(moreOptioning);
     }
 
     @FXML
     void Share(MouseEvent event) {
         //TODO: share?
         System.out.println("Share clicked");
+        event.consume();
+    }
+
+    @FXML
+    void Bookmark(MouseEvent event) {
+        //TODO: bookmark?
+        System.out.println("Bookmark clicked");
+        event.consume();
+    }
+
+    @FXML
+    void Report(MouseEvent event) {
+        if (currentUser == null) {
+            Login();
+            return;
+        }
+
+        try {
+            if(Client.ReportExists(new Report(0, this.currentUser, this.post, null, null, null, null))) {
+                showAlert("Duplicate Report", "You have already submitted a report on this target!");
+                return;
+            }
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("create-report-page.fxml"));
+            Parent root = loader.load();
+            CreateReportPageController reportPageController = loader.getController();
+            Stage popup = new Stage();
+            popup.setTitle("Report Page");
+            popup.setScene(new Scene(root));
+            popup.initModality(Modality.APPLICATION_MODAL);
+            reportPageController.initData(this.currentUser, this.post, popup);
+            popup.showAndWait();
+        }
+        catch (Exception ex) {
+            System.out.println(ex.getMessage());
+        }
+        event.consume();
+    }
+
+    @FXML
+    void Edit(MouseEvent event) {
+        if (currentUser == null) {
+            Login();
+            return;
+        }
+        Clean();
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("create-post-page.fxml"));
+            Parent root = loader.load();
+
+            CreatePostPageController createPostPageController = loader.getController();
+            createPostPageController.InitData(currentUser, this.post, null);
+
+            // Get the current stage
+            Stage stage = (Stage) postsContainer.getScene().getWindow();
+            // Set the new scene
+            stage.setScene(new Scene(root));
+        }
+        catch (Exception ex) {
+            System.out.println(ex.getMessage());
+        }
+        event.consume();
+    }
+
+    @FXML
+    void Delete(MouseEvent event) {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Confirm Action");
+        alert.setHeaderText("Delete post?");
+        alert.setContentText("Are you sure you want to delete this post?");
+
+        Optional<ButtonType> result = alert.showAndWait();
+
+        if (result.isPresent() && result.get() == ButtonType.OK) {
+            try {
+                Client.DeletePost(this.post);
+                GoHome();
+            }
+            catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else {
+            MoreOptionsButton();
+        }
         event.consume();
     }
 
@@ -464,19 +569,24 @@ public class ActualPostTemplateController {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        if(moreOptioning)
+            MoreOptionsButton();
         event.consume();
     }
 
     @FXML
     void CheckRules(MouseEvent event) {
         System.out.println("Rules Button Pressed");
-        Clean();
+        if(moreOptioning)
+            MoreOptionsButton();
         event.consume();
     }
 
     @FXML
     void ClearRecentPosts(MouseEvent event) {
         System.out.println("Clear Recent Posts Button Pressed");
+        if(moreOptioning)
+            MoreOptionsButton();
         event.consume();
     }
 
@@ -588,12 +698,15 @@ public class ActualPostTemplateController {
             ex.printStackTrace();
             new Alert(Alert.AlertType.ERROR, "Error: " + ex.getMessage()).showAndWait();
         }
-
+        if(moreOptioning)
+            MoreOptionsButton();
         event.consume();
     }
 
     @FXML
     void AttachMedia(MouseEvent event) {
+        if(moreOptioning)
+            MoreOptionsButton();
         Window window = ((Node) event.getSource()).getScene().getWindow();
 
         FileChooser fileChooser = new FileChooser();
@@ -605,10 +718,13 @@ public class ActualPostTemplateController {
         if(file == null)
             return;
         AddFile(file);
+
         event.consume();
     }
 
     private void AddFile(File file) {
+        if(moreOptioning)
+            MoreOptionsButton();
         if(commentMediaViewController != null) {
             RemoveMediaPane();
         }
@@ -639,6 +755,8 @@ public class ActualPostTemplateController {
     @FXML
     void Login() {
         System.out.println("Login Button Pressed");
+        if(moreOptioning)
+            MoreOptionsButton();
         navigateToLoginDialog();
     }
 
@@ -668,7 +786,7 @@ public class ActualPostTemplateController {
                 loginStage.close();
                 HelloApplication.startSession(currentUser);
                 // Refresh the page to show user-specific content
-                Refresh(null);
+                Refresh();
             });
 
             loginStage.showAndWait();
@@ -691,7 +809,7 @@ public class ActualPostTemplateController {
     }
 
     @FXML
-    void GoHome(MouseEvent event) {
+    void GoHome() {
 
         Clean();
         try {
@@ -711,11 +829,10 @@ public class ActualPostTemplateController {
         catch (Exception ex) {
             System.out.println(ex.getMessage());
         }
-        event.consume();
     }
 
     @FXML
-    void Refresh(MouseEvent event) {
+    void Refresh() {
         Clean();
         if(mediaViewController != null)
             mediaViewController.Clean();
@@ -724,7 +841,7 @@ public class ActualPostTemplateController {
             Parent root = loader.load();
 
             ActualPostTemplateController actualPostTemplateController = loader.getController();
-            actualPostTemplateController.InitData(post, currentUser, myVote);
+            actualPostTemplateController.InitData(post.GetID(), currentUser);
 
             // Get the current stage
             Stage stage = (Stage) JoinButton.getScene().getWindow();
@@ -734,7 +851,6 @@ public class ActualPostTemplateController {
         catch (Exception ex) {
             System.out.println(ex.getMessage());
         }
-        event.consume();
     }
 
     @FXML

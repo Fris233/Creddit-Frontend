@@ -59,24 +59,17 @@ public class SubcredditController implements Initializable {
     private ArrayList<PostPreviewTemplateController> postPreviewControllers;
     private boolean updating = false;
     private boolean scrollCooldown = false;
-    private String currentSort = "hot";
     private boolean isMember = false;
     private int lastPostId = 0;
 
-    public void InitData(User user, String subcredditName) {
+    public void InitData(int subID, User user) {
         this.currentUser = user;
-        this.postPreviewControllers = new ArrayList<>();
-
-        updateLoginUI();
-
-        loadSubcredditData(subcredditName);
-
-        setupScrollBehavior();
-    }
-
-    public void InitData(User user, Subcreddit subcreddit) {
-        this.currentUser = user;
-        this.currentSubcreddit = subcreddit;
+        try {
+            this.currentSubcreddit = Client.GetSubcreddit(subID);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
         this.postPreviewControllers = new ArrayList<>();
 
         updateLoginUI();
@@ -418,7 +411,7 @@ public class SubcredditController implements Initializable {
             Parent root = loader.load();
 
             SubcredditController controller = loader.getController();
-            controller.InitData(currentUser, currentSubcreddit);
+            controller.InitData(currentSubcreddit.GetSubId(), currentUser);
 
             Stage stage = (Stage) postsContainer.getScene().getWindow();
             stage.setScene(new Scene(root));
@@ -655,7 +648,7 @@ public class SubcredditController implements Initializable {
             Parent root = loader.load();
 
             SubcredditController controller = loader.getController();
-            controller.InitData(currentUser, subcreddit);
+            controller.InitData(subcreddit.GetSubId(), currentUser);
 
             Stage stage = (Stage) postsContainer.getScene().getWindow();
             stage.setScene(new Scene(root));

@@ -1,5 +1,7 @@
 package com.crdt;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -27,15 +29,6 @@ public class Report {
         if (target == null) {
             throw new IllegalArgumentException("Report target cannot be null.");
         }
-        if (reason == null) {
-            throw new IllegalArgumentException("Reason cannot be empty.");
-        }
-        if (type == null) {
-            throw new IllegalArgumentException("Report type cannot be null.");
-        }
-        if (status == null) {
-            throw new IllegalArgumentException("Report status cannot be null.");
-        }
 
         this.id = id;
         this.reporter = reporter;
@@ -46,6 +39,27 @@ public class Report {
         this.timeReported = timeReported;
     }
 
+    public boolean Exists(String BASE_URL, Gson gson) throws Exception {
+        String jsonBody = gson.toJson(this, Report.class);
+
+        URL url = new URL(BASE_URL + "/report/exist");
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("POST");
+        conn.setDoOutput(true);
+        conn.setRequestProperty("Content-Type", "application/json");
+
+        try (OutputStream os = conn.getOutputStream()) {
+            os.write(jsonBody.getBytes());
+        }
+
+        BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+        StringBuilder sb = new StringBuilder();
+        String line;
+        while ((line = reader.readLine()) != null) sb.append(line);
+        reader.close();
+
+        return gson.fromJson(sb.toString(), boolean.class);
+    }
 
     public boolean SubmitReport(String BASE_URL, Gson gson) throws Exception {
         String jsonBody = gson.toJson(this, Report.class);
@@ -63,6 +77,50 @@ public class Report {
         return conn.getResponseCode() == 200;
     }
 
+    public boolean Resolve(String BASE_URL, Gson gson) throws Exception {
+        String jsonBody = gson.toJson(this, Report.class);
+
+        URL url = new URL(BASE_URL + "/report/resolve");
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("POST");
+        conn.setDoOutput(true);
+        conn.setRequestProperty("Content-Type", "application/json");
+
+        try (OutputStream os = conn.getOutputStream()) {
+            os.write(jsonBody.getBytes());
+        }
+
+        BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+        StringBuilder sb = new StringBuilder();
+        String line;
+        while ((line = reader.readLine()) != null) sb.append(line);
+        reader.close();
+
+        return conn.getResponseCode() == 200;
+    }
+
+    public boolean Dismiss(String BASE_URL, Gson gson) throws Exception {
+        String jsonBody = gson.toJson(this, Report.class);
+
+        URL url = new URL(BASE_URL + "/report/dismiss");
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("POST");
+        conn.setDoOutput(true);
+        conn.setRequestProperty("Content-Type", "application/json");
+
+        try (OutputStream os = conn.getOutputStream()) {
+            os.write(jsonBody.getBytes());
+        }
+
+        BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+        StringBuilder sb = new StringBuilder();
+        String line;
+        while ((line = reader.readLine()) != null) sb.append(line);
+        reader.close();
+
+        return conn.getResponseCode() == 200;
+    }
+
     public static ArrayList<Report> GetUserReportFeed(Admin admin, int lastID) throws SQLException {
         return null;
     }
@@ -73,12 +131,6 @@ public class Report {
 
     public static ArrayList<Report> GetCommentReportFeed(User user, Subcreddit subcreddit, int lastID) throws SQLException {
         return null;
-    }
-
-    public void Resolve() throws SQLException {
-    }
-
-    public void Dismiss() throws SQLException {
     }
 
 

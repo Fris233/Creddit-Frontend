@@ -24,6 +24,8 @@ import javafx.stage.Window;
 
 import java.io.*;
 import java.nio.file.Files;
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.*;
 
 public class CreatePostPageController {
@@ -360,7 +362,7 @@ public class CreatePostPageController {
             return;
         }
 
-        if(this.post == null){
+        if(this.post == null) {
             try {
                 String title = titleField.getText();
                 String content = contentArea.getText();
@@ -373,7 +375,7 @@ public class CreatePostPageController {
                     ArrayList<File> fileArrayList = mediaViewController.GetFileArrayList();
                     for (File selectedFile : fileArrayList) {
                         String uploadResponse = Client.UploadFile(selectedFile);
-                        if (uploadResponse == null) {
+                        if (uploadResponse.isBlank()) {
                             new Alert(Alert.AlertType.ERROR, "Server unreachable! Check your connection and try again!").showAndWait();
                             return;
                         }
@@ -391,7 +393,7 @@ public class CreatePostPageController {
                     }
                 }
 
-                Post post = new Post(1, currentUser, subcredditComboBox.getSelectionModel().getSelectedItem(), title, content, media, selectedCategories, null, null, 0, 0);
+                Post post = new Post(0, currentUser, subcredditComboBox.getSelectionModel().getSelectedItem(), title, content, media, selectedCategories, Timestamp.from(Instant.now()), Timestamp.from(Instant.now()), 0, 0);
                 int id = Client.CreatePost(post);
                 if (id > 0) {
                     post.SetID(id);
@@ -406,7 +408,7 @@ public class CreatePostPageController {
                         Parent root = loader.load();
 
                         ActualPostTemplateController actualPostTemplateController = loader.getController();
-                        actualPostTemplateController.InitData(post, currentUser, 0);
+                        actualPostTemplateController.InitData(post.GetID(), currentUser);
 
                         Stage stage = (Stage) postButton.getScene().getWindow();
                         stage.setScene(new Scene(root));
@@ -431,7 +433,7 @@ public class CreatePostPageController {
             String mediaUrl = null;
             MediaType mediaType = null;
             try{
-                ArrayList<Media> media = mediaViewController.getMediaArrayList();
+                ArrayList<Media> media = mediaViewController == null? null : mediaViewController.getMediaArrayList();
                 if(mediaViewController != null) {
                     ArrayList<File> fileArrayList = mediaViewController.GetFileArrayList();
                     for (File selectedFile : fileArrayList) {
@@ -439,7 +441,7 @@ public class CreatePostPageController {
                         if (uploadResponse.isBlank()) {
                             new Alert(Alert.AlertType.ERROR, "Server unreachable! Check your connection and try again!").showAndWait();
                             return;
-                        }//todo fuck miho
+                        }
                         Map<?, ?> json = Client.GetResponse(uploadResponse);
                         mediaUrl = (String) json.get("url");
 
@@ -452,7 +454,28 @@ public class CreatePostPageController {
                         }
                         media.add(new Media(mediaType, mediaUrl));
                     }
+                    post.setTitle(titleField.getText());
+                    post.setContent(contentArea.getText());
+                    post.setCategories(selectedCategories);
+                    post.setMedia(media);
                     Client.EditPost(post);
+                    if(mediaViewController != null) {
+                        mediaViewController.Clean();
+                        RemoveMediaPane();
+                    }
+                    try {
+                        FXMLLoader loader = new FXMLLoader(getClass().getResource("ActualPost_Template.fxml"));
+                        Parent root = loader.load();
+
+                        ActualPostTemplateController actualPostTemplateController = loader.getController();
+                        actualPostTemplateController.InitData(post.GetID(), currentUser);
+
+                        Stage stage = (Stage) postButton.getScene().getWindow();
+                        stage.setScene(new Scene(root));
+                    }
+                    catch (Exception ex) {
+                        System.out.println(ex.getMessage());
+                    }
                 }
             }catch(Exception ex){
                 ex.printStackTrace();

@@ -243,8 +243,8 @@
                   </ImageView>
                </children>
             </AnchorPane>
-            <Button fx:id="pendingFriendButton" alignment="CENTER_RIGHT" contentDisplay="RIGHT" disable="true" layoutX="17.0" layoutY="49.0" mnemonicParsing="false" onMouseClicked="#CancelFriendRequest" prefHeight="40.0" prefWidth="99.0" style="-fx-text-fill: #ffffff; -fx-background-color: red; -fx-background-radius: 20;" text="Pending Friend" textAlignment="CENTER" textFill="#c6151500" visible="false" />
-            <AnchorPane fx:id="friendRequestAnchor" disable="true" layoutX="17.0" layoutY="49.0" prefHeight="41.0" prefWidth="99.0" visible="false">
+            <Button fx:id="pendingFriendButton" alignment="CENTER_RIGHT" contentDisplay="RIGHT" layoutX="17.0" layoutY="49.0" mnemonicParsing="false" onMouseClicked="#CancelFriendRequest" prefHeight="40.0" prefWidth="99.0" style="-fx-text-fill: #ffffff; -fx-background-color: red; -fx-background-radius: 20;" text="Pending Friend" textAlignment="CENTER" textFill="#c6151500" visible="false" />
+            <AnchorPane fx:id="friendRequestAnchor" layoutX="17.0" layoutY="49.0" prefHeight="41.0" prefWidth="99.0" visible="false">
                <children>
                   <Button alignment="CENTER" contentDisplay="RIGHT" mnemonicParsing="false" onMouseClicked="#AcceptFriend" prefHeight="41.0" prefWidth="46.0" style="-fx-text-fill: #ffffff; -fx-background-color: green; -fx-background-radius: 20; -fx-border-radius: 20; -fx-border-color: white;" text="✓" textAlignment="CENTER" textFill="#c6151500">
                      <font>
@@ -258,7 +258,7 @@
                   </Button>
                </children>
             </AnchorPane>
-            <AnchorPane fx:id="unfriendButtonAnchor" disable="true" layoutX="17.0" layoutY="49.0" visible="false">
+            <AnchorPane fx:id="unfriendButtonAnchor" layoutX="17.0" layoutY="49.0" visible="false">
                <children>
                   <Button alignment="CENTER_RIGHT" contentDisplay="RIGHT" mnemonicParsing="false" onMouseClicked="#Unfriend" prefHeight="40.0" prefWidth="99.0" style="-fx-text-fill: #ffffff; -fx-background-radius: 20; -fx-border-radius: 20; -fx-border-color: white;" text="Unfriend" textAlignment="CENTER" textFill="#c6151500" />
                   <ImageView fitHeight="31.0" fitWidth="31.0" layoutX="6.0" layoutY="5.0" mouseTransparent="true" pickOnBounds="true" preserveRatio="true">
@@ -310,7 +310,7 @@
                   </ImageView>
                </children>
             </AnchorPane>
-            <AnchorPane fx:id="chatAnchor" disable="true" layoutX="134.0" layoutY="49.0" visible="false">
+            <AnchorPane fx:id="chatAnchor" layoutX="134.0" layoutY="49.0" visible="false">
                <children>
                   <Button alignment="CENTER_RIGHT" contentDisplay="RIGHT" mnemonicParsing="false" onMouseClicked="#Chat" prefHeight="40.0" prefWidth="85.0" style="-fx-text-fill: #ffffff; -fx-background-color: #0E1113; -fx-background-radius: 20;" text="Chat" textFill="#c6151500" />
                   <ImageView fitHeight="40.0" fitWidth="37.0" layoutX="6.0" layoutY="2.0" mouseTransparent="true" pickOnBounds="true" preserveRatio="true" rotate="180.0">
