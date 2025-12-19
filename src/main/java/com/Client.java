@@ -454,6 +454,86 @@ public abstract class Client {
         return report.Dismiss(BASE_URL, gson);
     }
 
+    public static ArrayList<Report> GetUserReportFeed(Admin admin, int lastID) throws Exception {
+        JsonObject json = new JsonObject();
+        json.add("admin", gson.toJsonTree(admin, Admin.class));
+        json.addProperty("lastID", lastID);
+
+        String jsonBody = gson.toJson(json);
+
+        URL url = new URL(BASE_URL + "/report/feed/users");
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("POST");
+        conn.setDoOutput(true);
+        conn.setRequestProperty("Content-Type", "application/json");
+
+        try (OutputStream os = conn.getOutputStream()) {
+            os.write(jsonBody.getBytes());
+        }
+
+        BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+        StringBuilder sb = new StringBuilder();
+        String line;
+        while ((line = reader.readLine()) != null) sb.append(line);
+        reader.close();
+
+        return new ArrayList<>(Arrays.asList(gson.fromJson(sb.toString(), Report[].class)));
+    }
+
+    public static ArrayList<Report> GetPostReportFeed(User user, Subcreddit sub, int lastID) throws Exception {
+        JsonObject json = new JsonObject();
+        json.add("user", gson.toJsonTree(user, User.class));
+        json.add("sub", gson.toJsonTree(sub, User.class));
+        json.addProperty("lastID", lastID);
+
+        String jsonBody = gson.toJson(json);
+
+        URL url = new URL(BASE_URL + "/report/feed/posts");
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("POST");
+        conn.setDoOutput(true);
+        conn.setRequestProperty("Content-Type", "application/json");
+
+        try (OutputStream os = conn.getOutputStream()) {
+            os.write(jsonBody.getBytes());
+        }
+
+        BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+        StringBuilder sb = new StringBuilder();
+        String line;
+        while ((line = reader.readLine()) != null) sb.append(line);
+        reader.close();
+
+        return new ArrayList<>(Arrays.asList(gson.fromJson(sb.toString(), Report[].class)));
+    }
+
+    public static ArrayList<Report> GetCommentReportFeed(User user, Subcreddit sub, int lastID) throws Exception {
+        JsonObject json = new JsonObject();
+        json.add("user", gson.toJsonTree(user, User.class));
+        json.add("sub", gson.toJsonTree(sub, User.class));
+        json.addProperty("lastID", lastID);
+
+        String jsonBody = gson.toJson(json);
+
+        URL url = new URL(BASE_URL + "/report/feed/comments");
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("POST");
+        conn.setDoOutput(true);
+        conn.setRequestProperty("Content-Type", "application/json");
+
+        try (OutputStream os = conn.getOutputStream()) {
+            os.write(jsonBody.getBytes());
+        }
+
+        BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+        StringBuilder sb = new StringBuilder();
+        String line;
+        while ((line = reader.readLine()) != null) sb.append(line);
+        reader.close();
+
+        return new ArrayList<>(Arrays.asList(gson.fromJson(sb.toString(), Report[].class)));
+    }
+
 
     //BOOKMARK: Subcreddit
 

@@ -31,6 +31,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 public class SubcredditController implements Initializable {
@@ -85,52 +86,14 @@ public class SubcredditController implements Initializable {
         setupScrollBehavior();
     }
 
-    private void loadSubcredditData(String subcredditName) {
-        try {
-            Subcreddit[] allSubs = Client.GetAllSubcreddits();
-            Subcreddit foundSub = null;
-            for (Subcreddit sub : allSubs) {
-                if (sub.GetSubName().equalsIgnoreCase(subcredditName)) {
-                    foundSub = sub;
-                    break;
-                }
-            }
-
-            if (foundSub == null) {
-                showAlert("Error", "Subcreddit not found: " + subcredditName);
-                goToHome();
-                return;
-            }
-
-            this.currentSubcreddit = foundSub;
-
-            updateSubcredditUI();
-
-            checkMemberStatus();
-
-            loadModerators();
-
-            loadPosts();
-
-        } catch (Exception e) {
-            System.err.println("Error loading subcreddit: " + e.getMessage());
-            showAlert("Error", "Failed to load subcreddit: " + e.getMessage());
-            goToHome();  // Call parameterless version
-        }
-    }
-
     private void updateSubcredditUI() {
         if (currentSubcreddit == null) return;
 
-        subcredditName.setText("c/" + currentSubcreddit.GetSubName());
+        subcredditName.setText("cr/" + currentSubcreddit.GetSubName());
 
         descriptionText.setText(currentSubcreddit.GetDescription());
 
-        Timestamp created = currentSubcreddit.GetTimecreated();
-        if (created != null) {
-            SimpleDateFormat sdf = new SimpleDateFormat("MMM dd, yyyy");
-            createdDate.setText("Created: " + sdf.format(created));
-        }
+        createdDate.setText("Created: " + currentSubcreddit.GetTimecreated().toLocalDateTime().toLocalDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
 
         privacyStatus.setText("Privacy: " + (currentSubcreddit.GetPrivate() ? "Private" : "Public"));
 
@@ -211,13 +174,6 @@ public class SubcredditController implements Initializable {
                 if (post.GetID() > lastPostId) {
                     lastPostId = post.GetID();
                 }
-            }
-
-            if (postFeed.isEmpty()) {
-                Text noPostsText = new Text("No posts found in c/" + currentSubcreddit.GetSubName());
-                noPostsText.setFill(Color.WHITE);
-                noPostsText.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
-                postsContainer.getChildren().add(noPostsText);
             }
 
         } catch (Exception e) {
@@ -317,26 +273,26 @@ public class SubcredditController implements Initializable {
 //    }
 
     @FXML
-    void goToHome(MouseEvent event) {
-        goToHome();
-        event.consume();
-    }
-
-    private void goToHome() {
-        clean();
+    void GoHome(MouseEvent event) {
+        Clean();
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("home-page.fxml"));
             Parent root = loader.load();
 
-            HomePageController controller = loader.getController();
-            controller.InitData(currentUser, null, 0);
+            HomePageController homePageController = loader.getController();
+            homePageController.InitData(currentUser, null, 0);
 
-            Stage stage = (Stage) postsContainer.getScene().getWindow();
-            stage.setScene(new Scene(root));
-            stage.show();
-        } catch (Exception e) {
-            e.printStackTrace();
+            // Create the second scene
+            Scene scene2 = new Scene(root);
+            // Get the current stage
+            Stage stage = (Stage)postsContainer.getScene().getWindow();
+            // Set the new scene
+            stage.setScene(scene2);
         }
+        catch (Exception ex) {
+            System.out.println(ex.getMessage());
+        }
+        event.consume();
     }
 
     @FXML
