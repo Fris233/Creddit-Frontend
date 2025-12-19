@@ -5,12 +5,10 @@ import com.crdt.*;
 import javafx.animation.PauseTransition;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -25,12 +23,8 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.stage.Modality;
 import javafx.util.Duration;
-import javafx.geometry.Insets;
 
 import java.io.IOException;
-import java.net.URL;
-import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
@@ -53,6 +47,8 @@ public class SubcredditController {
     @FXML private VBox moderatorsList;
     @FXML private Button hotButton;
     @FXML private Button newButton;
+    @FXML private Button postReport;
+    @FXML private Button commentReport;
     @FXML private Button topButton;
 
     private User currentUser;
@@ -72,8 +68,10 @@ public class SubcredditController {
     public void InitData(int subID, String searchPrompt, User user) {
         this.currentUser = user;
         this.searchField.setText(searchPrompt);
+
         try {
             this.currentSubcreddit = Client.GetSubcreddit(subID);
+            ModCheck();
         }
         catch (Exception e) {
             e.printStackTrace();
@@ -102,6 +100,13 @@ public class SubcredditController {
         setupScrollBehavior();
 
         setupModerationTools();
+    }
+
+    public void ModCheck() throws Exception {
+        if (!Client.VerifyModeration(currentUser, currentSubcreddit)) {
+            postReport.setVisible(false);
+            commentReport.setVisible(false);
+        }
     }
 
     private void updateSubcredditUI() {
@@ -430,6 +435,17 @@ public class SubcredditController {
         }
     }
 
+    @FXML
+    void SearchPressed(KeyEvent event) {
+        if (event.getCode() == KeyCode.ENTER) {
+            // Search within this subcreddit
+            String searchTerm = searchField.getText();
+            if (!searchTerm.isEmpty()) {
+                searchInSubcreddit(searchTerm);
+            }
+        }
+    }
+
     private void searchInSubcreddit(String searchTerm) {
         Clean();
         try {
@@ -664,6 +680,41 @@ public class SubcredditController {
         DialogPane dialogPane = alert.getDialogPane();
         dialogPane.setStyle("-fx-background-color: #0E1113;");
         dialogPane.lookup(".content.label").setStyle("-fx-text-fill: white;");
+    }
+    @FXML
+    void PostReports(MouseEvent event) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("report-page.fxml"));
+            Parent root = loader.load();
+
+            ReportPageController reportPageController = loader.getController();
+            reportPageController.InitData(currentUser, Client.GetPostReportFeed(currentUser, currentSubcreddit, 0));
+
+            Scene scene2 = new Scene(root);
+            Stage stage = (Stage) postsContainer.getScene().getWindow();
+            stage.setScene(scene2);
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
+        }
+        event.consume();
+    }
+
+    @FXML
+    void CommentReports(MouseEvent event) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("report-page.fxml"));
+            Parent root = loader.load();
+
+            ReportPageController reportPageController = loader.getController();
+            reportPageController.InitData(currentUser, Client.GetCommentReportFeed(currentUser, currentSubcreddit, 0));
+
+            Scene scene2 = new Scene(root);
+            Stage stage = (Stage) postsContainer.getScene().getWindow();
+            stage.setScene(scene2);
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
+        }
+        event.consume();
     }
 
     private void Clean() {

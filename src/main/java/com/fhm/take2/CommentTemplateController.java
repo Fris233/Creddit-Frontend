@@ -146,7 +146,7 @@ public class CommentTemplateController {
             Parent root = loader.load();
 
             ActualPostTemplateController actualPostTemplateController = loader.getController();
-            actualPostTemplateController.InitData(comment.getPost().GetID(), /*comment.getID(),*/ this.currentUser);
+            actualPostTemplateController.InitData(comment.getPost().GetID(), comment.getID(), this.currentUser);
 
             // Get the current stage
             Stage stage = (Stage) userPFP.getScene().getWindow();
