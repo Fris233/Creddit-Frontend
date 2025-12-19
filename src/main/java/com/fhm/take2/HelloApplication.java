@@ -49,7 +49,7 @@ public class HelloApplication extends Application {
         Scene scene = new Scene(fxmlLoader.load(), 1600, 900);
         if(reachable) {
             HomePageController homePageController = fxmlLoader.getController();
-            homePageController.InitData(null, null, 0);
+            homePageController.InitData(null, "", 0);
         }
         else {
             Error404Controller error404Controller = fxmlLoader.getController();
@@ -66,7 +66,7 @@ public class HelloApplication extends Application {
                 }
 
                 HomePageController homePageController = loader.getController();
-                homePageController.InitData(null, null, 0);
+                homePageController.InitData(null, "", 0);
 
                 // Create the second scene
                 Scene scene2 = new Scene(root);

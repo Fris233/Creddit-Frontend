@@ -385,7 +385,7 @@ public class MediaViewController {
                     mediaPlayers.put(currentMediaIndex, mp);
                 }
             } else {
-                //TODO: For some reason, this doesn't seem to work? Haven't tested it outside of creating, but it seems to be broken.
+                topHBox.setVisible(true);
                 unknownMediaLabel.setVisible(true);
                 unknownMediaLabel.setText(url);
             }

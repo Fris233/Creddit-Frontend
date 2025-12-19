@@ -36,8 +36,8 @@
         </ScrollPane>
         <VBox spacing="8" style="-fx-background-color: #1A1A1B; -fx-border-color: #343536; -fx-border-width: 1 0 0 0; -fx-padding: 16;">
             <HBox alignment="CENTER_LEFT" spacing="8">
-            <TextArea fx:id="messageInput" prefHeight="78.0" prefWidth="260.0" promptText="Message" style="-fx-background-color: #272729; -fx-prompt-text-fill: #818384; -fx-text-fill: #D7DADC; -fx-border-color: #343536; -fx-padding: 12 16 12 16; -fx-background-radius: 20; -fx-border-radius: 20;" wrapText="true" />
-                <Button fx:id="sendButton" onAction="#sendMessage" style="-fx-background-color: #D7DADC; -fx-text-fill: #1A1A1B; -fx-background-radius: 20; -fx-padding: 12 20 12 20; -fx-font-weight: bold;" text="Send" />
+            <TextArea fx:id="messageInput" prefHeight="78.0" promptText="Message" style="-fx-background-color: #272729; -fx-prompt-text-fill: #818384; -fx-text-fill: #D7DADC; -fx-border-color: #343536; -fx-padding: 12 16 12 16; -fx-background-radius: 20; -fx-border-radius: 20;" wrapText="true" />
+                <Button fx:id="sendButton" maxHeight="-Infinity" maxWidth="-Infinity" onAction="#sendMessage" prefHeight="41.0" prefWidth="282.0" style="-fx-background-color: #D7DADC; -fx-text-fill: #1A1A1B; -fx-background-radius: 20; -fx-padding: 12 20 12 20; -fx-font-weight: bold;" text="Send" />
             </HBox>
         </VBox>
     </VBox>

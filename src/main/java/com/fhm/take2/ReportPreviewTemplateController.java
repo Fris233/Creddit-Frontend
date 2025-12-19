@@ -137,7 +137,7 @@ public class ReportPreviewTemplateController {
                 Parent root = loader.load();
 
                 ActualPostTemplateController actualPostTemplateController = loader.getController();
-                actualPostTemplateController.InitData(((Post) report.getTarget()).GetID(), currentUser);
+                actualPostTemplateController.InitData(((Post) report.getTarget()).GetID(), /*0,*/ currentUser);
 
                 Stage stage = (Stage) JoinButton.getScene().getWindow();
                 stage.setScene(new Scene(root));

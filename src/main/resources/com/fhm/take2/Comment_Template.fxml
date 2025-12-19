@@ -13,10 +13,9 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-
 <AnchorPane prefWidth="620.0" style="-fx-background-color: #0E1113;" stylesheets="@CredditCSS.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.fhm.take2.CommentTemplateController">
    <children>
-      <VBox fx:id="anchor" layoutX="1.0" layoutY="7.0">
+      <VBox fx:id="anchor" layoutX="1.0" layoutY="7.0" onMouseClicked="#OpenComment">
          <children>
             <VBox prefHeight="237.0" prefWidth="566.0" spacing="15.0" style="-fx-border-color: gray; -fx-border-width: 0 0 0 2;">
                <children>
@@ -181,6 +180,9 @@
                </padding>
             </VBox>
          </children>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
       </VBox>
    </children>
 </AnchorPane>
