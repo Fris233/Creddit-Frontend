@@ -406,7 +406,7 @@ public class HomePageController {
                 Parent root = loader.load();
 
                 SubcredditController controller = loader.getController();
-                controller.InitData(id, currentUser);
+                controller.InitData(id, searchPrompt, currentUser);
 
                 Stage stage = (Stage) postsContainer.getScene().getWindow();
                 stage.setScene(new Scene(root));
@@ -491,7 +491,7 @@ public class HomePageController {
             Parent root = loader.load();
 
             SubcredditController controller = loader.getController();
-            controller.InitData(subcreddit.GetSubId(), currentUser);
+            controller.InitData(subcreddit.GetSubId(), "", currentUser);
 
             Stage stage = (Stage) postsContainer.getScene().getWindow();
             stage.setScene(new Scene(root));
