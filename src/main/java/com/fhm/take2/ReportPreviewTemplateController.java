@@ -137,7 +137,7 @@ public class ReportPreviewTemplateController {
                 Parent root = loader.load();
 
                 ActualPostTemplateController actualPostTemplateController = loader.getController();
-                actualPostTemplateController.InitData(((Post) report.getTarget()).GetID(), /*0,*/ currentUser);
+                actualPostTemplateController.InitData(((Post) report.getTarget()).GetID(), 0, currentUser);
 
                 Stage stage = (Stage) JoinButton.getScene().getWindow();
                 stage.setScene(new Scene(root));
@@ -155,7 +155,7 @@ public class ReportPreviewTemplateController {
                 Parent root = loader.load();
 
                 ActualPostTemplateController actualPostTemplateController = loader.getController();
-                actualPostTemplateController.InitData(((Comment) report.getTarget()).getPost().GetID(), currentUser);
+                actualPostTemplateController.InitData(((Comment) report.getTarget()).getPost().GetID(), ((Comment)report.getTarget()).getID(), currentUser);
 
                 Stage stage = (Stage) JoinButton.getScene().getWindow();
                 stage.setScene(new Scene(root));

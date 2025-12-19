@@ -86,7 +86,7 @@ public class ActualPostTemplateController {
     private boolean scrollCooldown = false;
     private boolean moreOptioning = false;
 
-    public void InitData(int postid, /*int commentid,*/ User user) {
+    public void InitData(int postid, int commentid, User user) {
         this.currentUser = user;
         this.mediaViewController = null;
         try {
@@ -143,10 +143,12 @@ public class ActualPostTemplateController {
             catch (Exception e) {
                 e.printStackTrace();
             }
-            //subPFP.setImage(new Image(post.GetSubcreddit().GetLogo().GetURL(), true));
+            if(post.GetSubcreddit().GetLogo() != null && !post.GetSubcreddit().GetLogo().GetURL().isBlank())
+                subPFP.setImage(new Image(post.GetSubcreddit().GetLogo().GetURL(), true));
         }
         else {
-            //subPFP.setImage(new Image(post.GetAuthor().getPfp().GetURL(), true));
+            if(post.GetAuthor().getPfp() != null && !post.GetAuthor().getPfp().GetURL().isBlank())
+                subPFP.setImage(new Image(post.GetAuthor().getPfp().GetURL(), true));
         }
         UpdateJoinButton();
 
@@ -205,10 +207,10 @@ public class ActualPostTemplateController {
 
         try {
             CommentFeed commentFeed;
-            /*if(commentid == 0)*/
+            if(commentid == 0)
                 commentFeed = Client.GetPostCommentFeed(currentUser, this.post, 0);
-            /*else
-                commentFeed = Client.GetCommentFeed(currentUser, commentid);*/
+            else
+                commentFeed = Client.GetCommentFeed(currentUser, commentid);
             Map<Integer, Integer> votes = commentFeed.votes();
             int root = 0;
             for (Comment comment : commentFeed.parents()) {
@@ -249,47 +251,46 @@ public class ActualPostTemplateController {
                 scrollCooldown = true;
                 try {
                     CommentFeed commentFeed;
-                    /*if(commentid == 0)*/
+                    if(commentid == 0) {
                         commentFeed = Client.GetPostCommentFeed(currentUser, this.post, parentCommentControllers.getLast().GetCommentID());
-                    /*else
-                        commentFeed = Client.GetCommentFeed(currentUser, commentid);*/
-                    Map<Integer, Integer> votes = commentFeed.votes();
-                    int root = 0;
-                    for (Comment comment : commentFeed.parents()) {
-                        FXMLLoader loader = new FXMLLoader(getClass().getResource("Comment_Template.fxml"));
-                        Node node = loader.load();
+                        Map<Integer, Integer> votes = commentFeed.votes();
+                        int root = 0;
+                        for (Comment comment : commentFeed.parents()) {
+                            FXMLLoader loader = new FXMLLoader(getClass().getResource("Comment_Template.fxml"));
+                            Node node = loader.load();
 
-                        CommentTemplateController commentTemplateController = loader.getController();
-                        commentTemplateController.Init(comment, currentUser, votes.getOrDefault(comment.getID(), 0), 0, this, root);
+                            CommentTemplateController commentTemplateController = loader.getController();
+                            commentTemplateController.Init(comment, currentUser, votes.getOrDefault(comment.getID(), 0), 0, this, root);
 
-                        postsContainer.getChildren().add(node);
-                        parentCommentControllers.add(commentTemplateController);
-                        // Set the new scene
-                        Comment[] lv2 = commentFeed.lv2().get(comment.getID());
-                        for(Comment lv2_reply : lv2) {
+                            postsContainer.getChildren().add(node);
+                            parentCommentControllers.add(commentTemplateController);
+                            // Set the new scene
+                            Comment[] lv2 = commentFeed.lv2().get(comment.getID());
+                            for (Comment lv2_reply : lv2) {
 
-                            FXMLLoader loader2 = new FXMLLoader(getClass().getResource("Comment_Template.fxml"));
-                            Node node2 = loader2.load();
+                                FXMLLoader loader2 = new FXMLLoader(getClass().getResource("Comment_Template.fxml"));
+                                Node node2 = loader2.load();
 
-                            CommentTemplateController commentTemplateController2 = loader2.getController();
-                            commentTemplateController2.Init(lv2_reply, currentUser, votes.getOrDefault(comment.getID(), 0), 1, this, root);
+                                CommentTemplateController commentTemplateController2 = loader2.getController();
+                                commentTemplateController2.Init(lv2_reply, currentUser, votes.getOrDefault(comment.getID(), 0), 1, this, root);
 
-                            postsContainer.getChildren().add(node2);
-                            replyControllers.add(commentTemplateController2);
+                                postsContainer.getChildren().add(node2);
+                                replyControllers.add(commentTemplateController2);
 
-                            Comment[] lv3 = commentFeed.lv3().get(lv2_reply.getID());
-                            for(Comment lv3_reply : lv3) {
-                                FXMLLoader loader3 = new FXMLLoader(getClass().getResource("Comment_Template.fxml"));
-                                Node node3 = loader3.load();
+                                Comment[] lv3 = commentFeed.lv3().get(lv2_reply.getID());
+                                for (Comment lv3_reply : lv3) {
+                                    FXMLLoader loader3 = new FXMLLoader(getClass().getResource("Comment_Template.fxml"));
+                                    Node node3 = loader3.load();
 
-                                CommentTemplateController commentTemplateController3 = loader3.getController();
-                                commentTemplateController3.Init(lv3_reply, currentUser, votes.getOrDefault(comment.getID(), 0), 2, this, root);
+                                    CommentTemplateController commentTemplateController3 = loader3.getController();
+                                    commentTemplateController3.Init(lv3_reply, currentUser, votes.getOrDefault(comment.getID(), 0), 2, this, root);
 
-                                postsContainer.getChildren().add(node3);
-                                replyControllers.add(commentTemplateController3);
+                                    postsContainer.getChildren().add(node3);
+                                    replyControllers.add(commentTemplateController3);
+                                }
                             }
+                            root++;
                         }
-                        root++;
                     }
                 }
                 catch (Exception e) {
@@ -904,7 +905,7 @@ public class ActualPostTemplateController {
             Parent root = loader.load();
 
             ActualPostTemplateController actualPostTemplateController = loader.getController();
-            actualPostTemplateController.InitData(post.GetID(), /*this.comment.getID(),*/ currentUser);
+            actualPostTemplateController.InitData(post.GetID(), this.comment.getID(), currentUser);
 
             // Get the current stage
             Stage stage = (Stage) JoinButton.getScene().getWindow();
