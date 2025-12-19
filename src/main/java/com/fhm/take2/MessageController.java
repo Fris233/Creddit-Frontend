@@ -9,6 +9,7 @@ import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
+import javafx.scene.input.Clipboard;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.HBox;
@@ -27,7 +28,7 @@ public class MessageController {
 
     @FXML private VBox messagesContainer;
     @FXML private ScrollPane scrollPane;
-    @FXML private TextField messageInput;
+    @FXML private TextArea messageInput;
     @FXML private Button sendButton;
     @FXML private VBox friendsListContainer;
     @FXML private Label friendName;
@@ -83,9 +84,27 @@ public class MessageController {
         });
 
         setupScrollListener();
+
+        /*messageInput.setOnKeyPressed(event -> {
+            if (event.isControlDown() && event.getCode() == KeyCode.V) {
+                handlePaste();
+                event.consume();
+            }
+        });*/
     }
 
     /* --------------------------------------------------- */
+
+    /*private void handlePaste() {
+        Clipboard clipboard = Clipboard.getSystemClipboard();
+
+        // Check if clipboard has files
+        if (clipboard.hasFiles()) {
+            for (java.io.File file : clipboard.getFiles()) {
+                AddFile(file);
+            }
+        }
+    }*/
 
     private void setupScrollListener() {
         scrollPane.vvalueProperty().addListener((_, _, v) -> {
@@ -209,7 +228,9 @@ public class MessageController {
     }
 
     private HBox createMessageBubbleFromMessage(Message msg) {
-        return createMessageBubble(msg.GetText(), msg.GetSender().equals(currentUser));
+        HBox bubble = createMessageBubble(msg, msg.GetSender().equals(currentUser));
+        bubble.setUserData(msg); // store the Message
+        return bubble;
     }
 
     /* --------------------------------------------------- */
@@ -365,12 +386,48 @@ public class MessageController {
         friendStatus.setText("Send an invite message to start chatting!");
     }
 
-    private HBox createMessageBubble(String message, boolean isSent) {
+    private HBox createMessageBubble(Message msg, boolean isSent) {
         HBox messageContainer = new HBox();
         messageContainer.setPadding(new Insets(5, 10, 5, 10));
         messageContainer.setMaxWidth(Double.MAX_VALUE);
 
-        Text messageText = new Text(message);
+        /*Button deleteBtn = new Button("✕");
+        deleteBtn.setStyle(
+                "-fx-background-color: transparent;" +
+                        "-fx-text-fill: #ff5555;" +
+                        "-fx-cursor: hand;"
+        );
+        deleteBtn.setVisible(false);
+
+        if (msg.GetSender().equals(currentUser)) {
+            messageContainer.setOnMouseEntered(e -> deleteBtn.setVisible(true));
+            messageContainer.setOnMouseExited(e -> deleteBtn.setVisible(false));
+        }
+
+        deleteBtn.setOnAction(e -> {
+            try {
+                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                alert.setTitle("Confirm Action");
+                alert.setHeaderText("Delete Message?");
+                alert.setContentText("Are you sure you want to delete this message?");
+
+                Optional<ButtonType> result = alert.showAndWait();
+
+                if (result.isPresent() && result.get() == ButtonType.OK) {
+                    Client.DeletePM(msg);
+                } else {
+                    return;
+                }
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                return;
+            }
+
+            messagesContainer.getChildren().remove(messageContainer);
+            allMessages.get(currentFriend.getId()).removeIf(m -> m.GetID() == msg.GetID());
+        });*/
+
+        Text messageText = new Text(msg.GetText());
         messageText.setStyle("-fx-fill: white;");
         messageText.setWrappingWidth(280);
 

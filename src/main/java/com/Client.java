@@ -4,9 +4,11 @@ import com.crdt.*;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
+import com.google.gson.reflect.TypeToken;
 import com.google.gson.typeadapters.RuntimeTypeAdapterFactory;
 
 import java.io.*;
+import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.file.Files;
@@ -21,6 +23,9 @@ public abstract class Client {
     private static String BASE_URL;
 
     public static final ExecutorService THREAD_POOL = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+
+    private static Type commentMapType = new TypeToken<Map<Integer, Comment[]>>() {}.getType();
+    private static Type id_vote_type = new TypeToken<Map<Integer, Integer>>() {}.getType();
 
     public static void init() {
         RuntimeTypeAdapterFactory<User> userAdapter =
@@ -558,6 +563,39 @@ public abstract class Client {
 
     public static CommentFeed GetPostCommentFeed(User user, Post post, int lastID) throws Exception {
         return post.GetCommentFeed(user, lastID, BASE_URL, gson);
+    }
+
+    public static CommentFeed GetCommentFeed(User user, int commentid) throws Exception {
+        JsonObject json = new JsonObject();
+        json.add("user", gson.toJsonTree(user, User.class));
+        json.addProperty("commentid", commentid);
+
+        String jsonBody = gson.toJson(json);
+
+        URL url = new URL(BASE_URL + "/comment/feed");
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("POST");
+        conn.setDoOutput(true);
+        conn.setRequestProperty("Content-Type", "application/json");
+
+        try (OutputStream os = conn.getOutputStream()) {
+            os.write(jsonBody.getBytes());
+        }
+
+        BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+        StringBuilder sb = new StringBuilder();
+        String line;
+        while ((line = reader.readLine()) != null) sb.append(line);
+        reader.close();
+
+        JsonObject jsonObj = gson.fromJson(sb.toString(), JsonObject.class);
+        Comment comment = gson.fromJson(jsonObj.get("parent"), Comment.class);
+        Comment[] parents = {comment};
+        Map<Integer, Comment[]> lv1 = gson.fromJson(jsonObj.get("lv1"), commentMapType);
+        Map<Integer, Comment[]> lv2 = gson.fromJson(jsonObj.get("lv2"), commentMapType);
+        Map<Integer, Integer> votes = gson.fromJson(jsonObj.get("lv2"), id_vote_type);
+
+        return new CommentFeed(parents, lv1, lv2, votes);
     }
 
     public static int CreateComment(Comment comment) throws Exception {

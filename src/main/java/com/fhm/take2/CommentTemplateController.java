@@ -55,13 +55,15 @@ public class CommentTemplateController {
     private int level;
     private int ind;
     private AddCommentPaneController addCommentPaneController = null;
+    private int root;
 
-    public void Init(Comment newComment, User user, int userVote, int replyLevel, ActualPostTemplateController parent) {
+    public void Init(Comment newComment, User user, int userVote, int replyLevel, ActualPostTemplateController parent, int root) {
         this.comment = newComment;
         this.currentUser = user;
         this.parentPage = parent;
         this.level = replyLevel;
         this.mediaViewController = null;
+        this.root = root;
         myOGVote = 0;
         if(user != null)
             myOGVote = userVote;
@@ -106,19 +108,9 @@ public class CommentTemplateController {
         addedReply.addListener((obs, oldV, newV) -> {
             if(newV) {
                 try {
-                    FXMLLoader loader = new FXMLLoader(getClass().getResource("Comment_Template.fxml"));
-                    Node node = loader.load();
-
-                    CommentTemplateController commentTemplateController = loader.getController();
-                    commentTemplateController.Init(this.reply, currentUser, 0, this.level + 1, this.parentPage);
-
-                    ind = this.parentPage.parentCommentControllers.indexOf(this);
-                    if(ind < 0)
-                        ind = this.parentPage.replyControllers.indexOf(this);
-                    this.parentPage.replyControllers.add(ind + 1, commentTemplateController);
-                    this.parentPage.postsContainer.getChildren().add(ind + this.level + 3, node);
                     this.reply = null;
                     this.addedReply.set(false);
+                    this.parentPage.Refresh();
                 }
                 catch (Exception e) {
                     e.printStackTrace();
@@ -149,7 +141,21 @@ public class CommentTemplateController {
 
     @FXML
     void OpenComment(MouseEvent event) {
-        System.out.println("Open Comment Pressed!");
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("ActualPost_Template.fxml"));
+            Parent root = loader.load();
+
+            ActualPostTemplateController actualPostTemplateController = loader.getController();
+            actualPostTemplateController.InitData(comment.getPost().GetID(), /*comment.getID(),*/ this.currentUser);
+
+            // Get the current stage
+            Stage stage = (Stage) userPFP.getScene().getWindow();
+            // Set the new scene
+            stage.setScene(new Scene(root));
+        }
+        catch (Exception ex) {
+            System.out.println(ex.getMessage());
+        }
         event.consume();
     }
 
@@ -183,18 +189,24 @@ public class CommentTemplateController {
                 addCommentPaneController = loader.getController();
                 addCommentPaneController.Init(currentUser, this.comment, this);
 
+                addCommentPaneController.cancelButton.setOnMouseClicked((mouseEvent) -> {
+                    this.parentPage.postsContainer.getChildren().remove(ind + 3 + (level == 0? 0 : root));
+                    addCommentPaneController.Clean();
+                    addCommentPaneController = null;
+                    replying = false;
+                });
+
                 ind = this.parentPage.parentCommentControllers.indexOf(this);
                 if(ind < 0)
-                    ind = this.parentPage.replyControllers.indexOf(this);
-                this.parentPage.postsContainer.getChildren().add(ind + this.level + 3, node);
-                System.out.println("Added small reply box after comment at index : " + ind);
+                    ind = this.parentPage.replyControllers.indexOf(this) + 1;
+                this.parentPage.postsContainer.getChildren().add(ind + 3 + (level == 0? 0 : root), node);
             }
             catch (Exception e) {
                 e.printStackTrace();
             }
         }
         else {
-            this.parentPage.postsContainer.getChildren().remove(ind + this.level + 3);
+            this.parentPage.postsContainer.getChildren().remove(ind + 3 + (level == 0? 0 : root));
             addCommentPaneController.Clean();
             addCommentPaneController = null;
         }

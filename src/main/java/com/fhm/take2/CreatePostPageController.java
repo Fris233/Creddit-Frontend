@@ -429,7 +429,7 @@ public class CreatePostPageController {
                         Parent root = loader.load();
 
                         ActualPostTemplateController actualPostTemplateController = loader.getController();
-                        actualPostTemplateController.InitData(post.GetID(), currentUser);
+                        actualPostTemplateController.InitData(post.GetID(), /*0,*/ currentUser);
 
                         Stage stage = (Stage) postButton.getScene().getWindow();
                         stage.setScene(new Scene(root));
@@ -489,7 +489,7 @@ public class CreatePostPageController {
                         Parent root = loader.load();
 
                         ActualPostTemplateController actualPostTemplateController = loader.getController();
-                        actualPostTemplateController.InitData(post.GetID(), currentUser);
+                        actualPostTemplateController.InitData(post.GetID(), /*0,*/ currentUser);
 
                         Stage stage = (Stage) postButton.getScene().getWindow();
                         stage.setScene(new Scene(root));
