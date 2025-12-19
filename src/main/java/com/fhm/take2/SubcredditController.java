@@ -63,6 +63,11 @@ public class SubcredditController {
     private boolean isMember = false;
     private int lastPostId = 0;
     private boolean subMember = false;
+    @FXML private VBox moderationToolsBox;
+    @FXML private Button banUnbanButton;
+    @FXML private Button editRulesButton;
+    @FXML private Button viewReportsButton;
+    @FXML private Label modToolsLabel;
 
     public void InitData(int subID, String searchPrompt, User user) {
         this.currentUser = user;
@@ -95,6 +100,8 @@ public class SubcredditController {
         loadPosts();
 
         setupScrollBehavior();
+
+        setupModerationTools();
     }
 
     private void updateSubcredditUI() {
@@ -250,6 +257,89 @@ public class SubcredditController {
             if (event.getCode() == KeyCode.SPACE) event.consume();
             if (event.getCode() == KeyCode.TAB) event.consume();
         });
+    }// Add this method after your existing methods like setupScrollBehavior() or updateSubcredditUI()
+    private void setupModerationTools() {
+        try {
+            // Check if current user is a moderator of this subcreddit
+            boolean isModerator = Client.VerifyModeration(currentUser, currentSubcreddit);
+
+            // Show/hide the moderation tools box
+            moderationToolsBox.setVisible(isModerator);
+            moderationToolsBox.setManaged(isModerator); // This removes space when hidden
+
+            if (isModerator) {
+                // Update label with subcreddit name
+                modToolsLabel.setText("Moderation Tools for cr/" + currentSubcreddit.GetSubName());
+
+                // Setup button actions
+                banUnbanButton.setOnAction(event -> openBanUnbanManager());
+                editRulesButton.setOnAction(event -> showModAlert("Coming Soon", "Edit rules functionality will be implemented soon."));
+                viewReportsButton.setOnAction(event -> showModAlert("Coming Soon", "View reports functionality will be implemented soon."));
+
+                // Apply button styles with hover effects
+                applyModButtonStyles();
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            moderationToolsBox.setVisible(false);
+            moderationToolsBox.setManaged(false);
+        }
+    }
+
+    // Button styling
+    private void applyModButtonStyles() {
+        String buttonStyle =
+                "-fx-background-color: #272729;" +
+                        "-fx-text-fill: #D7DADC;" +
+                        "-fx-border-color: #343536;" +
+                        "-fx-border-width: 1;" +
+                        "-fx-border-radius: 4;" +
+                        "-fx-background-radius: 4;" +
+                        "-fx-padding: 8 12;" +
+                        "-fx-cursor: hand;" +
+                        "-fx-alignment: CENTER_LEFT;";
+
+        banUnbanButton.setStyle(buttonStyle);
+        editRulesButton.setStyle(buttonStyle);
+        viewReportsButton.setStyle(buttonStyle);
+
+        // Hover effects
+        banUnbanButton.setOnMouseEntered(e -> banUnbanButton.setStyle(buttonStyle + "-fx-background-color: #343536;"));
+        banUnbanButton.setOnMouseExited(e -> banUnbanButton.setStyle(buttonStyle));
+
+        viewReportsButton.setOnMouseEntered(e -> viewReportsButton.setStyle(buttonStyle + "-fx-background-color: #343536;"));
+        viewReportsButton.setOnMouseExited(e -> viewReportsButton.setStyle(buttonStyle));
+    }
+
+    // Open the Ban/Unban manager
+    private void openBanUnbanManager() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/fhm/take2/BanUnbanView.fxml"));
+            Parent banUnbanView = loader.load();
+            BanUnbanController controller = loader.getController();
+            controller.init(currentUser);
+
+            Stage banUnbanStage = new Stage();
+            banUnbanStage.setTitle("Ban/Unban Users - cr/" + currentSubcreddit.GetSubName());
+            banUnbanStage.setScene(new Scene(banUnbanView, 800, 600));
+            banUnbanStage.initModality(Modality.APPLICATION_MODAL);
+            banUnbanStage.show();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            showAlert("Error", "Could not open Ban/Unban manager: " + e.getMessage());
+        }
+    }
+
+    // Moderation alerts
+    private void showModAlert(String title, String content) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(content);
+        styleAlert(alert);
+        alert.showAndWait();
     }
 
     private void updateLoginUI() {

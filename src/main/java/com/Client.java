@@ -687,4 +687,67 @@ public abstract class Client {
     public static boolean EditComment(Comment comment) throws Exception {
         return comment.update(BASE_URL, gson);
     }
+
+    // BOOKMARK: BanUnBan
+    public static boolean BanUser(User moderator, User user, Subcreddit subcreddit, String reason) throws Exception {
+        JsonObject json = new JsonObject();
+        json.add("moderator", gson.toJsonTree(moderator, User.class));
+        json.add("user", gson.toJsonTree(user, User.class));
+        if (subcreddit != null) {
+            json.add("subcreddit", gson.toJsonTree(subcreddit));
+        }
+        json.addProperty("reason", reason);
+
+        String jsonBody = gson.toJson(json);
+
+        URL url = new URL(BASE_URL + "/user/ban");
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("POST");
+        conn.setDoOutput(true);
+        conn.setRequestProperty("Content-Type", "application/json");
+
+        try (OutputStream os = conn.getOutputStream()) {
+            os.write(jsonBody.getBytes());
+        }
+
+        BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+        StringBuilder sb = new StringBuilder();
+        String line;
+        while ((line = reader.readLine()) != null) sb.append(line);
+        reader.close();
+
+        Map<?, ?> response = gson.fromJson(sb.toString(), Map.class);
+        return response.get("success") != null && (boolean) response.get("success");
+    }
+
+    // Method to unban a user
+    public static boolean UnbanUser(User moderator, User user, Subcreddit subcreddit) throws Exception {
+        JsonObject json = new JsonObject();
+        json.add("moderator", gson.toJsonTree(moderator, User.class));
+        json.add("user", gson.toJsonTree(user, User.class));
+        if (subcreddit != null) {
+            json.add("subcreddit", gson.toJsonTree(subcreddit));
+        }
+
+        String jsonBody = gson.toJson(json);
+
+        URL url = new URL(BASE_URL + "/user/unban");
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("POST");
+        conn.setDoOutput(true);
+        conn.setRequestProperty("Content-Type", "application/json");
+
+        try (OutputStream os = conn.getOutputStream()) {
+            os.write(jsonBody.getBytes());
+        }
+
+        BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+        StringBuilder sb = new StringBuilder();
+        String line;
+        while ((line = reader.readLine()) != null) sb.append(line);
+        reader.close();
+
+        Map<?, ?> response = gson.fromJson(sb.toString(), Map.class);
+        return response.get("success") != null && (boolean) response.get("success");
+    }
 }
