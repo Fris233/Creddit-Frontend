@@ -366,7 +366,7 @@ public class HomePageController {
                 Parent root = loader.load();
 
                 ActualPostTemplateController actualPostTemplateController = loader.getController();
-                actualPostTemplateController.InitData(id, 0, currentUser);
+                actualPostTemplateController.InitData(id, /*0,*/ currentUser);
 
                 Stage stage = (Stage) postsContainer.getScene().getWindow();
                 stage.setScene(new Scene(root));
