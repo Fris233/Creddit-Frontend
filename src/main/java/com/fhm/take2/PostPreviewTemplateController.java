@@ -265,7 +265,7 @@ public class PostPreviewTemplateController {
                 Parent root = loader.load();
 
                 SubcredditController controller = loader.getController();
-                controller.InitData(post.GetSubcreddit().GetSubId(), currentUser);
+                controller.InitData(post.GetSubcreddit().GetSubId(), "", currentUser);
 
                 Stage stage = (Stage) JoinButton.getScene().getWindow();
                 stage.setScene(new Scene(root));
