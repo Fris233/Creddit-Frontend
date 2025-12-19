@@ -1,6 +1,7 @@
 package com.fhm.take2;
 
 import com.Client;
+import com.crdt.Admin;
 import com.crdt.Post;
 import com.crdt.Subcreddit;
 import com.crdt.User;
@@ -46,6 +47,8 @@ public class HomePageController {
     @FXML private Button filterPosts;
     @FXML private Button filterSubcreddits;
     @FXML private Button filterUsers;
+    @FXML private AnchorPane reportsAnchor;
+    @FXML private AnchorPane analyticsAnchor;
 
     private User currentUser;
     private ArrayList<PostPreviewTemplateController> postPreviewControllers;
@@ -58,9 +61,19 @@ public class HomePageController {
         currentUser = user;
         this.filter = filter;
         this.searchField.setText(searchPrompt);
-        if(currentUser != null)
+        if(currentUser != null && currentUser.getPfp() != null && !currentUser.getPfp().GetURL().isBlank())
             userPFP.setImage(new Image(currentUser.getPfp().GetURL(), true));
         postPreviewControllers = new ArrayList<>();
+
+        if(user instanceof Admin) {
+            System.out.println("Admin detected");
+            reportsAnchor.setVisible(true);
+            analyticsAnchor.setVisible(true);
+        }
+        else {
+            reportsAnchor.setVisible(false);
+            analyticsAnchor.setVisible(false);
+        }
 
         updateLoginUI();
 
@@ -200,8 +213,28 @@ public class HomePageController {
     }
 
     @FXML
-    void CheckRules(MouseEvent event) {
-        System.out.println("Rules Button Pressed");
+    void CheckAnalytics(MouseEvent event) {
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("analytics.fxml"));
+            Parent root = fxmlLoader.load();
+            AnalyticsController analyticsController = fxmlLoader.getController();
+            analyticsController.Init(this.currentUser);
+            Stage stage = new Stage();
+            stage.setTitle("Analytics");
+            stage.setScene(new Scene(root, 400, 280));
+            stage.setMinWidth(400);
+            stage.setMinHeight(280);
+            stage.initOwner(postsContainer.getScene().getWindow());
+            stage.showAndWait();
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+        event.consume();
+    }
+
+    @FXML
+    void CheckReports(MouseEvent event) {
         event.consume();
     }
 
