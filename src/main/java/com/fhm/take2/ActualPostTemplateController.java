@@ -14,10 +14,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.input.ScrollEvent;
-import javafx.scene.input.TransferMode;
+import javafx.scene.input.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
@@ -296,6 +293,13 @@ public class ActualPostTemplateController {
             }
         });
 
+        commentTextArea.setOnKeyPressed(event -> {
+            if (event.isControlDown() && event.getCode() == KeyCode.V) {
+                handlePaste();
+                event.consume();
+            }
+        });
+
         postsScrollPane.addEventFilter(ScrollEvent.SCROLL, e -> {
             double delta = e.getDeltaY() * 2;
             postsScrollPane.setVvalue(postsScrollPane.getVvalue() - delta / postsScrollPane.getContent().getBoundsInLocal().getHeight());
@@ -312,6 +316,17 @@ public class ActualPostTemplateController {
             } else {
                 moreOptionsVBox.getChildren().remove(reportButton);
                 moreOptionsVBox.getChildren().remove(bookmarkButton);
+            }
+        }
+    }
+
+    private void handlePaste() {
+        Clipboard clipboard = Clipboard.getSystemClipboard();
+
+        // Check if clipboard has files
+        if (clipboard.hasFiles()) {
+            for (java.io.File file : clipboard.getFiles()) {
+                AddFile(file);
             }
         }
     }

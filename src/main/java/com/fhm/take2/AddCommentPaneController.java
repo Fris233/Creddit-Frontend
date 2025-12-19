@@ -13,6 +13,8 @@ import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.AnchorPane;
@@ -88,6 +90,13 @@ public class AddCommentPaneController {
             event.consume();
         });
 
+        commentTextArea.setOnKeyPressed(event -> {
+            if (event.isControlDown() && event.getCode() == KeyCode.V) {
+                handlePaste();
+                event.consume();
+            }
+        });
+
         // Handle dropping files
         commentTextArea.setOnDragDropped(event -> {
             var db = event.getDragboard();
@@ -100,6 +109,17 @@ public class AddCommentPaneController {
             event.setDropCompleted(success);
             event.consume();
         });
+    }
+
+    private void handlePaste() {
+        Clipboard clipboard = Clipboard.getSystemClipboard();
+
+        // Check if clipboard has files
+        if (clipboard.hasFiles()) {
+            for (java.io.File file : clipboard.getFiles()) {
+                AddFile(file);
+            }
+        }
     }
 
     @FXML

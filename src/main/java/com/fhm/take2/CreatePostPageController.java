@@ -13,10 +13,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.input.ScrollEvent;
+import javafx.scene.input.*;
 import javafx.scene.layout.*;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -110,6 +107,19 @@ public class CreatePostPageController {
             }
         });
 
+        contentArea.setOnKeyPressed(event -> {
+            if (event.isControlDown() && event.getCode() == KeyCode.V) {
+                handlePaste();
+                event.consume();
+            }
+        });
+        titleField.setOnKeyPressed(event -> {
+            if (event.isControlDown() && event.getCode() == KeyCode.V) {
+                handlePaste();
+                event.consume();
+            }
+        });
+
         titleField.textProperty().addListener((obs, oldText, newText) -> {
             if(newText.length() > 255)
                 titleField.setText(oldText);
@@ -179,6 +189,17 @@ public class CreatePostPageController {
                     subcredditComboBox.setDisable(true);
                     break;
                 }
+            }
+        }
+    }
+
+    private void handlePaste() {
+        Clipboard clipboard = Clipboard.getSystemClipboard();
+
+        // Check if clipboard has files
+        if (clipboard.hasFiles()) {
+            for (java.io.File file : clipboard.getFiles()) {
+                AddFile(file);
             }
         }
     }
