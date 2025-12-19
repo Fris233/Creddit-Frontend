@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.geometry.Point3D?>
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane prefWidth="620.0" style="-fx-background-color: #0E1113;" stylesheets="@CredditCSS.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.fhm.take2.FilterCommentTemplateController">
+   <children>
+      <VBox fx:id="anchor" layoutX="1.0" layoutY="7.0" onMouseClicked="#onCommentPressed">
+         <children>
+            <VBox prefHeight="237.0" prefWidth="566.0" spacing="15.0" style="-fx-border-color: gray; -fx-border-width: 0 0 0 2;">
+               <children>
+                  <AnchorPane prefWidth="593.0">
+                     <children>
+                        <ImageView fx:id="userPFP" fitHeight="56.0" fitWidth="65.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@assets/creddit_icon_final_nobg.png" />
+                           </image>
+                           <cursor>
+                              <Cursor fx:constant="HAND" />
+                           </cursor>
+                        </ImageView>
+                        <Button fx:id="MoreOptionsButton" layoutX="485.0" layoutY="9.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="40.0" style="-fx-text-fill: #ffffff; -fx-padding: 0 0 10 0; -fx-background-radius: 40;" text="..." textFill="#c6151500">
+                           <font>
+                              <Font size="18.0" />
+                           </font>
+                        </Button>
+                        <Label fx:id="usernameLabel" layoutX="62.0" layoutY="14.0" maxWidth="206.0" prefHeight="27.0" text="u/fris" textFill="WHITE" wrapText="true">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                           <cursor>
+                              <Cursor fx:constant="HAND" />
+                           </cursor>
+                        </Label>
+                        <Label fx:id="modLabel" alignment="CENTER" layoutX="191.0" layoutY="15.0" prefHeight="27.0" prefWidth="60.0" text="MOD" textFill="#008a1e" visible="false" wrapText="true">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Label>
+                        <Label fx:id="timeLabel" layoutX="332.0" layoutY="15.0" mouseTransparent="true" prefHeight="27.0" text="X days ago" textFill="WHITE" wrapText="true">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Label>
+                     </children>
+                  </AnchorPane>
+                  <AnchorPane>
+                     <children>
+                        <Label fx:id="contentLabel" maxWidth="-Infinity" mouseTransparent="true" prefHeight="70.0" prefWidth="547.0" text="Comment Content" textFill="WHITE" wrapText="true">
+                           <font>
+                              <Font size="24.0" />
+                           </font>
+                           <cursor>
+                              <Cursor fx:constant="HAND" />
+                           </cursor>
+                        </Label>
+                     </children>
+                     <VBox.margin>
+                        <Insets />
+                     </VBox.margin>
+                  </AnchorPane>
+                  <StackPane fx:id="mediaAnchor" prefHeight="0.0" prefWidth="783.0" />
+                  <AnchorPane>
+                     <children>
+                        <HBox spacing="20.0">
+                           <children>
+                              <AnchorPane fx:id="voteAnchor" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onMouseClicked="#onCommentPressed" prefHeight="56.0" style="-fx-background-color: black; -fx-background-radius: 25;" stylesheets="@CredditCSS.css">
+                                 <children>
+                                    <HBox layoutX="14.0" layoutY="10.0">
+                                       <children>
+                                          <AnchorPane prefHeight="36.0" prefWidth="9.0">
+                                             <children>
+                                                <ImageView fx:id="upvoteButton" fitHeight="40.0" fitWidth="34.0" layoutX="-3.0" pickOnBounds="true" preserveRatio="true" rotate="180.0">
+                                                   <image>
+                                                      <Image url="@assets/vote_arrow.png" />
+                                                   </image>
+                                                   <cursor>
+                                                      <Cursor fx:constant="HAND" />
+                                                   </cursor>
+                                                </ImageView>
+                                             </children>
+                                          </AnchorPane>
+                                          <AnchorPane>
+                                             <children>
+                                                <Label fx:id="votesLabel" layoutX="10.0" layoutY="5.0" prefHeight="27.0" text="0" textFill="WHITE" wrapText="true">
+                                                   <font>
+                                                      <Font size="14.0" />
+                                                   </font>
+                                                </Label>
+                                             </children>
+                                          </AnchorPane>
+                                          <AnchorPane>
+                                             <children>
+                                                <ImageView fx:id="downvoteButton" fitHeight="40.0" fitWidth="34.0" layoutX="9.0" layoutY="1.0" pickOnBounds="true" preserveRatio="true">
+                                                   <image>
+                                                      <Image url="@assets/vote_arrow.png" />
+                                                   </image>
+                                                   <cursor>
+                                                      <Cursor fx:constant="HAND" />
+                                                   </cursor>
+                                                </ImageView>
+                                             </children>
+                                          </AnchorPane>
+                                       </children>
+                                       <padding>
+                                          <Insets right="5.0" />
+                                       </padding>
+                                    </HBox>
+                                 </children>
+                                 <padding>
+                                    <Insets right="5.0" />
+                                 </padding>
+                                 <cursor>
+                                    <Cursor fx:constant="DEFAULT" />
+                                 </cursor>
+                              </AnchorPane>
+                              <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="56.0" style="-fx-background-color: black; -fx-background-radius: 25;" stylesheets="@CredditCSS.css">
+                                 <padding>
+                                    <Insets right="10.0" />
+                                 </padding>
+                                 <children>
+                                    <HBox layoutX="14.0" layoutY="10.0" mouseTransparent="true">
+                                       <children>
+                                          <AnchorPane prefHeight="36.0" prefWidth="9.0">
+                                             <children>
+                                                <ImageView fitHeight="40.0" fitWidth="34.0" layoutX="-3.0" mouseTransparent="true" pickOnBounds="true" preserveRatio="true" rotate="180.0">
+                                                   <image>
+                                                      <Image url="@assets/comment.png" />
+                                                   </image>
+                                                   <cursor>
+                                                      <Cursor fx:constant="DEFAULT" />
+                                                   </cursor>
+                                                   <rotationAxis>
+                                                      <Point3D y="1.0" />
+                                                   </rotationAxis>
+                                                </ImageView>
+                                             </children>
+                                          </AnchorPane>
+                                          <AnchorPane>
+                                             <children>
+                                                <Label fx:id="replyCountLabel" layoutX="11.0" layoutY="4.0" prefHeight="27.0" text="0" textFill="WHITE" wrapText="true">
+                                                   <font>
+                                                      <Font size="14.0" />
+                                                   </font>
+                                                </Label>
+                                             </children>
+                                          </AnchorPane>
+                                       </children>
+                                       <padding>
+                                          <Insets right="10.0" />
+                                       </padding>
+                                    </HBox>
+                                 </children>
+                                 <cursor>
+                                    <Cursor fx:constant="HAND" />
+                                 </cursor>
+                              </AnchorPane>
+                           </children>
+                        </HBox>
+                     </children>
+                  </AnchorPane>
+               </children>
+               <padding>
+                  <Insets left="10.0" top="10.0" />
+               </padding>
+            </VBox>
+         </children>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+      </VBox>
+   </children>
+</AnchorPane>

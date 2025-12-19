@@ -18,7 +18,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="900.0" prefWidth="1600.0" style="-fx-background-color: #0E1113;" stylesheets="@CredditCSS.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.fhm.take2.HomePageController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="900.0" prefWidth="1600.0" style="-fx-background-color: #0E1113;" stylesheets="@CredditCSS.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.fhm.take2.HomePageController">
     <children>
         <ScrollPane fx:id="postsScrollPane" layoutX="307.0" layoutY="84.0" prefHeight="817.0" prefWidth="908.0" style="-fx-background-color: #0E1113; -fx-background: #0E1113;" stylesheets="@CredditCSS.css">
             <content>
@@ -44,7 +44,7 @@
                               <Font size="18.0" />
                            </font>
                         </Button>
-                        <Button fx:id="filterComments" layoutX="180.0" layoutY="10.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="114.0" style="-fx-text-fill: #ffffff; -fx-background-color: green; -fx-background-radius: 30;" text="Comments" textFill="#c6151500">
+                        <Button fx:id="filterComments" layoutX="180.0" layoutY="10.0" mnemonicParsing="false" onMouseClicked="#onFilterCommentPressed" prefHeight="40.0" prefWidth="114.0" style="-fx-text-fill: #ffffff; -fx-background-color: green; -fx-background-radius: 30;" text="Comments" textFill="#c6151500">
                            <font>
                               <Font size="18.0" />
                            </font>

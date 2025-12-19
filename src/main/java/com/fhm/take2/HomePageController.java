@@ -1,6 +1,7 @@
 package com.fhm.take2;
 
 import com.Client;
+import com.crdt.Comment;
 import com.crdt.Post;
 import com.crdt.Subcreddit;
 import com.crdt.User;
@@ -49,6 +50,7 @@ public class HomePageController {
 
     private User currentUser;
     private ArrayList<PostPreviewTemplateController> postPreviewControllers;
+    private ArrayList<FilterCommentTemplateController> filterCommentTemplateControllers;
     private ArrayList<ViewMiniSubcredditControllet> viewMiniSubcredditControllets;
     private boolean updating = false;
     private boolean scrollCooldown = false;
@@ -58,9 +60,11 @@ public class HomePageController {
         currentUser = user;
         this.filter = filter;
         this.searchField.setText(searchPrompt);
-        if(currentUser != null)
+        if(currentUser != null && currentUser.getPfp() != null && !currentUser.getPfp().GetURL().isBlank())
             userPFP.setImage(new Image(currentUser.getPfp().GetURL(), true));
         postPreviewControllers = new ArrayList<>();
+        filterCommentTemplateControllers = new ArrayList<>();
+        viewMiniSubcredditControllets = new ArrayList<>();
 
         updateLoginUI();
 
@@ -148,6 +152,48 @@ public class HomePageController {
                             controller.initData(sub, currentUser);
                             postsContainer.getChildren().add(subcredditNode);
                             viewMiniSubcredditControllets.add(controller);
+                        }
+                    }
+                    catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    updating = false;
+                    PauseTransition pause = new PauseTransition(Duration.seconds(2));
+                    pause.setOnFinished(e -> scrollCooldown = false);
+                    pause.play();
+                }
+            });
+        }else if(this.filter == 3){
+            filterHBox.setVisible(true);
+
+            try {
+                Map<Comment, Integer> commentFeed = Client.GetCommentFeed(currentUser, searchPrompt, 0);
+                for (Comment comment : commentFeed.keySet()) {
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource("filter-comment-template.fxml"));
+                    Node commentNode = loader.load();
+                    FilterCommentTemplateController controller = loader.getController();
+                    controller.initData(comment);
+                    postsContainer.getChildren().add(commentNode);
+                    filterCommentTemplateControllers.add(controller);
+                }
+            }
+            catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            postsScrollPane.vvalueProperty().addListener((obs, oldVal, newVal) -> {
+                if(!updating && !scrollCooldown && newVal.doubleValue() >= postsScrollPane.getVmax()) {
+                    updating = true;
+                    scrollCooldown = true;
+                    try {
+                        Map<Comment, Integer> commentFeed = Client.GetCommentFeed(currentUser, searchPrompt, filterCommentTemplateControllers.getLast().getId());
+                        for (Comment comment : commentFeed.keySet()) {
+                            FXMLLoader loader = new FXMLLoader(getClass().getResource("filter-comment_Template.fxml"));
+                            Node commentNode = loader.load();
+                            FilterCommentTemplateController controller = loader.getController();
+                            controller.initData(comment);
+                            postsContainer.getChildren().add(commentNode);
+                            filterCommentTemplateControllers.add(controller);
                         }
                     }
                     catch (Exception e) {
@@ -512,6 +558,12 @@ public class HomePageController {
     @FXML
     public void onFilterSubCredditPressed(MouseEvent event) {
         filter = 1;
+        Refresh();
+    }
+
+    @FXML
+    public void onFilterCommentPressed(MouseEvent event) {
+        filter = 3;
         Refresh();
     }
 }
