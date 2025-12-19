@@ -52,7 +52,7 @@
                         <Cursor fx:constant="HAND" />
                      </cursor>
                   </Label>
-                  <Label fx:id="target" layoutX="358.0" layoutY="27.0" maxHeight="70.0" maxWidth="780.0" mouseTransparent="true" text="Target" textFill="WHITE" wrapText="true">
+                  <Label fx:id="target" layoutX="358.0" layoutY="27.0" maxHeight="70.0" maxWidth="780.0" mouseTransparent="true" onMouseClicked="#OpenTarget" text="Target" textFill="WHITE" wrapText="true">
                      <font>
                         <Font size="24.0" />
                      </font>

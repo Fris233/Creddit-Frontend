@@ -148,7 +148,22 @@ public class ReportPreviewTemplateController {
             event.consume();
         }
         else if(report.getTarget() instanceof Comment){
-            //TODO: COMMENT TARGET
+            if(mediaViewController != null)
+                mediaViewController.Clean();
+            try {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("ActualPost_Template.fxml"));
+                Parent root = loader.load();
+
+                ActualPostTemplateController actualPostTemplateController = loader.getController();
+                actualPostTemplateController.InitData(((Comment) report.getTarget()).getPost().GetID(), currentUser);
+
+                Stage stage = (Stage) JoinButton.getScene().getWindow();
+                stage.setScene(new Scene(root));
+            }
+            catch (Exception ex) {
+                System.out.println(ex.getMessage());
+            }
+            event.consume();
         }
         else if(report.getTarget() instanceof User){
             if(mediaViewController != null)
