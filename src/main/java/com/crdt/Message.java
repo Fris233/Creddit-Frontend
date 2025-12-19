@@ -19,9 +19,10 @@ public class Message {
     private Timestamp create_time;
     private Timestamp edit_time;
     private boolean read;
+    private boolean deleted;
 
     //Constructor
-    public Message(int id, User sender, User receiver, String text, Media media, Timestamp create_time, Timestamp edit_time, boolean read){
+    public Message(int id, User sender, User receiver, String text, Media media, Timestamp create_time, Timestamp edit_time, boolean read, boolean deleted){
 
         this.id=id;
         this.sender=sender;
@@ -31,6 +32,7 @@ public class Message {
         this.create_time=create_time;
         this.edit_time=edit_time;
         this.read=read;
+        this.deleted=deleted;
 
     }
 
@@ -43,6 +45,8 @@ public class Message {
     public Timestamp GetCreate_time() {return create_time;}
     public Timestamp GetEdit_time() {return edit_time;}
     public boolean GetRead(){return read;}
+    public boolean isDeleted() { return deleted; }
+    public void setDeleted(boolean deleted) { this.deleted = deleted; }
 
     public boolean send(String BASE_URL, Gson gson) throws Exception {
         String jsonBody = gson.toJson(this, Message.class);

@@ -9,8 +9,8 @@ import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
-import javafx.scene.input.Clipboard;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -40,6 +40,8 @@ public class MessageController {
     private final List<User> friends = new ArrayList<>();
     private final Map<Integer, List<Message>> allMessages = new HashMap<>();
     private final Map<Integer, List<Message>> unreadMessages = new HashMap<>();
+    private final ContextMenu messageContextMenu = new ContextMenu();
+    private HBox selectedMessageBubble = null;
 
     private boolean receiving = true;
     private boolean isLoadingOlderMessages = false;
@@ -55,6 +57,7 @@ public class MessageController {
         applyInlineStyles();
         setupFriendlist();
         showEmptyChatState();
+        setupContextMenu(); // Initialize context menu
 
         try {
             for (Message msg : Client.GetUnreadPM(currentUser)) {
@@ -84,27 +87,52 @@ public class MessageController {
         });
 
         setupScrollListener();
-
-        /*messageInput.setOnKeyPressed(event -> {
-            if (event.isControlDown() && event.getCode() == KeyCode.V) {
-                handlePaste();
-                event.consume();
-            }
-        });*/
     }
 
     /* --------------------------------------------------- */
 
-    /*private void handlePaste() {
-        Clipboard clipboard = Clipboard.getSystemClipboard();
+    private void setupContextMenu() {
+        MenuItem deleteItem = new MenuItem("Delete Message");
+        deleteItem.setOnAction(e -> deleteSelectedMessage());
+        messageContextMenu.getItems().add(deleteItem);
+    }
 
-        // Check if clipboard has files
-        if (clipboard.hasFiles()) {
-            for (java.io.File file : clipboard.getFiles()) {
-                AddFile(file);
+    private void deleteSelectedMessage() {
+        if (selectedMessageBubble == null) return;
+
+        // Get the message from the bubble's userData
+        Message msg = (Message) selectedMessageBubble.getUserData();
+        if (msg == null) return;
+
+        // Check if message belongs to current user
+        if (!msg.GetSender().equals(currentUser)) {
+            return; // Can only delete own messages
+        }
+
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Delete Message");
+        alert.setHeaderText("Delete this message?");
+        alert.setContentText("This message will be deleted for everyone.");
+
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.isPresent() && result.get() == ButtonType.OK) {
+            try {
+                // Call server to delete message
+                Client.DeletePM(msg);
+
+                // Remove from local storage
+                allMessages.get(currentFriend.getId()).removeIf(m -> m.GetID() == msg.GetID());
+
+                // Remove from UI
+                messagesContainer.getChildren().remove(selectedMessageBubble);
+
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
-    }*/
+    }
+
+    /* --------------------------------------------------- */
 
     private void setupScrollListener() {
         scrollPane.vvalueProperty().addListener((_, _, v) -> {
@@ -178,7 +206,9 @@ public class MessageController {
                 }
 
                 try {
-                    Client.ReadMessage(currentUser, currentFriend);
+                    if (currentFriend != null) {
+                        Client.ReadMessage(currentUser, currentFriend);
+                    }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -215,21 +245,23 @@ public class MessageController {
     /* --------------------------------------------------- */
 
     private void addMessageToTop(Message msg) {
-        messagesContainer.getChildren().addFirst(createMessageBubbleFromMessage(msg));
+        HBox bubble = createMessageBubbleFromMessage(msg);
+        messagesContainer.getChildren().addFirst(bubble);
     }
 
     private void addMessageToBottom(Message msg) {
         boolean shouldScroll = scrollPane.getVvalue() >= 0.99;
-        messagesContainer.getChildren().add(createMessageBubbleFromMessage(msg));
+        HBox bubble = createMessageBubbleFromMessage(msg);
+        messagesContainer.getChildren().add(bubble);
+
         if (shouldScroll) {
-            System.out.println("Scrolling down");
             scrollToBottom();
         }
     }
 
     private HBox createMessageBubbleFromMessage(Message msg) {
         HBox bubble = createMessageBubble(msg, msg.GetSender().equals(currentUser));
-        bubble.setUserData(msg); // store the Message
+        bubble.setUserData(msg); // Store the Message object
         return bubble;
     }
 
@@ -278,6 +310,7 @@ public class MessageController {
                 null,
                 Timestamp.from(Instant.now()),
                 Timestamp.from(Instant.now()),
+                false,
                 false
         );
 
@@ -352,9 +385,11 @@ public class MessageController {
 
         container.getChildren().addAll(online, info);
         container.setOnMouseClicked((mouseEvent) -> {
-            container.setStyle("-fx-background-color: #272729; -fx-background-radius: 4;");
-            selectUser(user);
-            mouseEvent.consume();
+            if (mouseEvent.getButton() == MouseButton.PRIMARY) {
+                container.setStyle("-fx-background-color: #272729; -fx-background-radius: 4;");
+                selectUser(user);
+                mouseEvent.consume();
+            }
         });
 
         return container;
@@ -364,7 +399,10 @@ public class MessageController {
 
     private void setupEventHandlers() {
         messageInput.setOnKeyPressed(e -> {
-            if (e.getCode() == KeyCode.ENTER) sendMessage();
+            if (e.getCode() == KeyCode.ENTER) {
+                sendMessage();
+                e.consume();
+            }
         });
 
         messageInput.textProperty().addListener((_, _, v) ->
@@ -373,6 +411,11 @@ public class MessageController {
 
     private void setupScrollPane() {
         scrollPane.setFitToWidth(true);
+
+        // Auto-scroll to bottom when new messages are added
+        messagesContainer.heightProperty().addListener((obs, oldHeight, newHeight) -> {
+            scrollPane.setVvalue(1.0);
+        });
     }
 
     private void applyInlineStyles() {
@@ -391,42 +434,6 @@ public class MessageController {
         messageContainer.setPadding(new Insets(5, 10, 5, 10));
         messageContainer.setMaxWidth(Double.MAX_VALUE);
 
-        /*Button deleteBtn = new Button("✕");
-        deleteBtn.setStyle(
-                "-fx-background-color: transparent;" +
-                        "-fx-text-fill: #ff5555;" +
-                        "-fx-cursor: hand;"
-        );
-        deleteBtn.setVisible(false);
-
-        if (msg.GetSender().equals(currentUser)) {
-            messageContainer.setOnMouseEntered(e -> deleteBtn.setVisible(true));
-            messageContainer.setOnMouseExited(e -> deleteBtn.setVisible(false));
-        }
-
-        deleteBtn.setOnAction(e -> {
-            try {
-                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-                alert.setTitle("Confirm Action");
-                alert.setHeaderText("Delete Message?");
-                alert.setContentText("Are you sure you want to delete this message?");
-
-                Optional<ButtonType> result = alert.showAndWait();
-
-                if (result.isPresent() && result.get() == ButtonType.OK) {
-                    Client.DeletePM(msg);
-                } else {
-                    return;
-                }
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                return;
-            }
-
-            messagesContainer.getChildren().remove(messageContainer);
-            allMessages.get(currentFriend.getId()).removeIf(m -> m.GetID() == msg.GetID());
-        });*/
-
         Text messageText = new Text(msg.GetText());
         messageText.setStyle("-fx-fill: white;");
         messageText.setWrappingWidth(280);
@@ -441,6 +448,16 @@ public class MessageController {
                     "-fx-background-color: #0066CC;" +
                             "-fx-background-radius: 15 15 5 15;"
             );
+
+            // Add right-click context menu for sent messages
+            messageContainer.setOnMouseClicked(e -> {
+                if (e.getButton() == MouseButton.SECONDARY) {
+                    selectedMessageBubble = messageContainer;
+                    messageContextMenu.show(messageContainer, e.getScreenX(), e.getScreenY());
+                    e.consume();
+                }
+            });
+
         } else {
             messageContainer.setAlignment(Pos.CENTER_LEFT);
             textFlow.setStyle(
