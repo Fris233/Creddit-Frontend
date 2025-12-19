@@ -73,8 +73,10 @@ public class MediaViewController {
         else
             removeButton.setVisible(false);
 
-        PrevNextButtons();
-        DisplayMedia();
+        if(mode == 0) {
+            PrevNextButtons();
+            DisplayMedia();
+        }
 
         mediaPane.setOnMouseClicked(e -> mediaPane.requestFocus());
 
@@ -157,7 +159,9 @@ public class MediaViewController {
     }
 
     private void UpdateIndexLabel() {
-        int sz = mediaArrayList.size();
+        int sz = 0;
+        if(mode == 0)
+            sz = mediaArrayList.size();
         if(mode == 1)
             sz = fileArrayList.size();
         if(mode == 2)
@@ -430,7 +434,9 @@ public class MediaViewController {
 
     @FXML
     void NextMedia(MouseEvent event) {
-        int limit = mediaArrayList.size();
+        int limit = 0;
+        if(mode == 0)
+            limit = mediaArrayList.size();
         if(mode == 1)
             limit = fileArrayList.size();
         if(mode == 2) //sex
@@ -494,7 +500,7 @@ public class MediaViewController {
         if(mode == 0)
             return;
         fileArrayList.remove(currentMediaIndex);
-        if(fileArrayList.isEmpty())
+        if(fileArrayList.isEmpty() && (mediaArrayList == null || mediaArrayList.isEmpty()))
             done.set(true);
         if(currentMediaIndex > 0 && currentMediaIndex == (fileArrayList.size() - (mode == 2? mediaArrayList.size() : 0)))
             currentMediaIndex--;
@@ -506,7 +512,9 @@ public class MediaViewController {
         if(mp != null && (mp.getTotalDuration() == null || mp.getTotalDuration().isUnknown() || mp.getTotalDuration().isIndefinite()))
             RemoveMedia();
         UpdateIndexLabel();
-        int sz = mediaArrayList.size();
+        int sz = 0;
+        if(mode == 0)
+            sz = mediaArrayList.size();
         if(mode == 1)
             sz = fileArrayList.size();
         if(mode == 2)

@@ -436,7 +436,7 @@ public class CreatePostPageController {
                     ArrayList<File> fileArrayList = mediaViewController.GetFileArrayList();
                     for (File selectedFile : fileArrayList) {
                         String uploadResponse = Client.UploadFile(selectedFile);
-                        if (uploadResponse == null) {
+                        if (uploadResponse.isBlank()) {
                             new Alert(Alert.AlertType.ERROR, "Server unreachable! Check your connection and try again!").showAndWait();
                             return;
                         }//todo fuck miho
@@ -484,7 +484,7 @@ public class CreatePostPageController {
                 Node mediaNode = loader.load();
 
                 mediaViewController = loader.getController();
-                mediaViewController.init(new ArrayList<>(), (file == null) ? 1 : 2, new ArrayList<>());
+                mediaViewController.init(new ArrayList<>(), (this.post == null) ? 1 : 2, new ArrayList<>());
 
                 mediaPane.getChildren().add(mediaNode);
 
