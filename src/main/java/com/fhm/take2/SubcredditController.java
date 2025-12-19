@@ -78,6 +78,7 @@ public class SubcredditController {
         try {
             if (user != null)
                 subMember = Client.IsSubMember(this.currentUser, currentSubcreddit);
+            UpdateJoinButton();
         }
         catch (Exception e) {
             e.printStackTrace();
@@ -106,11 +107,6 @@ public class SubcredditController {
         createdDate.setText("Created: " + currentSubcreddit.GetTimecreated().toLocalDateTime().toLocalDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
 
         privacyStatus.setText("Privacy: " + (currentSubcreddit.GetPrivate() ? "Private" : "Public"));
-
-        updateJoinButton();
-
-        memberCount.setText("1234"); //dummy
-        onlineCount.setText("125"); //dummy
     }
 
     private void checkMemberStatus() {
@@ -266,22 +262,6 @@ public class SubcredditController {
         }
     }
 
-    private void updateJoinButton() {
-        if (isMember) {
-            joinButton.setText("Joined");
-            joinButton.setStyle("-fx-background-color: #2C3539; -fx-text-fill: white; -fx-font-weight: bold;");
-        } else {
-            joinButton.setText("Join");
-            joinButton.setStyle("-fx-background-color: #0079d3; -fx-text-fill: white; -fx-font-weight: bold;");
-        }
-    }
-
-//    private void updateSortButtons() {
-//        hotButton.setStyle("-fx-background-color: " + ("hot".equals(currentSort) ? "#0079d3" : "#2C3539") + "; -fx-text-fill: white;");
-//        newButton.setStyle("-fx-background-color: " + ("new".equals(currentSort) ? "#0079d3" : "#2C3539") + "; -fx-text-fill: white;");
-//        topButton.setStyle("-fx-background-color: " + ("top".equals(currentSort) ? "#0079d3" : "#2C3539") + "; -fx-text-fill: white;");
-//    }
-
     @FXML
     void GoHome(MouseEvent event) {
         Clean();
@@ -290,7 +270,7 @@ public class SubcredditController {
             Parent root = loader.load();
 
             HomePageController homePageController = loader.getController();
-            homePageController.InitData(currentUser, null, 0);
+            homePageController.InitData(currentUser, "", 0);
 
             // Create the second scene
             Scene scene2 = new Scene(root);
@@ -526,6 +506,10 @@ public class SubcredditController {
         else {
             if (Client.JoinSubcreddit(this.currentUser, currentSubcreddit))
                 subMember = true;
+        }
+        for(PostPreviewTemplateController postPreviewTemplateController : postPreviewControllers) {
+            postPreviewTemplateController.subMember = subMember;
+            postPreviewTemplateController.UpdateJoinButton();
         }
         UpdateJoinButton();
         event.consume();

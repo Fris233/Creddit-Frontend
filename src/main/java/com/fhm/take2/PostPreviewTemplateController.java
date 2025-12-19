@@ -41,7 +41,7 @@ public class PostPreviewTemplateController {
     private User currentUser;
     private int myOGVote;
     private int myVote;
-    private boolean subMember = false;
+    boolean subMember = false;
     private boolean modAuthor = false;
 
     MediaViewController mediaViewController;
@@ -143,7 +143,7 @@ public class PostPreviewTemplateController {
         }
     }
 
-    private void UpdateJoinButton() {
+    void UpdateJoinButton() {
         if(subMember) {
             JoinButton.setText("Joined");
             JoinButton.setStyle("-fx-text-fill: #ffffff; -fx-border-color: gray; -fx-border-radius: 20; -fx-background-radius: 20");

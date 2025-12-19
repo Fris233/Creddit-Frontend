@@ -182,7 +182,7 @@ public class CreatePostPageController {
             postButton.setText("Apply");//todo SEX
         }
 
-        if (subcreddit != null){
+        if (subcreddit != null && mySubcreddits != null){
             for (Subcreddit s : mySubcreddits){
                 if (s.equals(subcreddit)){
                     subcredditComboBox.getSelectionModel().select(s);
