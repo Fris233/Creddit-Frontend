@@ -179,12 +179,12 @@ public class CreatePostPageController {
             }
             contentArea.setText(post.GetContent());
             validPostInfo.set(true);
-            postButton.setText("Apply");//todo SEX
+            postButton.setText("Apply");
         }
 
         if (subcreddit != null && mySubcreddits != null){
             for (Subcreddit s : mySubcreddits){
-                if (s.equals(subcreddit)){
+                if (s != null && s.equals(subcreddit)){
                     subcredditComboBox.getSelectionModel().select(s);
                     subcredditComboBox.setDisable(true);
                     break;

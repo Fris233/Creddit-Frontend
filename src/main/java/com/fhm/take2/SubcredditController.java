@@ -77,7 +77,7 @@ public class SubcredditController {
 
         try {
             if (user != null)
-                subMember = Client.IsSubMember(this.currentUser, currentSubcreddit);
+                //subMember = Client.IsSubMember(this.currentUser, currentSubcreddit);
             UpdateJoinButton();
         }
         catch (Exception e) {
