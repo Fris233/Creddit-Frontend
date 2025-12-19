@@ -136,6 +136,8 @@
                                 </ImageView>
                             </graphic>
                         </Button>
+                  <Button fx:id="commentReport" layoutX="818.0" layoutY="21.0" mnemonicParsing="false" onMouseClicked="#CommentReports" text="Comment Reports" />
+                  <Button fx:id="postReport" layoutX="833.0" layoutY="49.0" mnemonicParsing="false" onMouseClicked="#PostReports" text="Post Reports" />
                     </children>
                 </AnchorPane>
 
