@@ -3,6 +3,7 @@ import com.Client;
 import com.crdt.Gender;
 import com.crdt.Message;
 import com.crdt.User;
+import javafx.animation.PauseTransition;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
@@ -24,6 +25,7 @@ import java.time.Instant;
 import java.util.*;
 
 import javafx.scene.shape.Circle;
+import javafx.util.Duration;
 
 public class MessageController {
 
@@ -40,6 +42,7 @@ public class MessageController {
     private Map<User, ArrayList<Message>> allMessages = new HashMap<>();
     private boolean isLoadingOlderMessages = false;
     private int currentLoadedCount = 0;
+    private boolean scrollCooldown = false;
 
     private User currentUser;
 
@@ -66,6 +69,9 @@ public class MessageController {
             // When scrolled to top (or near top), load older messages
             if (newValue.doubleValue() < 0.1 && !isLoadingOlderMessages && currentFriend != null) {
                 loadOlderMessages();
+                PauseTransition pause = new PauseTransition(Duration.seconds(2));
+                pause.setOnFinished(e -> scrollCooldown = false);
+                pause.play();
             }
         });
     }
@@ -234,7 +240,7 @@ public class MessageController {
 
     private void setupScrollPane() {
         // Auto-scroll to bottom when new messages are added
-        messagesContainer.heightProperty().addListener((_, _, _) -> scrollPane.setVvalue(1.0));
+        //messagesContainer.heightProperty().addListener((_, _, _) -> scrollPane.setVvalue(1.0));
 
         scrollPane.setFitToWidth(true);
     }
@@ -340,7 +346,7 @@ public class MessageController {
 
         // Online status indicator
         Circle onlineCircle = new Circle(5);
-        boolean isOnline = user.getActive(); // Your function for online status
+        boolean isOnline = user.getLastSeen().after(Timestamp.from(Instant.now().minusSeconds(10)));
         onlineCircle.setFill(isOnline ? javafx.scene.paint.Color.GREEN : javafx.scene.paint.Color.GRAY);
         onlineCircle.setStroke(javafx.scene.paint.Color.TRANSPARENT);
 
@@ -367,7 +373,7 @@ public class MessageController {
         rightInfo.setAlignment(Pos.TOP_RIGHT);
 
         // Time label
-        Label timeLabel = new Label(isOnline ? "now" : "recently");
+        Label timeLabel = new Label(isOnline ? "Online" : "Offline");
         timeLabel.setStyle("-fx-text-fill: #818384; -fx-font-size: 11px;");
 
         // Unread count badge
@@ -415,7 +421,7 @@ public class MessageController {
 
         // Update chat header
         friendName.setText(user.getUsername());
-        friendStatus.setText(user.getActive() ? "Online" : "Offline"); //todo this is wrong
+        friendStatus.setText("");
 
         // Clear current messages
         messagesContainer.getChildren().clear();

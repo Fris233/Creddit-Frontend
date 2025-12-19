@@ -222,7 +222,7 @@ public class MyProfilePageController {
                     e.printStackTrace();
                 }
                 updating = false;
-                PauseTransition pause = new PauseTransition(Duration.seconds(5));
+                PauseTransition pause = new PauseTransition(Duration.seconds(2));
                 pause.setOnFinished(e -> scrollCooldown = false);
                 pause.play();
             }

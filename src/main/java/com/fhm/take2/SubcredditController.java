@@ -278,7 +278,7 @@ public class SubcredditController implements Initializable {
                 loadMorePosts();
                 updating = false;
 
-                PauseTransition pause = new PauseTransition(Duration.seconds(1));
+                PauseTransition pause = new PauseTransition(Duration.seconds(2));
                 pause.setOnFinished(e -> scrollCooldown = false);
                 pause.play();
             }
