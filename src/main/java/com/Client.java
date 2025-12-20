@@ -338,6 +338,43 @@ public abstract class Client {
         return postMap;
     }
 
+    public static Map<Comment, Integer> GetPostFeedFilterComment(User user, User author, String prompt, int lastID) throws Exception {
+        JsonObject json = new JsonObject();
+        json.add("user", gson.toJsonTree(user, User.class));
+        json.add("author", gson.toJsonTree(author, User.class));
+        json.addProperty("prompt", prompt);
+        json.addProperty("lastID", lastID);
+
+        String jsonBody = gson.toJson(json);
+
+        URL url = new URL(BASE_URL + "/post/feed/filter-comment");
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("POST");
+        conn.setDoOutput(true);
+        conn.setRequestProperty("Content-Type", "application/json");
+
+        try (OutputStream os = conn.getOutputStream()) {
+            os.write(jsonBody.getBytes());
+        }
+
+        BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+        StringBuilder sb = new StringBuilder();
+        String line;
+        while ((line = reader.readLine()) != null) sb.append(line);
+        reader.close();
+
+        JsonObject jsonObj = gson.fromJson(sb.toString(), JsonObject.class);
+        Comment[] comments = gson.fromJson(jsonObj.get("comments"), Comment[].class);
+        Integer[] myVotes = gson.fromJson(jsonObj.get("votes"), Integer[].class);
+
+        Map<Comment, Integer> commentMap = new LinkedHashMap<>();
+        int sz = comments.length;
+        for(int i = 0; i < sz; i++)
+            commentMap.put(comments[i], myVotes[i]);
+
+        return commentMap;
+    }
+
     public static ArrayList<Post> GetPostFeedFilterVote(User user, String prompt, int voteValue, int lastID) throws Exception {
         JsonObject json = new JsonObject();
         json.add("user", gson.toJsonTree(user, User.class));

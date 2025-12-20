@@ -1,6 +1,7 @@
 package com.fhm.take2;
 
 import com.Client;
+import com.crdt.Comment;
 import com.crdt.Post;
 import com.crdt.Subcreddit;
 import com.crdt.User;
@@ -66,6 +67,8 @@ public class MyProfilePageController {
     private User currentUser;
     private ArrayList<Subcreddit> userSubcreddits;
     private ArrayList<PostPreviewTemplateController> postPreviewControllers;
+    private ArrayList<FilterCommentTemplateController> filterCommentControllers;
+    private ArrayList<ViewMiniSubcredditControllet>  viewMiniSubcredditControllets;
     private String searchPrompt;
     private boolean filterPosts;
     private boolean filterComments;
@@ -89,6 +92,8 @@ public class MyProfilePageController {
 
         this.searchField.setText(searchPrompt);
         postPreviewControllers = new ArrayList<>();
+        viewMiniSubcredditControllets = new ArrayList<>();
+        filterCommentControllers = new ArrayList<>();
 
         if(filterPosts)
             filterPostsButton.setStyle("-fx-background-color: #404040; -fx-text-fill: #ffffff; -fx-background-radius: 20;");
@@ -131,7 +136,17 @@ public class MyProfilePageController {
                     postPreviewControllers.add(controller);
                 }
             } else if(filterComments) {
-                //todo
+                Map<Comment, Integer> commentFeed = Client.GetPostFeedFilterComment(this.currentUser, this.currentUser, searchPrompt, 0);
+                for (Comment comment : commentFeed.keySet()) {
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource("filter-comment-template.fxml"));
+                    Node postNode = loader.load();
+
+                    FilterCommentTemplateController controller = loader.getController();
+                    controller.initData(comment);
+
+                    postsContainer.getChildren().add(postNode);
+                    filterCommentControllers.add(controller);
+                }
             } else if(filterSaved) {
                 //todo
             } else if(filterHistory) {
