@@ -48,8 +48,8 @@ public class EditProfilePageController {
 
     public void initdata(User user) throws Exception {
         this.user = user;
-//        if(user.getPfp() != null) todo
-//            userPFP.setImage(new Image(user.getPfp().GetURL(), true));
+        /*if(user.getPfp() != null && !user.getPfp().GetURL().isBlank())
+            userPFP.setImage(new Image(user.getPfp().GetURL(), true));*/
         usernameTextField.setText(user.getUsername());
         passwordTextField.setText(user.getPassword());
         bioTextArea.setText(user.getBio());
@@ -59,14 +59,14 @@ public class EditProfilePageController {
         lastOnlineLabel.setText("now");
         bio.setEditable(false);
         bio.setText(user.getBio());
-
     }
 
 
     @FXML
     void ApplyEdits(MouseEvent event) throws Exception {
         //todo check data validity
-        //user.setPFP(new Media(MediaType.IMAGE, Client.UploadFile(this.pfp)));
+        /*if(this.pfp != null)
+            user.setPFP(new Media(MediaType.IMAGE, Client.UploadFile(this.pfp)));*/
         user.setUsername(this.usernameTextField.getText());
         user.setPassword(this.passwordTextField.getText());
         user.setBio(this.bioTextArea.getText());
@@ -90,8 +90,10 @@ public class EditProfilePageController {
         if(file == null)
             return;
         String name = file.getName().toLowerCase();
-        if (name.endsWith(".png") || name.endsWith(".jpg") || name.endsWith(".jpeg") || name.endsWith(".gif"))
+        if (name.endsWith(".png") || name.endsWith(".jpg") || name.endsWith(".jpeg") || name.endsWith(".gif")) {
             this.pfp = file;
+            this.userPFP.setImage(new Image(this.pfp.toURI().toString()));
+        }
         event.consume();
     }
 
@@ -102,7 +104,7 @@ public class EditProfilePageController {
             Parent root = loader.load();
 
             MyProfilePageController myProfilePageController = loader.getController();
-            myProfilePageController.initData(user, null, true, false, false, false, false, false);
+            myProfilePageController.initData(user, "", true, false, false, false, false, false);
 
             // Create the second scene
             Scene scene2 = new Scene(root);
@@ -204,7 +206,7 @@ public class EditProfilePageController {
             Parent root = loader.load();
 
             HomePageController homePageController = loader.getController();
-            homePageController.InitData(user, null, 0);
+            homePageController.InitData(user, "", 0);
 
             // Create the second scene
             Scene scene2 = new Scene(root);
