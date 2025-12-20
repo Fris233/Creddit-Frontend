@@ -104,7 +104,7 @@ public class UserProfilePageController {
                 e.printStackTrace();
             }
         }
-        subcredditCountLabel.setText(String.valueOf(profileSubs.size()));
+        subcredditCountLabel.setText(String.valueOf((this.profileSubs == null) ? 0 : profileSubs.size()));
         bioTextArea.setText(this.profileUser.getBio());
 
         try {
