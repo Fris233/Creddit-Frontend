@@ -557,7 +557,7 @@ public class HomePageController {
     public void goToSubcreddit(Subcreddit subcreddit) {
         Clean();
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("subcreddit-page.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("subcreddit.fxml"));
             Parent root = loader.load();
 
             SubcredditController controller = loader.getController();
