@@ -560,6 +560,7 @@ public class HomePageController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("subcreddit.fxml"));
             Parent root = loader.load();
 
+
             SubcredditController controller = loader.getController();
             controller.InitData(subcreddit.GetSubId(), "", currentUser);
 

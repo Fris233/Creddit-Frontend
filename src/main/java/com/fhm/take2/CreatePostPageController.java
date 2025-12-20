@@ -16,6 +16,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.*;
 import javafx.scene.layout.*;
 import javafx.stage.FileChooser;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 
@@ -207,6 +208,22 @@ public class CreatePostPageController {
     @FXML
     void Chat(MouseEvent event) {
         System.out.println("Chat Button Pressed!");
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("message.fxml"));
+            Parent root = fxmlLoader.load();
+            MessageController messageController = fxmlLoader.getController();
+            messageController.Init(this.currentUser);
+            Stage stage = new Stage();
+            stage.setTitle("Chats");
+            stage.setScene(new Scene(root, 800, 600));
+            stage.setMinWidth(600);
+            stage.setMinHeight(400);
+            stage.initOwner(timeLabel.getScene().getWindow());
+            stage.showAndWait();
+            messageController.Clean();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         event.consume();
     }
 
@@ -223,7 +240,47 @@ public class CreatePostPageController {
         System.out.println("Create Subcreddit Button Pressed!");
         if(mediaViewController != null)
             mediaViewController.Clean();
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("create-subcreddit-page.fxml"));
+            Parent root = loader.load();
+
+            CreateSubcredditPageController createSubcredditPageController = loader.getController();
+            createSubcredditPageController.InitData(this.currentUser);
+
+            Stage createSubcredditStage = new Stage();
+            createSubcredditStage.setTitle("Create Subcreddit");
+            createSubcredditStage.setScene(new Scene(root, 600, 400));
+            createSubcredditStage.setResizable(false);
+            createSubcredditStage.initModality(Modality.WINDOW_MODAL);
+            createSubcredditStage.initOwner(timeLabel.getScene().getWindow());
+
+            createSubcredditPageController.setOnCreationSuccess(sub -> {
+                createSubcredditStage.close();
+                goToSubcreddit(sub);
+            });
+
+            createSubcredditStage.showAndWait();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         event.consume();
+    }
+
+    public void goToSubcreddit(Subcreddit subcreddit) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("subcreddit.fxml"));
+            Parent root = loader.load();
+
+
+            SubcredditController controller = loader.getController();
+            controller.InitData(subcreddit.GetSubId(), "", currentUser);
+
+            Stage stage = (Stage) timeLabel.getScene().getWindow();
+            stage.setScene(new Scene(root));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @FXML
@@ -254,6 +311,19 @@ public class CreatePostPageController {
     @FXML
     void ProfilePressed(MouseEvent event) {
         System.out.println("Profile Pressed!");
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("my-profile-page.fxml"));
+            Parent root = loader.load();
+
+            MyProfilePageController myProfilePageController = loader.getController();
+            myProfilePageController.initData(this.currentUser, "", true, false, false, false, false, false);
+
+            Stage stage = (Stage) timeLabel.getScene().getWindow();
+            stage.setScene(new Scene(root));
+        }
+        catch (Exception ex) {
+            System.out.println(ex.getMessage());
+        }
         event.consume();
     }
 
