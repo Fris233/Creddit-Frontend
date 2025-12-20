@@ -554,11 +554,21 @@ public class ActualPostTemplateController {
     void OpenSubcreddit(MouseEvent event) {
         if(mediaViewController != null)
             mediaViewController.Clean();
-        if(post.GetSubcreddit() == null) {
-            System.out.println("Open user profile");
-        }
-        else {
+        if(post.GetSubcreddit() != null) {
             System.out.println("Open Subcreddit Pressed!");
+            try {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("subcreddit.fxml"));
+                Parent root = loader.load();
+
+                SubcredditController controller = loader.getController();
+                controller.InitData(post.GetSubcreddit().GetSubId(), "", currentUser);
+
+                Stage stage = (Stage) JoinButton.getScene().getWindow();
+                stage.setScene(new Scene(root));
+            }
+            catch (Exception ex) {
+                System.out.println(ex.getMessage());
+            }
         }
         event.consume();
     }
