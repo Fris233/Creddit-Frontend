@@ -60,7 +60,7 @@ public class HomePageController {
         currentUser = user;
         this.filter = filter;
         this.searchField.setText(searchPrompt);
-        if(currentUser != null)
+        if(currentUser != null && currentUser.getPfp() != null && !currentUser.getPfp().GetURL().equals(""))
             userPFP.setImage(new Image(currentUser.getPfp().GetURL(), true));
         postPreviewControllers = new ArrayList<>();
         filterCommentTemplateControllers = new ArrayList<>();
