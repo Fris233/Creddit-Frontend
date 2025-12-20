@@ -200,8 +200,28 @@ public class HomePageController {
     }
 
     @FXML
-    void CheckRules(MouseEvent event) {
-        System.out.println("Rules Button Pressed");
+    void CheckAnalytics(MouseEvent event) {
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("analytics.fxml"));
+            Parent root = fxmlLoader.load();
+            AnalyticsController analyticsController = fxmlLoader.getController();
+            analyticsController.Init(this.currentUser);
+            Stage stage = new Stage();
+            stage.setTitle("Analytics");
+            stage.setScene(new Scene(root, 400, 280));
+            stage.setMinWidth(400);
+            stage.setMinHeight(280);
+            stage.initOwner(postsContainer.getScene().getWindow());
+            stage.showAndWait();
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+        event.consume();
+    }
+
+    @FXML
+    void CheckReports(MouseEvent event) {
         event.consume();
     }
 
