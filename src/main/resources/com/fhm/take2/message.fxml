@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<SplitPane dividerPositions="0.3954015544041451" focusTraversable="false" prefHeight="588.0" prefWidth="620" style="-fx-background-color: #1A1A1B;" stylesheets="@CredditCSS.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.fhm.take2.MessageController">
+
+
+    <VBox prefHeight="1253.0" prefWidth="408.0" spacing="16" style="-fx-background-color: #1A1A1B; -fx-padding: 16;">
+
+        <VBox spacing="8">
+            <Label style="-fx-text-fill: #D7DADC; -fx-font-size: 16px; -fx-font-weight: bold;" text="Chats" />
+            <Label style="-fx-text-fill: #818384; -fx-font-size: 14px; -fx-cursor: hand;" text="Friends" />
+        </VBox>
+        <HBox style="-fx-background-color: #343536; -fx-pref-height: 1;" />
+      <ScrollPane fitToWidth="true" focusTraversable="false" prefHeight="400.0" prefWidth="209.0" style="-fx-background: gray; -fx-border-color: gray; -fx-focus-color: gray; -fx-faint-focus-color: gray;">
+         <content>
+            <VBox fx:id="friendsListContainer" spacing="1" />
+         </content>
+      </ScrollPane>
+    </VBox>
+    <VBox spacing="0" style="-fx-background-color: #1A1A1B;">
+        <HBox alignment="CENTER_LEFT" style="-fx-background-color: #1A1A1B; -fx-border-color: #343536; -fx-border-width: 0 0 1 0; -fx-padding: 16;">
+            <VBox spacing="2">
+                <Label fx:id="friendName" style="-fx-text-fill: #D7DADC; -fx-font-size: 16px; -fx-font-weight: bold;" text="Select a chat" />
+                <Label fx:id="friendStatus" style="-fx-text-fill: #818384; -fx-font-size: 12px;" text="Send an invite message to start chatting!" />
+            </VBox>
+        </HBox>
+        <ScrollPane fx:id="scrollPane" style="-fx-background: #1A1A1B; -fx-border-color: transparent;" VBox.vgrow="ALWAYS">
+            <VBox fx:id="messagesContainer" spacing="8" style="-fx-background-color: #1A1A1B; -fx-padding: 16;" />
+        </ScrollPane>
+        <VBox spacing="8" style="-fx-background-color: #1A1A1B; -fx-border-color: #343536; -fx-border-width: 1 0 0 0; -fx-padding: 16;">
+            <HBox alignment="CENTER_LEFT" spacing="8">
+            <TextArea fx:id="messageInput" prefHeight="78.0" promptText="Message" style="-fx-background-color: #272729; -fx-prompt-text-fill: #818384; -fx-text-fill: #D7DADC; -fx-border-color: #343536; -fx-padding: 12 16 12 16; -fx-background-radius: 20; -fx-border-radius: 20;" wrapText="true" />
+                <Button fx:id="sendButton" maxHeight="-Infinity" maxWidth="-Infinity" onAction="#sendMessage" prefHeight="41.0" prefWidth="282.0" style="-fx-background-color: #D7DADC; -fx-text-fill: #1A1A1B; -fx-background-radius: 20; -fx-padding: 12 20 12 20; -fx-font-weight: bold;" text="Send" />
+            </HBox>
+        </VBox>
+    </VBox>
+</SplitPane>

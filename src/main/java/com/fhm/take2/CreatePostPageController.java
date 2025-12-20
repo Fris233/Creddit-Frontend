@@ -1,0 +1,647 @@
+package com.fhm.take2;
+
+import com.Client;
+import com.crdt.*;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
+import javafx.scene.image.ImageView;
+import javafx.scene.input.*;
+import javafx.scene.layout.*;
+import javafx.stage.FileChooser;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import javafx.stage.Window;
+
+import java.io.*;
+import java.nio.file.Files;
+import java.sql.Timestamp;
+import java.time.Instant;
+import java.util.*;
+
+public class CreatePostPageController {
+
+    @FXML private Button CreateSubcredditButton;
+    @FXML private Button HomeButton;
+    @FXML private Button RulesButton;
+    @FXML private TextArea contentArea;
+    @FXML private AnchorPane loggedInPane;
+    @FXML private StackPane mediaPane;
+    @FXML private Button postButton;
+    @FXML private VBox createInfoContainer;
+
+    @FXML private TextField categorySearchField;
+    @FXML private ListView<String> lvSuggestions;
+    @FXML private HBox hbSelectedCategories;
+
+    @FXML private ScrollPane scrollPane;
+    @FXML private TextField searchField;
+    @FXML private ComboBox<Subcreddit> subcredditComboBox;
+    @FXML private Label timeLabel;
+    @FXML private TextField titleField;
+    @FXML private ImageView userPFP;
+
+    private MediaViewController mediaViewController;
+    private User currentUser;
+    private BooleanProperty validPostInfo = new SimpleBooleanProperty(false);
+    private ArrayList<String> allCategories;
+    private ArrayList<String> selectedCategories;
+    private ArrayList<Subcreddit> mySubcreddits;
+    private ObservableList<String> suggestions;
+    private Post post;
+
+    public void InitData(User user, Post post, Subcreddit subcreddit) {
+        this.currentUser = user;
+        this.post = post;
+        try {
+            allCategories = new ArrayList<>(Arrays.asList(Client.GetAllCategories()));
+            mySubcreddits = Client.GetUserSubcreddits(this.currentUser);
+            mySubcreddits.addFirst(null);
+            subcredditComboBox.setItems(FXCollections.observableArrayList(mySubcreddits));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        selectedCategories = new ArrayList<>();
+        mediaViewController = null;
+
+        contentArea.setWrapText(true);
+
+        suggestions = FXCollections.observableArrayList();
+        lvSuggestions.setItems(suggestions);
+        lvSuggestions.setVisible(false);
+        lvSuggestions.setFocusTraversable(false);
+        lvSuggestions.setFixedCellSize(24);
+        categorySearchField.textProperty().addListener((obs, old, text) -> {
+            UpdateSuggestions(text);
+        });
+
+        lvSuggestions.setOnMouseClicked(e -> {
+            if(e.getClickCount() == 1)
+                HandleSelect();
+        });
+
+        int[] lastLineCount = { 1 };
+
+        contentArea.setPrefHeight(contentArea.getMinHeight());
+
+        contentArea.textProperty().addListener((obs, oldText, newText) -> {
+            int lines = newText.split("\n", -1).length;
+
+            if (lines != lastLineCount[0]) {
+                lastLineCount[0] = lines;
+
+                contentArea.applyCss();
+                contentArea.layout();
+
+                var content = contentArea.lookup(".content");
+                if (content != null) {
+                    double height = 52 + (32 * (Math.min(lines, 14)));
+                    contentArea.setPrefHeight(height);
+                }
+            }
+        });
+
+        contentArea.setOnKeyPressed(event -> {
+            if (event.isControlDown() && event.getCode() == KeyCode.V) {
+                handlePaste();
+                event.consume();
+            }
+        });
+        titleField.setOnKeyPressed(event -> {
+            if (event.isControlDown() && event.getCode() == KeyCode.V) {
+                handlePaste();
+                event.consume();
+            }
+        });
+
+        titleField.textProperty().addListener((obs, oldText, newText) -> {
+            if(newText.length() > 255)
+                titleField.setText(oldText);
+            validPostInfo.set(!newText.isBlank());
+        });
+
+        categorySearchField.textProperty().addListener((obs, oldText, newText) -> {
+            if(newText.length() > 50)
+                categorySearchField.setText(oldText);
+        });
+
+        validPostInfo.addListener((obs, oldVal, newVal) -> {
+            if(newVal) {
+                postButton.setStyle("-fx-background-color: #115bca; -fx-text-fill: #ffffff; -fx-background-radius: 30;"); //button blue and pressable
+                postButton.setDisable(false);
+            }
+            else {
+                postButton.setStyle("-fx-background-color: #191c1e; -fx-text-fill: #525454; -fx-background-radius: 30;"); //button grayed out
+                postButton.setDisable(true);
+            }
+        });
+
+        // Setup scroll behavior
+        scrollPane.addEventFilter(ScrollEvent.SCROLL, e -> {
+            double delta = e.getDeltaY() * 2;
+            scrollPane.setVvalue(scrollPane.getVvalue() - delta / scrollPane.getContent().getBoundsInLocal().getHeight());
+        });
+
+        scrollPane.setOnDragOver(event -> {
+            if (event.getGestureSource() != scrollPane && event.getDragboard().hasFiles()) {
+                event.acceptTransferModes(javafx.scene.input.TransferMode.COPY_OR_MOVE);
+            }
+            event.consume();
+        });
+
+        scrollPane.setOnDragDropped(event -> {
+            var db = event.getDragboard();
+            boolean success = false;
+            if (db.hasFiles()) {
+                success = true;
+                List<File> files = db.getFiles();
+                files.forEach(this::AddFile);
+            }
+            event.setDropCompleted(success);
+            event.consume();
+        });
+
+        if(post != null){
+            timeLabel.setText("Edit Post");
+            subcredditComboBox.hide();
+            titleField.setText(post.GetTitle());
+            for(String category : post.GetCategories()){
+                AddCategory(category);
+            }
+            for (Media media : post.GetMedia()) {
+                addMedia(media);
+            }
+            contentArea.setText(post.GetContent());
+            validPostInfo.set(true);
+            postButton.setText("Apply");
+        }
+
+        if (subcreddit != null && mySubcreddits != null){
+            for (Subcreddit s : mySubcreddits){
+                if (s != null && s.equals(subcreddit)){
+                    subcredditComboBox.getSelectionModel().select(s);
+                    subcredditComboBox.setDisable(true);
+                    break;
+                }
+            }
+        }
+    }
+
+    private void handlePaste() {
+        Clipboard clipboard = Clipboard.getSystemClipboard();
+
+        // Check if clipboard has files
+        if (clipboard.hasFiles()) {
+            for (java.io.File file : clipboard.getFiles()) {
+                AddFile(file);
+            }
+        }
+    }
+
+    @FXML
+    void Chat(MouseEvent event) {
+        System.out.println("Chat Button Pressed!");
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("message.fxml"));
+            Parent root = fxmlLoader.load();
+            MessageController messageController = fxmlLoader.getController();
+            messageController.Init(this.currentUser);
+            Stage stage = new Stage();
+            stage.setTitle("Chats");
+            stage.setScene(new Scene(root, 800, 600));
+            stage.setMinWidth(600);
+            stage.setMinHeight(400);
+            stage.initOwner(timeLabel.getScene().getWindow());
+            stage.showAndWait();
+            messageController.Clean();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        event.consume();
+    }
+
+    @FXML
+    void CheckRules(MouseEvent event) {
+        System.out.println("Rules Button Pressed!");
+        if(mediaViewController != null)
+            mediaViewController.Clean();
+        event.consume();
+    }
+
+    @FXML
+    void CreateSubcreddit(MouseEvent event) {
+        System.out.println("Create Subcreddit Button Pressed!");
+        if(mediaViewController != null)
+            mediaViewController.Clean();
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("create-subcreddit-page.fxml"));
+            Parent root = loader.load();
+
+            CreateSubcredditPageController createSubcredditPageController = loader.getController();
+            createSubcredditPageController.InitData(this.currentUser);
+
+            Stage createSubcredditStage = new Stage();
+            createSubcredditStage.setTitle("Create Subcreddit");
+            createSubcredditStage.setScene(new Scene(root, 600, 400));
+            createSubcredditStage.setResizable(false);
+            createSubcredditStage.initModality(Modality.WINDOW_MODAL);
+            createSubcredditStage.initOwner(timeLabel.getScene().getWindow());
+
+            createSubcredditPageController.setOnCreationSuccess(sub -> {
+                createSubcredditStage.close();
+                goToSubcreddit(sub);
+            });
+
+            createSubcredditStage.showAndWait();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        event.consume();
+    }
+
+    public void goToSubcreddit(Subcreddit subcreddit) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("subcreddit.fxml"));
+            Parent root = loader.load();
+
+
+            SubcredditController controller = loader.getController();
+            controller.InitData(subcreddit.GetSubId(), "", currentUser);
+
+            Stage stage = (Stage) timeLabel.getScene().getWindow();
+            stage.setScene(new Scene(root));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
+    void GoHome(MouseEvent event) {
+        System.out.println("Dashboard Pressed!");
+        if(mediaViewController != null)
+            mediaViewController.Clean();
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("home-page.fxml"));
+            Parent root = loader.load();
+
+            HomePageController homePageController = loader.getController();
+            homePageController.InitData(currentUser, "", 0);
+
+            // Create the second scene
+            Scene scene2 = new Scene(root);
+            // Get the current stage
+            Stage stage = (Stage)createInfoContainer.getScene().getWindow();
+            // Set the new scene
+            stage.setScene(scene2);
+        }
+        catch (Exception ex) {
+            System.out.println(ex.getMessage());
+        }
+        event.consume();
+    }
+
+    @FXML
+    void ProfilePressed(MouseEvent event) {
+        System.out.println("Profile Pressed!");
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("my-profile-page.fxml"));
+            Parent root = loader.load();
+
+            MyProfilePageController myProfilePageController = loader.getController();
+            myProfilePageController.initData(this.currentUser, "", true, false, false, false, false, false);
+
+            Stage stage = (Stage) timeLabel.getScene().getWindow();
+            stage.setScene(new Scene(root));
+        }
+        catch (Exception ex) {
+            System.out.println(ex.getMessage());
+        }
+        event.consume();
+    }
+
+    @FXML
+    void SearchPressed(KeyEvent event) {
+        System.out.println("Search Pressed!");
+        if(mediaViewController != null)
+            mediaViewController.Clean();
+        event.consume();
+    }
+
+    private void HandleSelect() {
+        String chosen;
+
+        int sel = lvSuggestions.getSelectionModel().getSelectedIndex();
+
+        if (sel != -1) {
+            chosen = suggestions.get(sel);
+        } else {
+            if(!suggestions.isEmpty())
+                chosen = suggestions.get(0);
+            else
+                chosen = categorySearchField.getText();
+        }
+
+        categorySearchField.setText(chosen);
+        lvSuggestions.setVisible(false);
+        categorySearchField.requestFocus();
+        categorySearchField.positionCaret(categorySearchField.getLength());
+    }
+
+    private void UpdateSuggestions(String input) {
+        if (input == null || input.trim().isEmpty()) {
+            suggestions.clear();
+            lvSuggestions.setVisible(false);
+            return;
+        }
+
+        String lower = input.toLowerCase();
+
+        suggestions.setAll(allCategories.stream().filter(c -> c.toLowerCase().contains(lower)).toList());
+
+        lvSuggestions.getSelectionModel().clearSelection();
+
+        if (suggestions.isEmpty()) {
+            lvSuggestions.setVisible(false);
+        } else {
+            lvSuggestions.setVisible(true);
+
+            int maxVisible = Math.min(suggestions.size(), 6);
+            lvSuggestions.setPrefHeight(maxVisible * lvSuggestions.getFixedCellSize());
+        }
+    }
+
+    private void AddCategory(String category) {
+        if(selectedCategories.contains(category))
+            return;
+        selectedCategories.add(category);
+        RenderSelectedCategories();
+    }
+
+    private void RenderSelectedCategories() {
+        hbSelectedCategories.getChildren().clear();
+        for(String str : selectedCategories) {
+            HBox chip = CreateChip(str);
+            hbSelectedCategories.getChildren().add(chip);
+        }
+    }
+
+    private HBox CreateChip(String str) {
+        Label name = new Label(str);
+        Button remove = new Button("X");
+        remove.setOnAction(e -> {
+            selectedCategories.remove(str);
+            RenderSelectedCategories();
+        });
+        remove.setStyle("-fx-background-color: transparent;");
+        HBox box = new HBox(name, remove);
+        //box.setPrefHeight(24);
+        box.setStyle("-fx-background-radius: 10; -fx-padding: 5 0 0 10; -fx-background-color: #d0d0d0; -fx-spacing: 15;");
+        return box;
+    }
+
+    @FXML
+    void CategorySearchKeyHandler(KeyEvent event) {
+        if(event.getCode() == KeyCode.ENTER) {
+            HandleSelect();
+            String text = categorySearchField.getText().trim();
+            if(text.isEmpty())
+                return;
+            if(selectedCategories.stream().anyMatch(c -> c.equalsIgnoreCase(text)))
+                return;
+            AddCategory(text);
+            categorySearchField.clear();
+            lvSuggestions.setVisible(false);
+        }
+        else if(event.getCode() == KeyCode.TAB) {
+            if(suggestions.isEmpty())
+                return;
+            HandleSelect();
+        }
+        else if(event.getCode() == KeyCode.UP) {
+            if (!suggestions.isEmpty()) {
+                int sel = lvSuggestions.getSelectionModel().getSelectedIndex();
+                if (sel == -1) sel = suggestions.size() - 1;
+                else sel = (sel - 1 + suggestions.size()) % suggestions.size(); // circular
+                lvSuggestions.getSelectionModel().select(sel);
+            }
+        }
+        else if(event.getCode() == KeyCode.DOWN) {
+            if (!suggestions.isEmpty()) {
+                int sel = lvSuggestions.getSelectionModel().getSelectedIndex();
+                if (sel == -1) sel = 0;     // first press = select top item
+                else sel = (sel + 1) % suggestions.size(); // circular
+                lvSuggestions.getSelectionModel().select(sel);
+            }
+        }
+        event.consume();
+    }
+
+    @FXML
+    void SendPost(MouseEvent event) {
+        if(!validPostInfo.get()) return;
+
+        if(!Client.isServerReachable()) {
+            new Alert(Alert.AlertType.ERROR, "Server unreachable! Check your connection and try again!").showAndWait();
+            return;
+        }
+
+        if(this.post == null) {
+            try {
+                String title = titleField.getText();
+                String content = contentArea.getText();
+
+                String mediaUrl = null;
+                MediaType mediaType = null;
+
+                ArrayList<Media> media = new ArrayList<>();
+                if(mediaViewController != null) {
+                    ArrayList<File> fileArrayList = mediaViewController.GetFileArrayList();
+                    for (File selectedFile : fileArrayList) {
+                        String uploadResponse = Client.UploadFile(selectedFile);
+                        if (uploadResponse.isBlank()) {
+                            new Alert(Alert.AlertType.ERROR, "Server unreachable! Check your connection and try again!").showAndWait();
+                            return;
+                        }
+                        Map<?, ?> json = Client.GetResponse(uploadResponse);
+                        mediaUrl = (String) json.get("url");
+
+                        String mime = Files.probeContentType(selectedFile.toPath());
+                        if (mime != null) {
+                            if (mime.startsWith("image/")) mediaType = MediaType.IMAGE;
+                            else if (mime.startsWith("video/")) mediaType = MediaType.VIDEO;
+                            else if (mime.startsWith("audio/")) mediaType = MediaType.AUDIO;
+                            else mediaType = MediaType.OTHER;
+                        }
+                        media.add(new Media(mediaType, mediaUrl));
+                    }
+                }
+
+                Post post = new Post(0, currentUser, subcredditComboBox.getSelectionModel().getSelectedItem(), title, content, media, selectedCategories, Timestamp.from(Instant.now()), Timestamp.from(Instant.now()), 0, 0);
+                int id = Client.CreatePost(post);
+                if (id > 0) {
+                    post.SetID(id);
+                    Alert alert = new Alert(Alert.AlertType.INFORMATION, "Post uploaded successfully!");
+                    alert.showAndWait();
+                    if(mediaViewController != null) {
+                        mediaViewController.Clean();
+                        RemoveMediaPane();
+                    }
+                    try {
+                        FXMLLoader loader = new FXMLLoader(getClass().getResource("ActualPost_Template.fxml"));
+                        Parent root = loader.load();
+
+                        ActualPostTemplateController actualPostTemplateController = loader.getController();
+                        actualPostTemplateController.InitData(post.GetID(), 0, currentUser);
+
+                        Stage stage = (Stage) postButton.getScene().getWindow();
+                        stage.setScene(new Scene(root));
+                    }
+                    catch (Exception ex) {
+                        System.out.println(ex.getMessage());
+                    }
+                }
+                else {
+                    Alert alert = new Alert(Alert.AlertType.ERROR, "Failed to send post!");
+                    alert.showAndWait();
+                }
+            }
+            catch (Exception ex) {
+                ex.printStackTrace();
+                new Alert(Alert.AlertType.ERROR, "Error: " + ex.getMessage()).showAndWait();
+            }
+        }else{
+            post.setTitle(titleField.getText());
+            post.setContent(contentArea.getText());
+            post.setCategories(selectedCategories);
+            String mediaUrl = null;
+            MediaType mediaType = null;
+            try{
+                ArrayList<Media> media = mediaViewController == null? null : mediaViewController.getMediaArrayList();
+                if(mediaViewController != null) {
+                    ArrayList<File> fileArrayList = mediaViewController.GetFileArrayList();
+                    for (File selectedFile : fileArrayList) {
+                        String uploadResponse = Client.UploadFile(selectedFile);
+                        if (uploadResponse.isBlank()) {
+                            new Alert(Alert.AlertType.ERROR, "Server unreachable! Check your connection and try again!").showAndWait();
+                            return;
+                        }
+                        Map<?, ?> json = Client.GetResponse(uploadResponse);
+                        mediaUrl = (String) json.get("url");
+
+                        String mime = Files.probeContentType(selectedFile.toPath());
+                        if (mime != null) {
+                            if (mime.startsWith("image/")) mediaType = MediaType.IMAGE;
+                            else if (mime.startsWith("video/")) mediaType = MediaType.VIDEO;
+                            else if (mime.startsWith("audio/")) mediaType = MediaType.AUDIO;
+                            else mediaType = MediaType.OTHER;
+                        }
+                        media.add(new Media(mediaType, mediaUrl));
+                    }
+                    post.setTitle(titleField.getText());
+                    post.setContent(contentArea.getText());
+                    post.setCategories(selectedCategories);
+                    post.setMedia(media);
+                    Client.EditPost(post);
+                    if(mediaViewController != null) {
+                        mediaViewController.Clean();
+                        RemoveMediaPane();
+                    }
+                    try {
+                        FXMLLoader loader = new FXMLLoader(getClass().getResource("ActualPost_Template.fxml"));
+                        Parent root = loader.load();
+
+                        ActualPostTemplateController actualPostTemplateController = loader.getController();
+                        actualPostTemplateController.InitData(post.GetID(), 0, currentUser);
+
+                        Stage stage = (Stage) postButton.getScene().getWindow();
+                        stage.setScene(new Scene(root));
+                    }
+                    catch (Exception ex) {
+                        System.out.println(ex.getMessage());
+                    }
+                }
+            }catch(Exception ex){
+                ex.printStackTrace();
+            }
+        }
+        event.consume();
+    }
+
+    @FXML
+    void AttachMedia(MouseEvent event) {
+        Window window = ((javafx.scene.Node) event.getSource()).getScene().getWindow();
+
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Open File");
+
+        fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
+
+        File file = fileChooser.showOpenDialog(window);
+        if(file == null)
+            return;
+        AddFile(file);
+        event.consume();
+    }
+
+    private void AddFile(File file) {
+        if(mediaViewController == null) {
+            try {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("media-view.fxml"));
+                Node mediaNode = loader.load();
+
+                mediaViewController = loader.getController();
+                mediaViewController.init(new ArrayList<>(), (this.post == null) ? 1 : 2, new ArrayList<>());
+
+                mediaPane.getChildren().add(mediaNode);
+
+                mediaViewController.done.addListener((obs, oldVal, newVal) -> {
+                    if (newVal)
+                        RemoveMediaPane();
+                });
+            }
+            catch (Exception ex) {
+                System.out.println(ex.getMessage());
+            }
+        }
+        mediaViewController.AddMedia(file);
+    }
+
+    private void addMedia(Media media) {
+        if(mediaViewController == null) {
+            try {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("media-view.fxml"));
+                Node mediaNode = loader.load();
+
+                mediaViewController = loader.getController();
+                mediaViewController.init(new ArrayList<>(), 2, new ArrayList<>());
+
+                mediaPane.getChildren().add(mediaNode);
+
+                mediaViewController.done.addListener((obs, oldVal, newVal) -> {
+                    if (newVal)
+                        RemoveMediaPane();
+                });
+            }
+            catch (Exception ex) {
+                System.out.println(ex.getMessage());
+            }
+        }
+        mediaViewController.AddMedia(media);
+    }
+
+    private void RemoveMediaPane() {
+        mediaPane.getChildren().clear();
+        if(mediaViewController != null)
+            mediaViewController.Clean();
+        mediaViewController = null;
+    }
+
+}

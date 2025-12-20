@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
-<?import javafx.geometry.Point3D?>
 <?import javafx.scene.Cursor?>
-<?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
@@ -27,16 +25,6 @@
                         <Cursor fx:constant="HAND" />
                      </cursor>
                   </ImageView>
-                  <Button fx:id="JoinButton" layoutX="650.0" layoutY="7.0" mnemonicParsing="false" onMouseClicked="#JoinSubcreddit" prefHeight="41.0" prefWidth="84.0" style="-fx-text-fill: #ffffff; -fx-background-color: #115bca; -fx-border-color: gray; -fx-border-radius: 20; -fx-background-radius: 20;" text="Join" textFill="#c6151500" visible="false">
-                     <font>
-                        <Font size="18.0" />
-                     </font>
-                  </Button>
-                  <Button fx:id="MoreOptionsButton" layoutX="743.0" layoutY="7.0" mnemonicParsing="false" onMouseClicked="#MoreOptionsButton" prefHeight="40.0" prefWidth="40.0" style="-fx-text-fill: #ffffff; -fx-padding: 0 0 10 0; -fx-background-radius: 40;" text="..." textFill="#c6151500">
-                     <font>
-                        <Font size="18.0" />
-                     </font>
-                  </Button>
                   <Label fx:id="subName" layoutX="62.0" layoutY="14.0" maxWidth="206.0" onMouseClicked="#OpenSubcreddit" prefHeight="27.0" text="cr/Unknown" textFill="WHITE" wrapText="true">
                      <font>
                         <Font size="14.0" />
@@ -45,21 +33,26 @@
                         <Cursor fx:constant="HAND" />
                      </cursor>
                   </Label>
-                  <Label fx:id="modLabel" alignment="CENTER" layoutX="252.0" layoutY="14.0" prefHeight="27.0" prefWidth="60.0" text="MOD" textFill="#008a1e" visible="false" wrapText="true">
-                     <font>
-                        <Font size="14.0" />
-                     </font>
-                  </Label>
                   <Label fx:id="timeLabel" layoutX="392.0" layoutY="14.0" mouseTransparent="true" prefHeight="27.0" text="X days ago" textFill="WHITE" wrapText="true">
                      <font>
                         <Font size="14.0" />
                      </font>
                   </Label>
+                  <Label layoutX="77.0" layoutY="6.0" text="Reporter" textFill="WHITE" />
+                  <Label fx:id="reporttype" layoutX="214.0" layoutY="20.0" prefWidth="84.0" text="ReportType" textFill="WHITE" />
                </children>
             </AnchorPane>
             <AnchorPane>
                <children>
-                  <Label fx:id="titleLabel" maxHeight="70.0" maxWidth="780.0" mouseTransparent="true" text="Title of the Post" textFill="WHITE" wrapText="true">
+                  <Label fx:id="titleLabel" maxHeight="70.0" maxWidth="780.0" mouseTransparent="true" text="Reason" textFill="WHITE" wrapText="true">
+                     <font>
+                        <Font size="24.0" />
+                     </font>
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </Label>
+                  <Label fx:id="target" layoutX="358.0" layoutY="27.0" maxHeight="70.0" maxWidth="780.0" mouseTransparent="true" onMouseClicked="#OpenTarget" text="Target" textFill="WHITE" wrapText="true">
                      <font>
                         <Font size="24.0" />
                      </font>
@@ -80,9 +73,9 @@
                                  <children>
                                     <AnchorPane prefHeight="36.0" prefWidth="9.0">
                                        <children>
-                                          <ImageView fx:id="upvoteButton" fitHeight="40.0" fitWidth="34.0" layoutX="-3.0" onMouseClicked="#Upvote" pickOnBounds="true" preserveRatio="true" rotate="180.0">
+                                          <ImageView fx:id="upvoteButton" fitHeight="40.0" fitWidth="34.0" layoutX="-3.0" onMouseClicked="#Resolve" pickOnBounds="true" preserveRatio="true">
                                              <image>
-                                                <Image url="@assets/vote_arrow.png" />
+                                                <Image url="@assets/approve.png" />
                                              </image>
                                              <cursor>
                                                 <Cursor fx:constant="HAND" />
@@ -90,20 +83,12 @@
                                           </ImageView>
                                        </children>
                                     </AnchorPane>
+                                    <AnchorPane />
                                     <AnchorPane>
                                        <children>
-                                          <Label fx:id="votesLabel" layoutX="10.0" layoutY="5.0" prefHeight="27.0" text="0" textFill="WHITE" wrapText="true">
-                                             <font>
-                                                <Font size="14.0" />
-                                             </font>
-                                          </Label>
-                                       </children>
-                                    </AnchorPane>
-                                    <AnchorPane>
-                                       <children>
-                                          <ImageView fx:id="downvoteButton" fitHeight="40.0" fitWidth="34.0" layoutX="9.0" layoutY="1.0" onMouseClicked="#Downvote" pickOnBounds="true" preserveRatio="true">
+                                          <ImageView fx:id="downvoteButton" fitHeight="40.0" fitWidth="34.0" layoutX="9.0" layoutY="1.0" onMouseClicked="#Dismiss" pickOnBounds="true" preserveRatio="true">
                                              <image>
-                                                <Image url="@assets/vote_arrow.png" />
+                                                <Image url="@assets/dismiss.png" />
                                              </image>
                                              <cursor>
                                                 <Cursor fx:constant="HAND" />
@@ -133,24 +118,9 @@
                                  <children>
                                     <AnchorPane prefHeight="36.0" prefWidth="9.0">
                                        <children>
-                                          <ImageView fitHeight="40.0" fitWidth="34.0" layoutX="-3.0" pickOnBounds="true" preserveRatio="true" rotate="180.0">
-                                             <image>
-                                                <Image url="@assets/comment.png" />
-                                             </image>
-                                             <cursor>
-                                                <Cursor fx:constant="DEFAULT" />
-                                             </cursor>
-                                             <rotationAxis>
-                                                <Point3D y="1.0" />
-                                             </rotationAxis>
-                                          </ImageView>
-                                       </children>
-                                    </AnchorPane>
-                                    <AnchorPane>
-                                       <children>
-                                          <Label fx:id="commentsLabel" layoutX="11.0" layoutY="4.0" prefHeight="27.0" text="0" textFill="WHITE" wrapText="true">
+                                          <Label fx:id="status" layoutY="8.0" text="Current Status" textFill="WHITE">
                                              <font>
-                                                <Font size="14.0" />
+                                                <Font size="15.0" />
                                              </font>
                                           </Label>
                                        </children>

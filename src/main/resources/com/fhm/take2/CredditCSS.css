@@ -1,0 +1,171 @@
+.button {
+    -fx-background-color: transparent; /* normal state color */
+    -fx-background-radius: 10; /* Some roundness to the button */
+}
+
+.button:hover {
+    -fx-background-color: #404040; /* hover color */
+    -fx-cursor: hand; /* hand cursor on hover */
+}
+
+.button:pressed {
+    -fx-background-color: #2a2a2a; /* Darker on press */
+    -fx-scale-x: 0.97;             /* Shrink */
+    -fx-scale-y: 0.97;
+    -fx-effect: innershadow(gaussian, rgba(255,255,255,0.25), 10, 0.2, 0, 0);
+}
+
+.text-field {
+    -fx-background-color: transparent;
+    -fx-text-fill: white;
+}
+
+.text-area {
+    -fx-background-color: transparent;
+    -fx-text-fill: white;
+}
+
+.text-area .scroll-pane {
+    -fx-background-color: transparent;
+}
+
+.text-area .scroll-pane .viewport {
+    -fx-background-color: transparent;
+}
+
+.text-area .content {
+    -fx-background-color: transparent;
+    -fx-text-fill: white;
+}
+
+/* ==== VERTICAL SCROLLBAR ==== */
+.scroll-pane .scroll-bar:vertical {
+    -fx-background-color: transparent;       /* background track */
+}
+
+.scroll-pane .scroll-bar:vertical .thumb {
+    -fx-background-color: #b1b1b1;           /* color of scroll thumb */
+    -fx-background-radius: 4px;
+}
+
+/* ==== HORIZONTAL SCROLLBAR ==== */
+.scroll-pane .scroll-bar:horizontal {
+    -fx-background-color: transparent;
+}
+
+.scroll-pane .scroll-bar:horizontal .thumb {
+    -fx-background-color: #b1b1b1;
+    -fx-background-radius: 4px;
+}
+
+/* ComboBox styling */
+.combo-box {
+    -fx-background-color: #2C3539;
+    -fx-text-fill: white;
+    -fx-border-color: #555;
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
+}
+
+.combo-box .list-cell {
+    -fx-background-color: #2C3539;
+    -fx-text-fill: white;
+}
+
+.combo-box .list-view {
+    -fx-background-color: #2C3539;
+    -fx-background-radius: 5;
+}
+
+.combo-box .list-view .list-cell {
+    -fx-background-color: #2C3539;
+    -fx-text-fill: white;
+}
+
+.combo-box .list-view .list-cell:hover {
+    -fx-background-color: #404040;
+}
+
+.combo-box .list-view .list-cell:selected {
+    -fx-background-color: #0079d3;
+}
+
+.combo-box .arrow {
+    -fx-background-color: white;
+}
+.post-card {
+    -fx-background-color: #1a1a1b;
+    -fx-background-radius: 5;
+    -fx-padding: 15;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 5, 0, 0, 2);
+}
+
+.post-card:hover {
+    -fx-background-color: #222;
+    -fx-cursor: hand;
+}
+
+/* Vote buttons */
+.vote-button {
+    -fx-background-color: transparent;
+    -fx-text-fill: #818384;
+    -fx-font-size: 20px;
+    -fx-padding: 0;
+    -fx-min-width: 40px;
+    -fx-min-height: 30px;
+}
+
+.vote-button:hover {
+    -fx-text-fill: #0079d3;
+    -fx-cursor: hand;
+}
+
+/* Subreddit info card */
+.subreddit-info-card {
+    -fx-background-color: #1a1a1b;
+    -fx-background-radius: 5;
+    -fx-padding: 15;
+    -fx-border-color: #343536;
+    -fx-border-width: 1;
+    -fx-border-radius: 5;
+}
+
+/* Sort button active state */
+.sort-button-active {
+    -fx-background-color: #0079d3;
+    -fx-text-fill: white;
+}
+
+.sort-button-inactive {
+    -fx-background-color: #2C3539;
+    -fx-text-fill: white;
+}
+
+.sort-button-inactive:hover {
+    -fx-background-color: #404040;
+}
+
+/* Moderator list item */
+.moderator-item {
+    -fx-padding: 5 0 5 0;
+}
+
+.moderator-item:hover {
+    -fx-background-color: #2a2a2a;
+    -fx-background-radius: 3;
+    -fx-cursor: hand;
+}
+
+/* Action buttons in posts */
+.action-button {
+    -fx-background-color: transparent;
+    -fx-text-fill: #818384;
+    -fx-font-size: 12px;
+    -fx-padding: 5 10 5 10;
+}
+
+.action-button:hover {
+    -fx-background-color: #2a2a2a;
+    -fx-text-fill: white;
+    -fx-cursor: hand;
+}

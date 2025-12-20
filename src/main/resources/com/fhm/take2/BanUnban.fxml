@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx/11"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.fhm.take2.BanUnbanController"
+      spacing="10"
+      style="-fx-background-color: #1A1A1B; -fx-padding: 20;">
+
+    <Label text="Ban Members"
+           style="-fx-text-fill: #D7DADC; -fx-font-size: 24px; -fx-font-weight: bold;" />
+
+    <HBox spacing="20" alignment="CENTER_LEFT">
+        <Label text="Select Subcreddit:"
+               style="-fx-text-fill: #D7DADC; -fx-font-size: 14px;" />
+        <ComboBox fx:id="subcredditComboBox" prefWidth="300" />
+
+        <Label text="Search User:"
+               style="-fx-text-fill: #D7DADC; -fx-font-size: 14px; -fx-padding: 0 0 0 20;" />
+        <TextField fx:id="searchUserField" prefWidth="200" promptText="Username or Email" />
+    </HBox>
+
+    <TableView fx:id="usersTable" prefHeight="400" VBox.vgrow="ALWAYS">
+        <columns>
+            <TableColumn fx:id="usernameColumn" text="Username" prefWidth="150" />
+            <TableColumn fx:id="emailColumn" text="Email" prefWidth="200" />
+            <TableColumn fx:id="joinDateColumn" text="Join Date" prefWidth="150" />
+            <TableColumn fx:id="statusColumn" text="Status" prefWidth="100" />
+            <TableColumn fx:id="actionColumn" text="Action" prefWidth="120" />
+        </columns>
+    </TableView>
+
+    <VBox spacing="10" style="-fx-padding: 10 0 0 0;">
+        <Label text="Ban Reason:" style="-fx-text-fill: #D7DADC; -fx-font-size: 14px;" />
+        <TextArea fx:id="reasonTextArea"
+                  promptText="Enter reason for ban..."
+                  prefHeight="60"
+                  wrapText="true" />
+    </VBox>
+
+    <HBox spacing="20" alignment="CENTER">
+        <Button fx:id="banButton" text="Ban Selected User" prefWidth="150" />
+        <Button fx:id="unbanButton" text="Unban (disabled)" prefWidth="150" />
+    </HBox>
+
+    <Label fx:id="statusLabel" text="Select a subcreddit to manage bans."
+           style="-fx-text-fill: #818384; -fx-font-size: 12px; -fx-padding: 10 0 0 0;" />
+
+</VBox>

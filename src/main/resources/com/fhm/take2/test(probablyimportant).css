@@ -1,9 +1,0 @@
-.button {
-    -fx-background-color: #0E1113; /* normal state color */
-    -fx-background-radius: 10; /* Some roundness to the button */
-}
-
-.button:hover {
-    -fx-background-color: #404040; /* hover color */
-    -fx-cursor: hand; /* hand cursor on hover */
-}
