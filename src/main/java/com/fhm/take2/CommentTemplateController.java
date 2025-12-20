@@ -2,6 +2,7 @@ package com.fhm.take2;
 
 import com.Client;
 import com.crdt.Comment;
+import com.crdt.Report;
 import com.crdt.User;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -11,18 +12,19 @@ import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Optional;
 
 public class CommentTemplateController {
 
@@ -60,6 +62,7 @@ public class CommentTemplateController {
     private int ind;
     private AddCommentPaneController addCommentPaneController = null;
     private int root;
+    private boolean moreOptioning = false;
 
     public void Init(Comment newComment, User user, int userVote, int replyLevel, ActualPostTemplateController parent, int root) {
         this.comment = newComment;
@@ -121,6 +124,19 @@ public class CommentTemplateController {
                 }
             }
         });
+
+        moreOptionsVBox.setVisible(false);
+        if(this.currentUser == null) {
+            moreOptionsVBox.setDisable(true);
+        }
+        else {
+            if (!this.currentUser.equals(this.comment.getAuthor())) {
+                moreOptionsVBox.getChildren().remove(editButton);
+                moreOptionsVBox.getChildren().remove(deleteButton);
+            } else {
+                moreOptionsVBox.getChildren().remove(reportButton);
+            }
+        }
     }
 
     private void ColorVote() {
@@ -260,15 +276,133 @@ public class CommentTemplateController {
     }
 
     @FXML
-    void MoreOptionsButton(MouseEvent event) {
-        System.out.println("More Options Pressed!");
+    void Report(MouseEvent event) {
+        try {
+            if(Client.ReportExists(new Report(0, this.currentUser, this.comment, null, null, null, null))) {
+                showAlert("Duplicate Report", "You have already submitted a report on this target!");
+                return;
+            }
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("create-report-page.fxml"));
+            Parent root = loader.load();
+            CreateReportPageController reportPageController = loader.getController();
+            Stage popup = new Stage();
+            popup.setTitle("Report Page");
+            popup.setScene(new Scene(root));
+            popup.initModality(Modality.APPLICATION_MODAL);
+            reportPageController.initData(this.currentUser, this.comment, popup);
+            popup.showAndWait();
+        }
+        catch (Exception ex) {
+            System.out.println(ex.getMessage());
+        }
         event.consume();
+    }
+
+    @FXML
+    void Edit(MouseEvent event) {
+        if(!replying) {
+            try {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("add-comment-pane.fxml"));
+                Node node = loader.load();
+
+                addCommentPaneController = loader.getController();
+                addCommentPaneController.editing = true;
+                addCommentPaneController.Init(currentUser, this.comment, this);
+                addCommentPaneController.commentButton.setText("Apply");
+
+                addCommentPaneController.cancelButton.setOnMouseClicked((mouseEvent) -> {
+                    this.parentPage.postsContainer.getChildren().remove(ind + 3 + (level == 0? 0 : root));
+                    addCommentPaneController.Clean();
+                    addCommentPaneController = null;
+                    replying = false;
+                });
+
+                ind = this.parentPage.parentCommentControllers.indexOf(this);
+                if(ind < 0)
+                    ind = this.parentPage.replyControllers.indexOf(this) + 1;
+                this.parentPage.postsContainer.getChildren().add(ind + 3 + (level == 0? 0 : root), node);
+            }
+            catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        else {
+            this.parentPage.postsContainer.getChildren().remove(ind + 3 + (level == 0? 0 : root));
+            addCommentPaneController.Clean();
+            addCommentPaneController = null;
+        }
+        replying = !replying;
+        event.consume();
+    }
+
+    @FXML
+    void Delete(MouseEvent event) {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Confirm Action");
+        alert.setHeaderText("Delete comment?");
+        alert.setContentText("Are you sure you want to delete this comment?");
+
+        Optional<ButtonType> result = alert.showAndWait();
+
+        if (result.isPresent() && result.get() == ButtonType.OK) {
+            try {
+                Client.DeleteComment(this.comment);
+                GoHome();
+            }
+            catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else {
+            MoreOptionsButton();
+        }
+        event.consume();
+    }
+
+    @FXML
+    void MoreOptionsButton() {
+        moreOptioning = !moreOptioning;
+        moreOptionsVBox.setVisible(moreOptioning);
+    }
+
+    private void GoHome() {
+        Clean();
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("home-page.fxml"));
+            Parent root = loader.load();
+
+            HomePageController homePageController = loader.getController();
+            homePageController.InitData(currentUser, "", 0);
+
+            // Create the second scene
+            Scene scene2 = new Scene(root);
+            // Get the current stage
+            Stage stage = (Stage)contentLabel.getScene().getWindow();
+            // Set the new scene
+            stage.setScene(scene2);
+        }
+        catch (Exception ex) {
+            System.out.println(ex.getMessage());
+        }
     }
 
     public void Clean() {
         if(mediaViewController != null) {
             mediaViewController.Clean();
         }
+    }
+
+    private void showAlert(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+
+        // Style the alert to match our dark theme
+        DialogPane dialogPane = alert.getDialogPane();
+        dialogPane.setStyle("-fx-background-color: #0E1113;");
+        dialogPane.lookup(".content.label").setStyle("-fx-text-fill: white;");
+
+        alert.showAndWait();
     }
 
     int GetCommentID() {return this.comment.getID();}

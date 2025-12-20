@@ -27,16 +27,18 @@ import java.nio.file.Files;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
 public class AddCommentPaneController {
 
     @FXML private AnchorPane commentAnchor;
-    @FXML private Button commentButton;
+    @FXML Button commentButton;
     @FXML private StackPane commentMediaPane;
     @FXML private TextArea commentTextArea;
     @FXML Button cancelButton;
+    boolean editing = false;
 
     private MediaViewController commentMediaViewController;
     private BooleanProperty validCommentInfo = new SimpleBooleanProperty(false);
@@ -49,6 +51,13 @@ public class AddCommentPaneController {
         this.currentUser = user;
         this.parentComment = comment;
         this.parentController = parent;
+
+        if(editing) {
+            commentTextArea.setText(comment.getContent());
+            if(comment.getMedia() != null && !comment.getMedia().GetURL().isBlank()) {
+                commentMediaViewController.init(new ArrayList<>(Arrays.asList(comment.getMedia())), 2, new ArrayList<>());
+            }
+        }
 
         int[] lastLineCount = { 1 };
         commentTextArea.textProperty().addListener((obs, oldText, newText) -> {
@@ -175,55 +184,97 @@ public class AddCommentPaneController {
             return;
         }
 
-        try {
-            String content = commentTextArea.getText();
-
-            String mediaUrl = "";
-            MediaType mediaType = MediaType.NONE;
+        if(editing) {
+            this.parentComment.setContent(this.commentTextArea.getText());
 
             Media media = null;
+            String mediaUrl = "";
+            MediaType mediaType = MediaType.NONE;
             if(commentMediaViewController != null) {
-                File selectedFile = commentMediaViewController.GetFileArrayList().getFirst();
-                String uploadResponse = Client.UploadFile(selectedFile);
-                if (uploadResponse.isBlank()) {
-                    new Alert(Alert.AlertType.ERROR, "Server unreachable! Check your connection and try again!").showAndWait();
-                    return;
+                if(commentMediaViewController.getMediaArrayList() != null)
+                    this.parentComment.setMedia(commentMediaViewController.getMediaArrayList().getFirst());
+                else {
+                    try {
+                        File selectedFile = commentMediaViewController.GetFileArrayList().getFirst();
+                        String uploadResponse = Client.UploadFile(selectedFile);
+                        if (uploadResponse.isBlank()) {
+                            new Alert(Alert.AlertType.ERROR, "Server unreachable! Check your connection and try again!").showAndWait();
+                            return;
+                        }
+                        Map<?, ?> json = Client.GetResponse(uploadResponse);
+                        mediaUrl = (String) json.get("url");
+                        // Detect media type
+                        String mime = Files.probeContentType(selectedFile.toPath());
+                        if (mime != null) {
+                            if (mime.startsWith("image/")) mediaType = MediaType.IMAGE;
+                            else if (mime.startsWith("video/")) mediaType = MediaType.VIDEO;
+                            else if (mime.startsWith("audio/")) mediaType = MediaType.AUDIO;
+                            else mediaType = MediaType.OTHER;
+                        }
+                        media = new Media(mediaType, mediaUrl);
+                    }
+                    catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
-                Map<?, ?> json = Client.GetResponse(uploadResponse);
-                mediaUrl = (String) json.get("url");
-                // Detect media type
-                String mime = Files.probeContentType(selectedFile.toPath());
-                if (mime != null) {
-                    if (mime.startsWith("image/")) mediaType = MediaType.IMAGE;
-                    else if (mime.startsWith("video/")) mediaType = MediaType.VIDEO;
-                    else if (mime.startsWith("audio/")) mediaType = MediaType.AUDIO;
-                    else mediaType = MediaType.OTHER;
-                }
-                media = new Media(mediaType, mediaUrl);
             }
-
-            // Now send post JSON
-            Comment comment = new Comment(0, this.parentComment.getPost(), this.currentUser, content, media, this.parentComment.getID(), 0, 0, Timestamp.from(Instant.now()), Timestamp.from(Instant.now()), false);
-            int id = Client.CreateComment(comment);
-            if (id > 0) {
-                comment.setId(id);
-                Alert alert = new Alert(Alert.AlertType.INFORMATION, "Comment uploaded successfully!");
-                alert.showAndWait();
-                if(commentMediaViewController != null) {
-                    commentMediaViewController.Clean();
-                    RemoveMediaPane();
-                }
-                parentController.reply = comment;
+            try {
+                Client.EditComment(this.parentComment);
                 parentController.addedReply.set(true);
             }
-            else {
-                Alert alert = new Alert(Alert.AlertType.ERROR, "Failed to send post!");
-                alert.showAndWait();
+            catch (Exception e) {
+                e.printStackTrace();
             }
         }
-        catch (Exception ex) {
-            ex.printStackTrace();
-            new Alert(Alert.AlertType.ERROR, "Error: " + ex.getMessage()).showAndWait();
+        else {
+            try {
+                String content = commentTextArea.getText();
+
+                String mediaUrl = "";
+                MediaType mediaType = MediaType.NONE;
+
+                Media media = null;
+                if (commentMediaViewController != null) {
+                    File selectedFile = commentMediaViewController.GetFileArrayList().getFirst();
+                    String uploadResponse = Client.UploadFile(selectedFile);
+                    if (uploadResponse.isBlank()) {
+                        new Alert(Alert.AlertType.ERROR, "Server unreachable! Check your connection and try again!").showAndWait();
+                        return;
+                    }
+                    Map<?, ?> json = Client.GetResponse(uploadResponse);
+                    mediaUrl = (String) json.get("url");
+                    // Detect media type
+                    String mime = Files.probeContentType(selectedFile.toPath());
+                    if (mime != null) {
+                        if (mime.startsWith("image/")) mediaType = MediaType.IMAGE;
+                        else if (mime.startsWith("video/")) mediaType = MediaType.VIDEO;
+                        else if (mime.startsWith("audio/")) mediaType = MediaType.AUDIO;
+                        else mediaType = MediaType.OTHER;
+                    }
+                    media = new Media(mediaType, mediaUrl);
+                }
+
+                // Now send post JSON
+                Comment comment = new Comment(0, this.parentComment.getPost(), this.currentUser, content, media, this.parentComment.getID(), 0, 0, Timestamp.from(Instant.now()), Timestamp.from(Instant.now()), false);
+                int id = Client.CreateComment(comment);
+                if (id > 0) {
+                    comment.setId(id);
+                    Alert alert = new Alert(Alert.AlertType.INFORMATION, "Comment uploaded successfully!");
+                    alert.showAndWait();
+                    if (commentMediaViewController != null) {
+                        commentMediaViewController.Clean();
+                        RemoveMediaPane();
+                    }
+                    parentController.reply = comment;
+                    parentController.addedReply.set(true);
+                } else {
+                    Alert alert = new Alert(Alert.AlertType.ERROR, "Failed to send post!");
+                    alert.showAndWait();
+                }
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                new Alert(Alert.AlertType.ERROR, "Error: " + ex.getMessage()).showAndWait();
+            }
         }
 
         event.consume();
