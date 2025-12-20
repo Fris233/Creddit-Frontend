@@ -80,6 +80,47 @@ public class HomePageController {
 
         if(this.filter == 0){
 
+            filterHBox.setVisible(!searchPrompt.isBlank());
+
+            try {
+                Map<Post, Integer> postFeed = Client.GetPostFeed(currentUser, searchPrompt, 0);
+                for (Post post : postFeed.keySet()) {
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource("Post_Preview_Template.fxml"));
+                    Node postNode = loader.load();
+                    PostPreviewTemplateController controller = loader.getController();
+                    controller.init(post, user, postFeed.get(post));
+                    postsContainer.getChildren().add(postNode);
+                    postPreviewControllers.add(controller);
+                }
+            }
+            catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            postsScrollPane.vvalueProperty().addListener((obs, oldVal, newVal) -> {
+                if(!updating && !scrollCooldown && newVal.doubleValue() >= postsScrollPane.getVmax()) {
+                    updating = true;
+                    scrollCooldown = true;
+                    try {
+                        Map<Post, Integer> postFeed = Client.GetPostFeed(currentUser, searchPrompt, postPreviewControllers.getLast().GetPostID());
+                        for (Post post : postFeed.keySet()) {
+                            FXMLLoader loader = new FXMLLoader(getClass().getResource("Post_Preview_Template.fxml"));
+                            Node postNode = loader.load();
+                            PostPreviewTemplateController controller = loader.getController();
+                            controller.init(post, user, postFeed.get(post));
+                            postsContainer.getChildren().add(postNode);
+                            postPreviewControllers.add(controller);
+                        }
+                    }
+                    catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    updating = false;
+                    PauseTransition pause = new PauseTransition(Duration.seconds(2));
+                    pause.setOnFinished(e -> scrollCooldown = false);
+                    pause.play();
+                }
+            });
 
         } else if(this.filter == 1){
             filterHBox.setVisible(true);
