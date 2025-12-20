@@ -184,5 +184,24 @@
             <Cursor fx:constant="HAND" />
          </cursor>
       </VBox>
+      <VBox fx:id="moreOptionsVBox" layoutX="429.0" layoutY="59.0" prefWidth="106.0" style="-fx-background-color: #181c1f;">
+         <children>
+            <Button fx:id="reportButton" layoutX="10.0" layoutY="50.0" mnemonicParsing="false" onMouseClicked="#Report" prefHeight="40.0" prefWidth="118.0" style="-fx-background-radius: 10; -fx-text-fill: #ffffff;" text="Report" textFill="#c6151500">
+               <font>
+                  <Font size="18.0" />
+               </font>
+            </Button>
+            <Button fx:id="editButton" layoutX="10.0" layoutY="88.0" mnemonicParsing="false" onMouseClicked="#Edit" prefHeight="40.0" prefWidth="118.0" style="-fx-background-radius: 10; -fx-text-fill: #ffffff;" text="Edit" textFill="#c6151500">
+               <font>
+                  <Font size="18.0" />
+               </font>
+            </Button>
+            <Button fx:id="deleteButton" layoutX="10.0" layoutY="127.0" mnemonicParsing="false" onMouseClicked="#Delete" prefHeight="40.0" prefWidth="118.0" style="-fx-background-radius: 10; -fx-text-fill: #ffffff;" text="Delete" textFill="#c6151500">
+               <font>
+                  <Font size="18.0" />
+               </font>
+            </Button>
+         </children>
+      </VBox>
    </children>
 </AnchorPane>

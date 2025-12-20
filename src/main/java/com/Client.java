@@ -687,4 +687,30 @@ public abstract class Client {
     public static boolean EditComment(Comment comment) throws Exception {
         return comment.update(BASE_URL, gson);
     }
+
+
+    public static ArrayList<Integer> GetAnalytics(User user) throws Exception {
+        if(user instanceof Admin) {
+            String jsonBody = gson.toJson(user, User.class);
+            URL url = new URL(BASE_URL + "/analytics");
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("POST");
+            conn.setDoOutput(true);
+            conn.setRequestProperty("Content-Type", "application/json");
+            try (OutputStream os = conn.getOutputStream()) {
+                os.write(jsonBody.getBytes());
+            }
+
+            BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+            StringBuilder sb = new StringBuilder();
+            String line;
+            while ((line = reader.readLine()) != null) sb.append(line);
+            reader.close();
+
+            return new ArrayList<>(Arrays.asList(gson.fromJson(sb.toString(), Integer[].class)));
+        }
+        else {
+            return null;
+        }
+    }
 }
