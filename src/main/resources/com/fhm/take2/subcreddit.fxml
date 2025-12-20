@@ -5,6 +5,7 @@
 <?import javafx.geometry.Point3D?>
 <?import javafx.scene.Cursor?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
@@ -19,7 +20,6 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<?import javafx.scene.control.Label?>
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="900.0" prefWidth="1600.0" style="-fx-background-color: #0E1113;" stylesheets="@CredditCSS.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.fhm.take2.SubcredditController">
     <children>
         <ScrollPane fx:id="postsScrollPane" layoutX="307.0" layoutY="84.0" prefHeight="817.0" prefWidth="908.0" style="-fx-background-color: #0E1113; -fx-background: #0E1113;" stylesheets="@CredditCSS.css">
@@ -222,27 +222,15 @@
                             <VBox fx:id="moderatorsList" spacing="5.0" />
 
                             <!-- Moderation Tools Box -->
-                            <VBox fx:id="moderationToolsBox"
-                                  visible="false"
-                                  managed="false"
-                                  style="-fx-background-color: #1A1A1B; -fx-border-color: #343536; -fx-border-width: 1; -fx-border-radius: 4; -fx-padding: 16;"
-                                  spacing="8">
+                            <VBox fx:id="moderationToolsBox" managed="false" spacing="8" style="-fx-background-color: #1A1A1B; -fx-border-color: #343536; -fx-border-width: 1; -fx-border-radius: 4; -fx-padding: 16;" visible="false">
 
-                                <Label fx:id="modToolsLabel"
-                                       text="Moderation Tools"
-                                       style="-fx-text-fill: #D7DADC; -fx-font-size: 16px; -fx-font-weight: bold;" />
+                                <Label fx:id="modToolsLabel" style="-fx-text-fill: #D7DADC; -fx-font-size: 16px; -fx-font-weight: bold;" text="Moderation Tools" />
 
-                                <Button fx:id="banUnbanButton"
-                                        text="Ban/Unban Users"
-                                        prefWidth="200" />
+                                <Button fx:id="banUnbanButton" prefWidth="200" text="Ban/Unban Users" />
 
-                                <Button fx:id="editRulesButton"
-                                        text="Edit Rules"
-                                        prefWidth="200" />
+                                <Button fx:id="editRulesButton" prefWidth="200" text="Edit Rules" />
 
-                                <Button fx:id="viewReportsButton"
-                                        text="View Reports"
-                                        prefWidth="200" />
+                                <Button fx:id="viewReportsButton" prefWidth="200" text="View Reports" />
 
                             </VBox>
                         </VBox>
@@ -254,7 +242,5 @@
                 <URL value="@CredditCSS.css" />
             </stylesheets>
         </AnchorPane>
-        <Button fx:id="commentReport" layoutX="1163.0" layoutY="92.0" mnemonicParsing="false" onMouseClicked="#CommentReports" text="Comment Reports" />
-        <Button fx:id="postReport" layoutX="1192.0" layoutY="121.0" mnemonicParsing="false" onMouseClicked="#PostReports" text="Post Reports" />
     </children>
 </AnchorPane>
