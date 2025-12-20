@@ -869,6 +869,19 @@ public class ActualPostTemplateController {
         }
         System.out.println("Profile Button Pressed");
         Clean();
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("my-profile-page.fxml"));
+            Parent root = loader.load();
+
+            MyProfilePageController myProfilePageController = loader.getController();
+            myProfilePageController.initData(this.currentUser, "", true, false, false, false, false, false);
+
+            Stage stage = (Stage) postsContainer.getScene().getWindow();
+            stage.setScene(new Scene(root));
+        }
+        catch (Exception ex) {
+            System.out.println(ex.getMessage());
+        }
         event.consume();
     }
 
