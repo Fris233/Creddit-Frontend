@@ -219,10 +219,23 @@
                         <Button mnemonicParsing="false" onMouseClicked="#showSubcredditRules" prefHeight="40.0" prefWidth="330.0" style="-fx-background-color: #2C3539; -fx-text-fill: white; -fx-font-weight: bold;" text="See Rules" />
                         <VBox spacing="10.0">
                             <Text fill="#818384" style="-fx-font-weight: bold;" text="MODERATORS" />
-                                <VBox fx:id="moderatorsList" spacing="5.0" />visible="false" managed="false" style="-fx-background-color: #1A1A1B; -fx-border-color: #343536; -fx-border-width: 1; -fx-border-radius: 4; -fx-padding: 16;" spacing="8">
-                                    <Label fx:id="modToolsLabel" text="Moderation Tools" style="-fx-text-fill: #D7DADC; -fx-font-size: 16px; -fx-font-weight: bold;" />
-                                        <Button fx:id="banUnbanButton" text="Ban/Unban Users" prefWidth="200" />
-                                        <Button fx:id="viewReportsButton" text="View Reports" prefWidth="200" />
+                            <VBox fx:id="moderatorsList" spacing="5.0" />
+
+                            <!-- Moderation Tools Box -->
+                            <VBox fx:id="moderationToolsBox"
+                                  managed="false"
+                                  style="-fx-background-color: #1A1A1B; -fx-border-color: #343536; -fx-border-width: 1; -fx-border-radius: 4; -fx-padding: 16;"
+                                  spacing="8">
+
+                                <Label fx:id="modToolsLabel"
+                                       text="Moderation Tools"
+                                       style="-fx-text-fill: #D7DADC; -fx-font-size: 16px; -fx-font-weight: bold;" />
+
+                                <Button fx:id="banUnbanButton"
+                                        text="Ban/Unban Users"
+                                        prefWidth="200" />
+
+                            </VBox>
                         </VBox>
                     </children>
                 </VBox>
