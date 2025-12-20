@@ -554,11 +554,21 @@ public class ActualPostTemplateController {
     void OpenSubcreddit(MouseEvent event) {
         if(mediaViewController != null)
             mediaViewController.Clean();
-        if(post.GetSubcreddit() == null) {
-            System.out.println("Open user profile");
-        }
-        else {
+        if(post.GetSubcreddit() != null) {
             System.out.println("Open Subcreddit Pressed!");
+            try {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("subcreddit.fxml"));
+                Parent root = loader.load();
+
+                SubcredditController controller = loader.getController();
+                controller.InitData(post.GetSubcreddit().GetSubId(), "", currentUser);
+
+                Stage stage = (Stage) JoinButton.getScene().getWindow();
+                stage.setScene(new Scene(root));
+            }
+            catch (Exception ex) {
+                System.out.println(ex.getMessage());
+            }
         }
         event.consume();
     }
@@ -869,6 +879,19 @@ public class ActualPostTemplateController {
         }
         System.out.println("Profile Button Pressed");
         Clean();
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("my-profile-page.fxml"));
+            Parent root = loader.load();
+
+            MyProfilePageController myProfilePageController = loader.getController();
+            myProfilePageController.initData(this.currentUser, "", true, false, false, false, false, false);
+
+            Stage stage = (Stage) postsContainer.getScene().getWindow();
+            stage.setScene(new Scene(root));
+        }
+        catch (Exception ex) {
+            System.out.println(ex.getMessage());
+        }
         event.consume();
     }
 

@@ -25,7 +25,7 @@ public class ViewMiniSubcredditControllet {
         this.currentUser = currentUser;
         if (subcreddit == null)
             return;
-        if(subcreddit.GetLogo() != null)
+        if(subcreddit.GetLogo() != null && !subcreddit.GetLogo().GetURL().equals(""))
             subPFP.setImage(new Image(subcreddit.GetLogo().GetURL()));
         subName.setText(subcreddit.GetSubName());
         subDescription.setText(subcreddit.GetDescription());
