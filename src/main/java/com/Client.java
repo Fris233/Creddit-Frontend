@@ -746,7 +746,7 @@ public abstract class Client {
         Comment[] parents = {comment};
         Map<Integer, Comment[]> lv1 = gson.fromJson(jsonObj.get("lv1"), commentMapType);
         Map<Integer, Comment[]> lv2 = gson.fromJson(jsonObj.get("lv2"), commentMapType);
-        Map<Integer, Integer> votes = gson.fromJson(jsonObj.get("lv2"), id_vote_type);
+        Map<Integer, Integer> votes = gson.fromJson(jsonObj.get("votes"), id_vote_type);
 
         return new CommentFeed(parents, lv1, lv2, votes);
     }

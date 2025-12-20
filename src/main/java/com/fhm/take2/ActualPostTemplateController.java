@@ -928,7 +928,7 @@ public class ActualPostTemplateController {
             Parent root = loader.load();
 
             ActualPostTemplateController actualPostTemplateController = loader.getController();
-            actualPostTemplateController.InitData(post.GetID(), this.comment.getID(), currentUser);
+            actualPostTemplateController.InitData(post.GetID(), this.comment == null? 0 : this.comment.getID(), currentUser);
 
             // Get the current stage
             Stage stage = (Stage) JoinButton.getScene().getWindow();

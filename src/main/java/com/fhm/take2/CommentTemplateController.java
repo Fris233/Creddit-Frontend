@@ -347,7 +347,7 @@ public class CommentTemplateController {
         if (result.isPresent() && result.get() == ButtonType.OK) {
             try {
                 Client.DeleteComment(this.comment);
-                GoHome();
+                this.parentPage.Refresh();
             }
             catch (Exception e) {
                 e.printStackTrace();

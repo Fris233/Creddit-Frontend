@@ -54,7 +54,7 @@ public class AddCommentPaneController {
 
         if(editing) {
             commentTextArea.setText(comment.getContent());
-            if(comment.getMedia() != null && !comment.getMedia().GetURL().isBlank()) {
+            if(commentMediaViewController != null && comment.getMedia() != null && !comment.getMedia().GetURL().isBlank()) {
                 commentMediaViewController.init(new ArrayList<>(Arrays.asList(comment.getMedia())), 2, new ArrayList<>());
             }
         }

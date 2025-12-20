@@ -63,7 +63,7 @@ public class Comment implements Voteable, Reportable {
     public boolean delete(String BASE_URL, Gson gson) throws Exception {
         String jsonBody = gson.toJson(this, Comment.class);
 
-        URL url = new URL(BASE_URL + "/post/delete");
+        URL url = new URL(BASE_URL + "/comment/delete");
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         conn.setRequestMethod("POST");
         conn.setDoOutput(true);
@@ -79,7 +79,7 @@ public class Comment implements Voteable, Reportable {
     public boolean update(String BASE_URL, Gson gson) throws Exception {
         String jsonBody = gson.toJson(this, Post.class);
 
-        URL url = new URL(BASE_URL + "/post/edit");
+        URL url = new URL(BASE_URL + "/comment/edit");
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         conn.setRequestMethod("POST");
         conn.setDoOutput(true);
