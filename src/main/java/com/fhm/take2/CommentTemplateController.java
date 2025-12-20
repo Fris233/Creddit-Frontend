@@ -40,6 +40,10 @@ public class CommentTemplateController {
     @FXML private AnchorPane voteAnchor;
     @FXML private VBox anchor;
     @FXML private Label votesLabel;
+    @FXML private VBox moreOptionsVBox;
+    @FXML private Button reportButton;
+    @FXML private Button editButton;
+    @FXML private Button deleteButton;
 
     private User currentUser;
     private Comment comment;
