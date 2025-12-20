@@ -320,7 +320,7 @@ public class SubcredditController {
     // Open the Ban/Unban manager
     private void openBanUnbanManager() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/fhm/take2/BanUnbanView.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/fhm/take2/BanUnban.fxml"));
             Parent banUnbanView = loader.load();
             BanUnbanController controller = loader.getController();
             controller.init(currentUser);
