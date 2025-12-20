@@ -514,4 +514,10 @@ public class HomePageController {
         filter = 1;
         Refresh();
     }
+
+    @FXML
+    public void onFilterCommentPressed(MouseEvent event) {
+        filter = 3;
+        Refresh();
+    }
 }
