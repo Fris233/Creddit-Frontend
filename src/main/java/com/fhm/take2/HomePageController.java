@@ -1,10 +1,7 @@
 package com.fhm.take2;
 
 import com.Client;
-import com.crdt.Comment;
-import com.crdt.Post;
-import com.crdt.Subcreddit;
-import com.crdt.User;
+import com.crdt.*;
 import javafx.animation.PauseTransition;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -47,6 +44,8 @@ public class HomePageController {
     @FXML private Button filterPosts;
     @FXML private Button filterSubcreddits;
     @FXML private Button filterUsers;
+    @FXML private AnchorPane analyticsAnchor;
+    @FXML private AnchorPane reportsAnchor;
 
     private User currentUser;
     private ArrayList<PostPreviewTemplateController> postPreviewControllers;
@@ -207,7 +206,14 @@ public class HomePageController {
                 }
             });
         }
-
+        if(this.currentUser instanceof Admin) {
+            reportsAnchor.setVisible(true);
+            analyticsAnchor.setVisible(true);
+        }
+        else {
+            reportsAnchor.setVisible(false);
+            analyticsAnchor.setVisible(false);
+        }
     }
 
     private void updateLoginUI() {
