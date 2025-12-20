@@ -103,6 +103,8 @@ public class Comment implements Voteable, Reportable {
     public int getReplyCount() {return replyCount;}
 
     public void setId(int id) {this.id = id;}
+    public void setContent(String content) {this.content = content;}
+    public void setMedia(Media media) {this.media = media;}
 
     @Override
     public boolean equals(Object obj) {
