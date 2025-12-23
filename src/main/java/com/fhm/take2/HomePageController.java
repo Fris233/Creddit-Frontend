@@ -59,8 +59,8 @@ public class HomePageController {
         currentUser = user;
         this.filter = filter;
         this.searchField.setText(searchPrompt);
-        //if(currentUser != null && currentUser.getPfp() != null && !currentUser.getPfp().GetURL().isBlank())
-            //userPFP.setImage(new Image(currentUser.getPfp().GetURL(), true));
+        if(currentUser != null && currentUser.getPfp() != null && currentUser.getPfp().GetURL() != null && !currentUser.getPfp().GetURL().isBlank())
+            userPFP.setImage(new Image(currentUser.getPfp().GetURL(), true));
         postPreviewControllers = new ArrayList<>();
         filterCommentTemplateControllers = new ArrayList<>();
         viewMiniSubcredditControllets = new ArrayList<>();

@@ -499,11 +499,39 @@ public class MediaViewController {
     void RemoveMedia() {
         if(mode == 0)
             return;
-        fileArrayList.remove(currentMediaIndex);
+        if(mode == 2) {
+            if(currentMediaIndex >= mediaArrayList.size())
+                fileArrayList.remove(currentMediaIndex - mediaArrayList.size());
+            else
+                mediaArrayList.remove(currentMediaIndex);
+        }
+        else
+            fileArrayList.remove(currentMediaIndex);
         if(fileArrayList.isEmpty() && (mediaArrayList == null || mediaArrayList.isEmpty())) {
             done.set(true);
             return;
         }
+        if(images.containsKey(currentMediaIndex))
+            images.remove(currentMediaIndex);
+        else if(mediaPlayers.containsKey(currentMediaIndex))
+            mediaPlayers.remove(currentMediaIndex);
+        ArrayList<Integer> modifications = new ArrayList<>();
+        for(int k : images.keySet())
+            if(k > currentMediaIndex)
+                modifications.add(k);
+        for(int m : modifications) {
+            images.put(m-1, images.get(m));
+            images.remove(m);
+        }
+
+        for(int k : mediaPlayers.keySet())
+            if(k > currentMediaIndex)
+                modifications.add(k);
+        for(int m : modifications) {
+            mediaPlayers.put(m-1, mediaPlayers.get(m));
+            mediaPlayers.remove(m);
+        }
+
         if(currentMediaIndex > 0 && currentMediaIndex == (fileArrayList.size() - (mode == 2? mediaArrayList.size() : 0)))
             currentMediaIndex--;
         PrevNextButtons();

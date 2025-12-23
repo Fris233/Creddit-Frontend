@@ -90,10 +90,12 @@ public class PostPreviewTemplateController {
             catch (Exception e) {
                 e.printStackTrace();
             }
-            //subPFP.setImage(new Image(post.GetSubcreddit().GetLogo().GetURL(), true));
+            if(post.GetSubcreddit().GetLogo() != null && post.GetSubcreddit().GetLogo().GetURL() != null && !post.GetSubcreddit().GetLogo().GetURL().isBlank())
+                subPFP.setImage(new Image(post.GetSubcreddit().GetLogo().GetURL(), true));
         }
         else {
-            //subPFP.setImage(new Image(post.GetAuthor().getPfp().GetURL(), true));
+            if(post.GetAuthor().getPfp() != null && post.GetAuthor().getPfp().GetURL() != null && !post.GetAuthor().getPfp().GetURL().isBlank())
+                subPFP.setImage(new Image(post.GetAuthor().getPfp().GetURL(), true));
         }
         UpdateJoinButton();
     }

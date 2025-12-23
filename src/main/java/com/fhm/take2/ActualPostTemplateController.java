@@ -143,11 +143,11 @@ public class ActualPostTemplateController {
             catch (Exception e) {
                 e.printStackTrace();
             }
-            if(post.GetSubcreddit().GetLogo() != null && !post.GetSubcreddit().GetLogo().GetURL().isBlank())
+            if(post.GetSubcreddit().GetLogo() != null && post.GetSubcreddit().GetLogo().GetURL() != null && !post.GetSubcreddit().GetLogo().GetURL().isBlank())
                 subPFP.setImage(new Image(post.GetSubcreddit().GetLogo().GetURL(), true));
         }
         else {
-            if(post.GetAuthor().getPfp() != null && !post.GetAuthor().getPfp().GetURL().isBlank())
+            if(post.GetAuthor().getPfp() != null && post.GetSubcreddit().GetLogo().GetURL() != null && !post.GetAuthor().getPfp().GetURL().isBlank())
                 subPFP.setImage(new Image(post.GetAuthor().getPfp().GetURL(), true));
         }
         UpdateJoinButton();

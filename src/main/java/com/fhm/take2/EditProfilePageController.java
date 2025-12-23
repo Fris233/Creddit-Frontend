@@ -48,8 +48,8 @@ public class EditProfilePageController {
 
     public void initdata(User user) throws Exception {
         this.user = user;
-        /*if(user.getPfp() != null && !user.getPfp().GetURL().isBlank())
-            userPFP.setImage(new Image(user.getPfp().GetURL(), true));*/
+        if(user.getPfp() != null && user.getPfp().GetURL() != null && !user.getPfp().GetURL().isBlank())
+            userPFP.setImage(new Image(user.getPfp().GetURL(), true));
         usernameTextField.setText(user.getUsername());
         passwordTextField.setText(user.getPassword());
         bioTextArea.setText(user.getBio());
